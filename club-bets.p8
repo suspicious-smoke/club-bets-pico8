@@ -44,8 +44,10 @@ end
 function _draw()
 	cls()
 	for i=1,4 do
-		print(ceil(odds[i]*100).."%",10,10*i)
+		print(odds[i].."%",10,10*i)
+		print(get_display_odds(odds[i])..":1",30,10*i)
 	end
+	
 	_drw()
 
 	--debug
@@ -67,7 +69,6 @@ function calculate_odds(plyr_base)
 		for die=3,18 do
 			local p_prob=d6x3[die]
 			local p_score=p_base+die
-			--p(a=3) x p(b)
 			-- we have our die roll
 			--opponent probabilities
 			for o=1,4 do
@@ -86,19 +87,20 @@ function calculate_odds(plyr_base)
 			end
 			total_prob+=p_prob
 		end
-		_odds[p]=total_prob
+		_odds[p]=ceil(total_prob*100)
 	end
 	return _odds
 end
 
-function get_display_odds(odd)
-	local _perc=odd*100
+
+function get_display_odds(_odd)
 	local _percs={40,30,25,20,15,10,7, 5, 3, 4, 1}
 	local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
 	for i=1,#_percs do
-		if _perc>=_percs[i] then
-			return _podds
+		if _odd>=_percs[i] then
+			return _podds[i]
 		end
+	end
 end
 
 -->8
