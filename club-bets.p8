@@ -20,6 +20,7 @@ function _init()
 	}
 	
 	plyr_base={11,13,9,10}
+	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
 			.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046
