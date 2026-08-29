@@ -20,6 +20,7 @@ function _init()
 	}
 	
 	plyr_base={11,13,9,10}
+	
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -43,11 +44,26 @@ end
 
 function _draw()
 	cls()
+--	for i=1,4 do
+--		print(odds[i].."%",10,8*i)
+--		print(get_display_odds(odds[i])..":1",30,8*i)
+--	end
+bet_sel=1
+	dashes="-------------------------------"
+	local gc={1,4,2,3}
+	grd_off=3
 	for i=1,4 do
-		print(odds[i].."%",10,10*i)
-		print(get_display_odds(odds[i])..":1",30,10*i)
+		for j=1,4 do
+			rrectfill(4,j*7+(i-1)*30-9+grd_off,120,7,0,6+j%2)
+			print("th 2:1",6,j*7+(i-1)*30-8+grd_off,gc[i])
+			for k=1,10 do
+			print("●",24+k*9,j*7+(i-1)*30-8+grd_off,5)
+		end
+		end
 	end
-	
+	--info area
+	rrectfill(4,120,120,7,0,5)
+	print("bet "..bet_sel..". odds:13:1"..". pays:1000000",5,121,7)
 	_drw()
 
 	--debug
