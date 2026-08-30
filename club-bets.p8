@@ -103,8 +103,8 @@ end
 function draw_quickbetpage()
 	local gc={1,4,2,3}
 	-- color change to 6 \f6
-	for i=1,4 do
-		for j=1,4 do
+	for i=1,4 do--arena
+		for j=1,4 do--player
 			--background rows
 			rrectfill(1,j*7+(i-1)*28-6,126,7,0,6+j%2)
 			print("thh 13:1",2,j*7+(i-1)*28-5,gc[i])
