@@ -41,7 +41,7 @@ function _init()
 		{"behold","bhd",16},
 		{"king","kng",18},
 	}
-	
+	arenas={}
 	plyr_base={11,13,9,10}
 	
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
@@ -129,8 +129,11 @@ function toggle_bet()
 end
 
 function draw_quickbetpage()
-	local gc={1,4,2,3}
-	-- color change to 6 \f6
+	local gc={1,4,2,3}--arena text colors
+
+	for i=1,16 do--players in arenas
+		
+	end
 	for i=1,4 do--arena
 		for j=1,4 do--player
 			--background rows
@@ -159,37 +162,42 @@ function draw_quickbetpage()
 end
 -->8
 --calculations
-function calculate_odds(plyr_base)
+function calculate_odds()
 	--loop through the players
-	local _odds={0,0,0,0}
-	for p=1,4 do
-		local total_prob=0
-		local p_base=plyr_base[p]
-		--16 possibilities for dice rolls
-		for die=3,18 do
-			local p_prob=d6x3[die]
-			local p_score=p_base+die
-			-- we have our die roll
-			--opponent probabilities
-			for o=1,4 do
-				if o!=p then--opp!=plyr
-					local o_prob=0
-					local o_base=plyr_base[o]
-					for o_die=3,18 do
-						--get player scores that beat opponent's score
-						if o_base+o_die<p_score then
-							o_prob+=d6x3[o_die]
+	odds={}
+	for _arena=1,4 do
+		for _cplyr=1,4 do
+			local total_prob=0
+			local _plyr=(1-_arena)*4+_cplyr--gets the arena from the list of 16 (ie 1-4,5-8, etc)
+			local p_base=players[_plyr][3]
+			--16 possibilities for dice rolls
+			for die=3,18 do
+				local p_prob=d6x3[die]
+				local p_score=p_base+die
+				-- we have our die roll
+				--opponent probabilities
+				for _copp=1,4 do
+					local _opp=(1-_arena)*4+_copp
+					if _opp!=_plyr then--opp!=plyr
+						local o_prob=0
+						local o_base=players[_opp]
+						for o_die=3,18 do
+							--get player scores that beat opponent's score
+							if o_base+o_die<p_score then
+								o_prob+=d6x3[o_die]
+							end
 						end
-					end
-					--multiply opponent prob to player prob
-					p_prob=p_prob*o_prob
-				end 
+						--multiply opponent prob to player prob
+						p_prob=p_prob*o_prob
+					end 
+				end
+				total_prob+=p_prob
 			end
-			total_prob+=p_prob
+			add(odds,ceil(total_prob*100))
 		end
-		_odds[p]=ceil(total_prob*100)
 	end
-	return _odds
+	
+	
 end
 
 
@@ -204,30 +212,31 @@ function get_display_odds(_odd)
 end
 
 function fill_arenas()
-	odds={}
-	arenas{}
- local	_plrs={}
- for i=1,16 do
- 	add(_plrs,i)
- end
+	arenas={}
+	--array of 1,2,...,16 for random players
+	local _rplrs={}
+	for i=1,16 do
+		add(_rplrs,i)
+	end
 	--fill pirates in arenas
 	for i=1,16 do
-		local _r=rnd(_plrs)
-		add(arenas,_r)
-		del(_plrs,_r)
+		local _rplyr=rnd(_rplrs)
+		add(arenas,_rplyr)
+		del(_rplrs,_rplyr)
 	end
-	for i=1,4 do
-		--get base of plyrs
-		_i=(i-1)*4
-		local _plyr_base={}
-		for j=1,4 do
-			add(_plyr_base,players[arenas[_i+j][3]])
-		end
-		_o=calculate_odds(_plyr_base)
-		for j=1,4 do
-			odds[_i+j]=_o[j]
-		end
-	end
+	calculate_odds()
+	-- for i=1,4 do
+	-- 	--get base of plyrs
+	-- 	_i=(i-1)*4
+	-- 	local _plyr_base={}
+	-- 	for j=1,4 do
+	-- 		add(_plyr_base,players[arenas[_i+j][3]])
+	-- 	end
+	-- 	_o=calculate_odds(_plyr_base)
+	-- 	for j=1,4 do
+	-- 		odds[_i+j]=_o[j]
+	-- 	end
+	-- end
 	--calculate the odds table
 end
 
