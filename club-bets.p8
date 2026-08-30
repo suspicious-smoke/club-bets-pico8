@@ -105,6 +105,8 @@ function update_quickbetpage()
 	elseif btnp(🅾️) then
 		toggle_bet()
 	elseif btnp(❎) then
+		--open up window to see
+		--more info or switch menus
 	end
 end
 
@@ -132,8 +134,8 @@ function draw_quickbetpage()
 	for i=1,4 do--arena
 		for j=1,4 do--player
 			--background rows
-			rrectfill(1,j*7+(i-1)*28-6,126,7,0,6+j%2)
-			print("thh 13:1",2,j*7+(i-1)*28-5,gc[i])
+			rrectfill(1,j*7+(i-1)*30-6,126,7,0,6+j%2)
+			print("thh 13:1",2,j*7+(i-1)*30-5,gc[i])
 			for k=1,10 do
 				bet_clr=5
 				local p_bet=(i-1)*4+j
@@ -141,20 +143,19 @@ function draw_quickbetpage()
 					bet_clr=3
 				end
 				if bet_sel==k and player_sel==p_bet then
-					print("\f7\^oc5a●",29+k*9,j*7+(i-1)*28-5)
+					print("\f7\^oc5a●",29+k*9,j*7+(i-1)*30-5)
 				end
-				print("●",29+k*9,j*7+(i-1)*28-5,bet_clr)
+				print("●",29+k*9,j*7+(i-1)*30-5,bet_clr)
 			end
 		end
 	end
 	--bet selector
-	rrect(28+bet_sel*9,0,9,114,0,12)
+	rrect(28+bet_sel*9,0,9,120,0,12)
 	--info area
-	rrectfill(0,114,128,14,0,5)
-	print("bet \f9#"..bet_sel,2,115,7)
-	print("odds \f913:1",34,115,7)
-	print("pays \f9$1000000",74,115,7)
-	print("player info like aff and stuff",2,122,7)
+	rrectfill(0,120,128,7,0,5)
+	print("bet \f9#"..bet_sel,2,121,7)
+	print("odds \f913:1",34,121,7)
+	print("pays \f9$1000000",74,121,7)
 end
 -->8
 --calculations
