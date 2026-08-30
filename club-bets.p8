@@ -21,8 +21,8 @@ function _init()
 			add(bets[i],false)
 		end
 	end
-	bets[1][1]=true
-	racers={
+	
+	players={
 		--{name,abreiv,strength,{categories}}
 		{"slime","slm",1},
 		{"knight","knt",2},
@@ -41,7 +41,7 @@ function _init()
 		{"behold","bhd",16},
 		{"king","kng",18},
 	}
-		
+	
 	plyr_base={11,13,9,10}
 	
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
@@ -51,7 +51,7 @@ function _init()
 	}
 	--prob of 3d6 from 3-18
 	
-	odds=calculate_odds(plyr_base)
+	odds={}
 	_upd=blank
 	_drw=blank
 	init_quickbetpage()
@@ -201,6 +201,34 @@ function get_display_odds(_odd)
 			return _podds[i]
 		end
 	end
+end
+
+function fill_arenas()
+	odds={}
+	arenas{}
+ local	_plrs={}
+ for i=1,16 do
+ 	add(_plrs,i)
+ end
+	--fill pirates in arenas
+	for i=1,16 do
+		local _r=rnd(_plrs)
+		add(arenas,_r)
+		del(_plrs,_r)
+	end
+	for i=1,4 do
+		--get base of plyrs
+		_i=(i-1)*4
+		local _plyr_base={}
+		for j=1,4 do
+			add(_plyr_base,players[arenas[_i+j][3]])
+		end
+		_o=calculate_odds(_plyr_base)
+		for j=1,4 do
+			odds[_i+j]=_o[j]
+		end
+	end
+	--calculate the odds table
 end
 
 -->8
