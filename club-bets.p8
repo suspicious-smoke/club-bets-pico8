@@ -106,24 +106,24 @@ function draw_quickbetpage()
 	for i=1,4 do
 		for j=1,4 do
 			--background rows
-			rrectfill(1,j*7+(i-1)*29-6,126,7,0,6+j%2)
-			print("thh 13:1",2,j*7+(i-1)*29-5,gc[i])
+			rrectfill(1,j*7+(i-1)*28-6,126,7,0,6+j%2)
+			print("thh 13:1",2,j*7+(i-1)*28-5,gc[i])
 			for k=1,10 do
 				if bet_sel==k and player_sel==(i-1)*4+j then
-					print("\f7\^oc5a●",29+k*9,j*7+(i-1)*29-5)
+					print("\f7\^oc5a●",29+k*9,j*7+(i-1)*28-5)
 				end
-				print("●",29+k*9,j*7+(i-1)*29-5,5)
+				print("●",29+k*9,j*7+(i-1)*28-5,5)
 			end
 		end
 	end
 	--bet selector
-	rrect(28+bet_sel*9,0,9,117,0,12)
+	rrect(28+bet_sel*9,0,9,114,0,12)
 	--info area
-	rrectfill(0,116,128,12,0,5)
-	print("bet \f9#"..bet_sel,2,121,7)
-	print("odds \f93:1",34,121,7)
-	print("pays \f91000000",78,121,7)
-	debug[1]=player_sel
+	rrectfill(0,114,128,14,0,5)
+	print("bet \f9#"..bet_sel,2,115,7)
+	print("odds \f913:1",34,115,7)
+	print("pays \f9$1000000",74,115,7)
+	print("player info like aff and stuff",2,122,7)
 end
 -->8
 --calculations
