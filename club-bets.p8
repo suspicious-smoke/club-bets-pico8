@@ -44,6 +44,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
+	bet_amount=100
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -101,12 +102,14 @@ end
 function init_quickbetpage()
 	bet_sel=1--1-10
 	player_sel=1--select player for each arena 1-16
-
+	total_odds=0
+	total_pay=0
 	_upd=update_quickbetpage
 	_drw=draw_quickbetpage
 end
 
 function update_quickbetpage()
+	get_total_odds_and_pay()
 	if btnp(➡️) then
 		bet_sel=(bet_sel%10)+1
 	elseif btnp(⬅️) then
@@ -123,6 +126,18 @@ function update_quickbetpage()
 	end
 end
 
+function get_total_odds_and_pay()
+	total_odds=1
+	total_pay=0
+	for aplyr=1,16 do
+		if bets[bet_sel][aplyr] then
+			total_odds*=bet_odds[aplyr]
+		end
+	end
+	clmp_odds=min(total_odds,300)
+	total_pay=min(bet_amount*clmp_odds,32766)
+end
+
 function toggle_bet()
 	--toggle bet if already selected
 	if bets[bet_sel][player_sel] then
@@ -130,9 +145,9 @@ function toggle_bet()
 		return
 	end
 	--switch off other bets in arena
-	arena_start=1
+	arena_start=0
 	if player_sel<5 then
-		--arena start=1
+		arena_start=1
 	elseif player_sel<9 then
 		arena_start=5
 	elseif player_sel<13 then
@@ -182,8 +197,12 @@ function draw_quickbetpage()
 	--info area
 	rrectfill(0,120,128,7,0,5)
 	print("bet \f9#"..bet_sel,2,121,7)
-	print("odds \f913:1",34,121,7)
-	print("pays \f9$1000000",74,121,7)
+	local _odds_c="\f9"
+	if clmp_odds==300 then
+		_odds_c="\f8"
+	end
+	print("odds".._odds_c..clmp_odds..":1",34,121,7)
+	print("pays \f9$"..total_pay,74,121,7)
 end
 -->8
 --calculations
@@ -255,21 +274,6 @@ function fill_arenas()
 		del(_rplrs,_rplyr)
 	end
 	calculate_odds()
-	
-
-	-- for i=1,4 do
-	-- 	--get base of plyrs
-	-- 	_i=(i-1)*4
-	-- 	local _plyr_base={}
-	-- 	for j=1,4 do
-	-- 		add(_plyr_base,players[arenas[_i+j][3]])
-	-- 	end
-	-- 	_o=calculate_odds(_plyr_base)
-	-- 	for j=1,4 do
-	-- 		odds[_i+j]=_o[j]
-	-- 	end
-	-- end
-	--calculate the odds table
 end
 
 -->8
