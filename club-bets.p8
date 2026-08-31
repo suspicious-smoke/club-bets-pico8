@@ -24,14 +24,14 @@ function _init()
 	
 	players={
 		--{name,abreiv,strength,{categories}}
-		{"slime","slm",1},
-		{"knight","knt",2},
-		{"dark knight","dkt",3},
-		{"dragon","dgn",5},
-		{"pegasus","pgs",6},
-		{"demon","dmn",7},
-		{"imp","imp",8},
-		{"wizard","wzd",9},
+		{"slime","slm",10},
+		{"knight","knt",11},
+		{"dark knight","dkt",12},
+		{"dragon","dgn",13},
+		{"pegasus","pgs",14},
+		{"demon","dmn",15},
+		{"imp","imp",16},
+		{"wizard","wzd",17},
 		{"goblin","gbn",10},
 		{"thief","thf",11},
 		{"hero","hro",12},
@@ -39,7 +39,7 @@ function _init()
 		{"quibble","qbl",14},
 		{"chao","cho",15},
 		{"behold","bhd",16},
-		{"king","kng",18},
+		{"king","kng",17},
 	}
 	arenas={}
 	odds={}
@@ -54,8 +54,9 @@ function _init()
 	
 	_upd=blank
 	_drw=blank
-	init_quickbetpage()
 	fill_arenas()
+	init_quickbetpage()
+	
 end
 
 function blank() end
@@ -67,12 +68,24 @@ function _update()
 	--update_fx()--particles
 end
 
+function odds_debug()
+	local gc={1,4,2,3}--arena text colors
+	gc_ind=1--color index
+	g_off=0--space between arenas
+	for i=1,16 do
+		print(bet_odds[i]..":1",24,i*8-6,gc[gc_ind])
+		print(players[arenas[i]][1],50,i*8-6,gc[gc_ind])
+		print(odds[i].."%",10,i*8-6,gc[gc_ind])
+		if i%4==0 then
+			gc_ind+=1
+			g_off+=2
+		end
+	end
+end
+
 function _draw()
 	cls()
-	-- for i=1,16 do
-	-- 	print(bet_odds[i]..":1",10,i*8-6,5)
-	-- 	print(players[arenas[i]][1],30,i*8-6,6)
-	-- end
+	
 	_drw()
 
 	--debug
@@ -215,12 +228,14 @@ end
 
 function get_bet_odds()
 	bet_odds={}
-	for odd_index=1,16 do
-		local _percs={40,30,25,20,15,10,7, 5, 3, 4, 1}
+	for oi=1,16 do--odds index
+		local _percs={40,30,25,20,15,10,7, 5, 3, 4, 0}
 		local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
+		local found=false
 		for i=1,#_percs do
-			if odds[odd_index]>=_percs[i] then
+			if odds[oi]>=_percs[i] and not found then
 				add(bet_odds,_podds[i])
+				found=true
 			end
 		end
 	end
