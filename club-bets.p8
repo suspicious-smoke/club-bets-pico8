@@ -42,7 +42,8 @@ function _init()
 		{"king","kng",18},
 	}
 	arenas={}
-	
+	odds={}
+	bet_odds={}
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -50,11 +51,10 @@ function _init()
 	}
 	--prob of 3d6 from 3-18
 	
-	odds={}
-	bet_odds={}
+	
 	_upd=blank
 	_drw=blank
-	--init_quickbetpage()
+	init_quickbetpage()
 	fill_arenas()
 end
 
@@ -69,10 +69,10 @@ end
 
 function _draw()
 	cls()
-	for i=1,16 do
-		print(bet_odds[i]..":1",10,i*8-6,5)
-		print(players[arenas[i]][1],30,i*8-6,6)
-	end
+	-- for i=1,16 do
+	-- 	print(bet_odds[i]..":1",10,i*8-6,5)
+	-- 	print(players[arenas[i]][1],30,i*8-6,6)
+	-- end
 	_drw()
 
 	--debug
@@ -111,6 +111,11 @@ function update_quickbetpage()
 end
 
 function toggle_bet()
+	--toggle bet if already selected
+	if bets[bet_sel][player_sel] then
+		bets[bet_sel][player_sel]=false
+		return
+	end
 	--switch off other bets in arena
 	arena_start=1
 	if player_sel<5 then
@@ -130,26 +135,33 @@ end
 
 function draw_quickbetpage()
 	local gc={1,4,2,3}--arena text colors
-
-	for i=1,16 do--players in arenas
-		arenas=54325--odds={odds for player 1-16}
-	end
-	for i=1,4 do--arena
-		for j=1,4 do--player
-			--background rows
-			rrectfill(1,j*7+(i-1)*30-6,126,7,0,6+j%2)
-			print("thh 13:1",2,j*7+(i-1)*30-5,gc[i])
-			for k=1,10 do
-				bet_clr=5
-				local p_bet=(i-1)*4+j
-				if bets[k][p_bet]	then
-					bet_clr=3
-				end
-				if bet_sel==k and player_sel==p_bet then
-					print("\f7\^oc5a●",29+k*9,j*7+(i-1)*30-5)
-				end
-				print("●",29+k*9,j*7+(i-1)*30-5,bet_clr)
+	gc_ind=1--color index
+	g_off=0--space between arenas
+	for ap_id=1,16 do--players in arenas
+		local _py=ap_id*7+g_off
+		rrectfill(1,_py-6,126,7,0,6+ap_id%2)--row background
+		--print player string
+		local _pstring=players[arenas[ap_id]][2].." "
+		if bet_odds[ap_id] < 10 then
+			_pstring=_pstring.." "
+		end
+		_pstring=_pstring..bet_odds[ap_id]..":1"
+		print(_pstring,3,_py-5,gc[gc_ind])
+		--bet buttons
+		for k=1,10 do
+			bet_clr=5
+			if bets[k][ap_id] then
+				bet_clr=3
 			end
+			if bet_sel==k and player_sel==ap_id then
+				print("\f7\^oc5a●",29+k*9,_py-5)
+			end
+			print("●",29+k*9,_py-5,bet_clr)
+		end
+
+		if ap_id%4==0 then
+			gc_ind+=1
+			g_off+=2
 		end
 	end
 	--bet selector
