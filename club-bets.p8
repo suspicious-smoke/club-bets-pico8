@@ -42,7 +42,6 @@ function _init()
 		{"king","kng",18},
 	}
 	arenas={}
-	plyr_base={11,13,9,10}
 	
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
@@ -52,9 +51,11 @@ function _init()
 	--prob of 3d6 from 3-18
 	
 	odds={}
+	bet_odds={}
 	_upd=blank
 	_drw=blank
-	init_quickbetpage()
+	--init_quickbetpage()
+	fill_arenas()
 end
 
 function blank() end
@@ -68,11 +69,10 @@ end
 
 function _draw()
 	cls()
---	for i=1,4 do
---		print(odds[i].."%",10,8*i)
---		print(get_display_odds(odds[i])..":1",30,8*i)
---	end
-
+	for i=1,16 do
+		print(bet_odds[i]..":1",10,i*8-6,5)
+		print(players[arenas[i]][1],30,i*8-6,6)
+	end
 	_drw()
 
 	--debug
@@ -132,7 +132,7 @@ function draw_quickbetpage()
 	local gc={1,4,2,3}--arena text colors
 
 	for i=1,16 do--players in arenas
-		
+		arenas=54325--odds={odds for player 1-16}
 	end
 	for i=1,4 do--arena
 		for j=1,4 do--player
@@ -165,48 +165,51 @@ end
 function calculate_odds()
 	--loop through the players
 	odds={}
-	for _arena=1,4 do
-		for _cplyr=1,4 do
-			local total_prob=0
-			local _plyr=(1-_arena)*4+_cplyr--gets the arena from the list of 16 (ie 1-4,5-8, etc)
-			local p_base=players[_plyr][3]
-			--16 possibilities for dice rolls
-			for die=3,18 do
-				local p_prob=d6x3[die]
-				local p_score=p_base+die
-				-- we have our die roll
-				--opponent probabilities
-				for _copp=1,4 do
-					local _opp=(1-_arena)*4+_copp
-					if _opp!=_plyr then--opp!=plyr
-						local o_prob=0
-						local o_base=players[_opp]
-						for o_die=3,18 do
-							--get player scores that beat opponent's score
-							if o_base+o_die<p_score then
-								o_prob+=d6x3[o_die]
-							end
+	arena_opp_off=0
+	for _arena_index=1,16 do
+		local _plyr_id=arenas[_arena_index]
+		local total_prob=0
+		local p_base=players[_plyr_id][3]
+		for die=3,18 do
+			local p_prob=d6x3[die]
+			local p_score=p_base+die
+			-- we have our die roll
+			--opponent probabilities
+			for _copp=1,4 do
+				local _opp_id=arenas[arena_opp_off+_copp]
+				if _opp_id!=_plyr_id then
+					local o_prob=0
+					local o_base=players[_opp_id][3]
+					for o_die=3,18 do
+						--get player scores that beat opponent's score
+						if o_base+o_die<p_score then
+							o_prob+=d6x3[o_die]
 						end
-						--multiply opponent prob to player prob
-						p_prob=p_prob*o_prob
-					end 
-				end
-				total_prob+=p_prob
+					end
+					--multiply opponent prob to player prob
+					p_prob=p_prob*o_prob
+				end 
 			end
-			add(odds,ceil(total_prob*100))
+			total_prob+=p_prob
 		end
+		if _arena_index%4==0 then
+			arena_opp_off+=4
+		end
+		add(odds,ceil(total_prob*100))
 	end
-	
-	
+	get_bet_odds()
 end
 
 
-function get_display_odds(_odd)
-	local _percs={40,30,25,20,15,10,7, 5, 3, 4, 1}
-	local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
-	for i=1,#_percs do
-		if _odd>=_percs[i] then
-			return _podds[i]
+function get_bet_odds()
+	bet_odds={}
+	for odd_index=1,16 do
+		local _percs={40,30,25,20,15,10,7, 5, 3, 4, 1}
+		local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
+		for i=1,#_percs do
+			if odds[odd_index]>=_percs[i] then
+				add(bet_odds,_podds[i])
+			end
 		end
 	end
 end
@@ -225,6 +228,8 @@ function fill_arenas()
 		del(_rplrs,_rplyr)
 	end
 	calculate_odds()
+	
+
 	-- for i=1,4 do
 	-- 	--get base of plyrs
 	-- 	_i=(i-1)*4
