@@ -44,7 +44,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
-	bet_amount=100
+	bet_amount={1,0,0}
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -56,7 +56,7 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	--init_quickbetpage()
+	init_quickbetpage()
 end
 
 function blank() end
@@ -133,8 +133,8 @@ function get_total_odds_and_pay()
 			total_odds*=bet_odds[aplyr]
 		end
 	end
-	clmp_odds=min(total_odds,300)
-	total_pay=min(bet_amount*clmp_odds,32766)
+	clmp_odds=int_to_arr(min(total_odds,500))
+	total_pay=arr_display(arr_mult(clmp_odds,bet_amount))
 end
 
 function toggle_bet()
@@ -196,11 +196,12 @@ function draw_quickbetpage()
 	--info area
 	rrectfill(0,120,128,7,0,5)
 	print("bet \f9#"..bet_sel,2,121,7)
-	local _odds_c="\f9"
-	if clmp_odds==300 then
-		_odds_c="\f8"
+	local _odds_clr="\f9"
+	int_clmp_odds=arr_display(clmp_odds)
+	if int_clmp_odds=="500" then
+		_odds_clr="\f8"
 	end
-	print("odds".._odds_c..clmp_odds..":1",34,121,7)
+	print("odds".._odds_clr..int_clmp_odds..":1",34,121,7)
 	print("pays \f9$"..total_pay,74,121,7)
 end
 -->8
@@ -316,6 +317,26 @@ function d6()
 	return rnd_rng(1,6)
 end
 -->8
+--array arithmatic
+function int_to_arr(n)
+ local r={}
+ -- handle 0
+ if n==0 then
+  return {0}
+ end
+ -- extract digits from right to left
+ while n>0 do
+  add(r,n%10)
+  n=flr(n/10)
+ end
+ -- reverse the array
+ for i=1,#r\2 do
+  r[i],r[#r-i+1]=r[#r-i+1],r[i]
+ end
+
+ return r
+end
+
 
 function arr_display(_arr)
 	anum=""
@@ -355,7 +376,7 @@ function arr_add(a,b)
 	return r
 end
 
-function arr_mul(a,b)
+function arr_mult(a,b)
 	local r={} --result array
 	--create enough space for the result
 	for i=1,#a+#b do
