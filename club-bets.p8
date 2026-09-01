@@ -99,8 +99,10 @@ end
 -->8
 --main page
 function init_betpage()
-		_upd=upd_betpage
+	tx,ty=20,10
+	_upd=upd_betpage
 	_drw=drw_betpage
+	
 end
 
 function upd_betpage()
@@ -108,7 +110,7 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	tx,ty=20,10
+	
 	local _arx,_plx,_odx=tx+2,tx+26,tx+66
 	--ticket
 	for i=1,15 do
@@ -133,13 +135,13 @@ function drw_betpage()
 	print("arena",_arx,ty+28,0)
 	print("player",_plx+4,ty+28,0)
 	print("odds",_odx,ty+28,0)
-	print("----------------------",22,44,0)
+	print("----------------------",tx+2,ty+22,0)
 	for i=1,4 do
 		print(i,_arx+8,ty+34+8*i,0)
 		print("the dude",_plx,ty+34+8*i,0)
 		print("11:1",_odx,ty+34+8*i,0)
 	end
-	print("----------------------",23,90,0)
+	print("----------------------",tx+3,ty+80,0)
 	print("bet:",_arx+1,ty+85)
 	print("odds:",tx+41,ty+85)
 	print("payout:",_arx+2,ty+93)
