@@ -56,7 +56,8 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	init_quickbetpage()
+	--init_quickbetpage()
+	init_betpage()
 end
 
 function blank() end
@@ -96,6 +97,25 @@ function _draw()
 	end
 end
 -->8
+--main page
+function init_betpage()
+		_upd=upd_betpage
+	_drw=drw_betpage
+end
+
+function upd_betpage()
+	
+end
+
+function drw_betpage()
+	rrectfill(20,10,90,100,0,7)--ticket
+	rrectfill(22,12,86,10,0,2)--red area
+	print("★galaxy club bets★",25,15,7)
+	print("★galaxy club★",36,56,6)	
+	
+	
+end
+-->8
 --quick bet page
 
 function init_quickbetpage()
@@ -103,11 +123,11 @@ function init_quickbetpage()
 	player_sel=1--select player for each arena 1-16
 	total_odds=0
 	total_pay=0
-	_upd=update_quickbetpage
+	_upd=upd_quickbetpage
 	_drw=draw_quickbetpage
 end
 
-function update_quickbetpage()
+function upd_quickbetpage()
 	get_total_odds_and_pay()
 	if btnp(➡️) then
 		bet_sel=(bet_sel%10)+1
