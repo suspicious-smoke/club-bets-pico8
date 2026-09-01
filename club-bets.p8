@@ -108,40 +108,41 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	local _arx,_plx,_odx=22,46,86
+	tx,ty=20,10
+	local _arx,_plx,_odx=tx+2,tx+26,tx+66
 	--ticket
 	for i=1,15 do
-		rrect(15+6*i,9,3,1,0,7)
+		rrect(tx-5+6*i,ty-1,3,1,0,7)
 	end
-	rrectfill(20,10,90,81,0,7)--ticket
-	rrectfill(26,91,84,24,0,7)--lwr ticket
-	spr(128,18,91,1,3)--left leaf
-	spr(129,109,91,1,3)--right leaf
+	rrectfill(tx,ty,90,81,0,7)--ticket
+	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
+	spr(128,tx-2,ty+81,1,3)--left leaf
+	spr(129,tx+89,ty+81,1,3)--right leaf
 	for i=1,3 do
 		_wmoff=0
 		if i==3 then
 			_wmoff=1
 		end
-		print("★galaxy club★",35,i*32-3+_wmoff,6)	
+		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
 	end
 	--text
-	rrectfill(22,12,86,10,0,2)--red area
-	print("★galaxy club bets★",25,15,7)
-	print("round #1784",42,25,0)
-	print("----------------------",22,32,0)
-	print("arena",_arx,38,0)
-	print("player",_plx+4,38,0)
-	print("odds",_odx,38,0)
+	rrectfill(tx+2,ty+2,86,10,0,2)--red area
+	print("★galaxy club bets★",tx+5,ty+5,7)
+	print("round #1784",tx+22,ty+15,0)
+	print("----------------------",tx+2,ty+22,0)
+	print("arena",_arx,ty+28,0)
+	print("player",_plx+4,ty+28,0)
+	print("odds",_odx,ty+28,0)
 	print("----------------------",22,44,0)
 	for i=1,4 do
-		print(i,_arx+8,44+8*i,0)
-		print("the dude",_plx,44+8*i,0)
-		print("11:1",_odx,44+8*i,0)
+		print(i,_arx+8,ty+34+8*i,0)
+		print("the dude",_plx,ty+34+8*i,0)
+		print("11:1",_odx,ty+34+8*i,0)
 	end
 	print("----------------------",23,90,0)
-	print("bet:",_arx+1,95)
-	print("odds:",61,95)
-	print("payout:",_arx+2,103)
+	print("bet:",_arx+1,ty+85)
+	print("odds:",tx+41,ty+85)
+	print("payout:",_arx+2,ty+93)
 end
 -->8
 --quick bet page
