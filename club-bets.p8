@@ -56,8 +56,7 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	init_quickbetpage()
-	
+	--init_quickbetpage()
 end
 
 function blank() end
@@ -217,7 +216,7 @@ function calculate_odds()
 		for die=3,18 do
 			local p_prob=d6x3[die]
 			local p_score=p_base+die
-			-- we have our die roll
+			--we have our die roll
 			--opponent probabilities
 			for _copp=1,4 do
 				local _opp_id=arenas[arena_opp_off+_copp]
@@ -308,7 +307,7 @@ function f_rnd(_i)
 	return flr(rnd(_i))
 end
 --gives random number between
--- _s and _e
+--_s and _e
 function rnd_rng(_s,_e)
 	return f_rnd(_e-_s+1)+_s
 end
@@ -316,6 +315,74 @@ end
 function d6()
 	return rnd_rng(1,6)
 end
+-->8
+
+function arr_display(_arr)
+	anum=""
+	if _arr then
+		for i=1,#_arr do
+			anum=anum.._arr[i]
+		end
+	end
+	return anum
+end
+
+function arr_add(a,b)
+	local r={} --result array and carry value
+	local c=0 --carry variable
+	--start at the rightmost digit
+	local i=#a
+	local j=#b
+	--work from right to left
+	while i>0 or j>0 do
+		--add the two digits plus any carry
+		local n=(a[i] or 0)+(b[j] or 0)+c
+		--store the ones digit
+		add(r,n%10)
+		--calculate the carry for the next digit
+		c=flr(n/10)
+		--move to the next digits
+		i-=1
+		j-=1
+	end
+	--add any remaining carry
+	if c>0 then add(r,c) end
+	--digits were added right-to-left,
+	--so reverse the result to normal order
+	for i=1,#r\2 do
+	r[i],r[#r-i+1]=r[#r-i+1],r[i]
+	end
+	return r
+end
+
+function arr_mul(a,b)
+	local r={} --result array
+	--create enough space for the result
+	for i=1,#a+#b do
+		r[i]=0
+	end
+	--multiply each digit by every digit
+	--starting from the right
+	for i=#a,1,-1 do
+		for j=#b,1,-1 do
+			local p=i+j
+			--add the product to the correct position
+			r[p]+=a[i]*b[j]
+		end
+	end
+	--handle carries from right to left
+	for i=#r,2,-1 do
+		r[i-1]+=flr(r[i]/10)
+		r[i]%=10
+	end
+	--remove leading zeroes
+	while #r>1 and r[1]==0 do
+		deli(r,1)
+	end
+
+	return r
+end
+
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000003bbb1000000000000000000000000000000000000000000000000000000000000000000000
