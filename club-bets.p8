@@ -108,10 +108,10 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	local _arx,_plx,_odx=24,55,90
+	local _arx,_plx,_odx=22,46,86
 	rrectfill(20,10,90,100,0,7)--ticket
 	for i=1,3 do
-		print("★galaxy club★",36,i*30-2,6)	
+		print("★galaxy club★",35,i*30-1,6)	
 	end
 	rrectfill(22,12,86,10,0,2)--red area
 	print("★galaxy club bets★",25,15,7)
@@ -119,10 +119,18 @@ function drw_betpage()
 	print("round #1784",42,25,0)
 	print("----------------------",22,32,0)
 	print("arena",_arx,38,0)
-	print("player",_plx,38,0)
-	print("odd",_odx,38,0)
+	print("player",_plx+4,38,0)
+	print("odds",_odx,38,0)
 	print("----------------------",22,44,0)
-	
+	for i=1,4 do
+		print(i,_arx+8,44+8*i,0)
+		print("the dude",_plx,44+8*i,0)
+		print("11:1",_odx,44+8*i,0)
+	end
+	print("----------------------",22,90,0)
+	print("bet:",_arx,95)
+	print("odds:",60,95)
+	print("payout:",_arx,103)
 end
 -->8
 --quick bet page
