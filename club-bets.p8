@@ -109,24 +109,38 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	rrectfill(14,2,100,85,0,7)--ticket
-	rrect(13,1,102,87,0,1)
-	rrectfill(14,2,100,17,0,2)--red area
-	print("round:#",24,4,6)	
-	print("bet:#",80,4,6)	
-	print("place a bet",39,12,7)
-	rrectfill(14,20,100,11,0,5)--grey area
-	line(13,19,114,19,1)--hline
-	line(41,19,41,87,1)--vline
-	print("arena",18,23,0)
-	print("player",66,23,0)
+	rrectfill(4,2,120,81,0,7)--ticket
+	rrect(3,1,122,83,0,1)--outline
+	rrectfill(4,2,120,17,0,2)--red area
+	print("round:#",8,4,6)	
+	print("bet:\f9#1",54,4,6)	
+
+	print("place a bet",42,12,7)
+	rrectfill(4,20,120,8,0,5)--grey area
+	line(3,19,124,19,1)--hline
+	line(31,19,31,83,1)--vline
+	print("arena",8,21,0)
+	print("player",68,21,0)
 	for i=1,4 do
-		line(13,17+i*14,114,17+i*14,1)
-		rrectfill(44,20+i*14,67,9,1,6)
-		print("[] "..i,18,22+i*14,0)
-		print("who to bet on?",46,22+i*14,0)
-		spr(68,104,23+i*14)
+		line(3,13+i*14,124,13+i*14,1)
+		rrectfill(34,16+i*14,88,9,1,6)
+		print("[] "..i,8,18+i*14,0)
+		print("who to bet on?",48,18+i*14,0)
+		spr(68,115,19+i*14)
 	end
+	
+	--winning calculator
+	rrectfill(14,87,100,26,0,7)--ticket
+	rrect(13,86,102,28,0,1)--outline
+	rrectfill(14,87,100,8,0,5)--title
+	print("winnings calculator",26,88,0)
+	line(13,94,114,94,1)--hline1
+	line(13,102,114,102,1)--hline2
+	print("bet amt",16,96,0)
+	line(44,94,44,112,1)--vline1
+	print("odds",48,96,0)
+	line(65,94,65,112,1)--vline2
+	print("payout",78,96,0)
 end
 
 
@@ -372,15 +386,18 @@ function explode_d6()
 	end
 end
 
-
-function in_list(_l,_val)
-	for _v in all(_l) do
-		if _v == _val then
-		 return true
-		end
-	end
-	return false
+function hcenter(s)
+	return 64-#s*2
 end
+
+--function in_list(_l,_val)
+--	for _v in all(_l) do
+--		if _v == _val then
+--		 return true
+--		end
+--	end
+--	return false
+--end
 
 --i=2 gives num between 0,1
 --rnd never gives the limit
