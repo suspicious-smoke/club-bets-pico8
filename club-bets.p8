@@ -111,8 +111,9 @@ function drw_betpage()
 	local _arx,_plx,_odx=22,46,86
 	rrectfill(20,10,90,100,0,7)--ticket
 	for i=1,3 do
-		print("★galaxy club★",35,i*30-1,6)	
+		print("★galaxy club★",35,i*32-3,6)	
 	end
+	--print("★galaxy club★",35,62,6)	
 	rrectfill(22,12,86,10,0,2)--red area
 	print("★galaxy club bets★",25,15,7)
 	
