@@ -99,10 +99,8 @@ end
 -->8
 --main page
 function init_betpage()
-	tx,ty=20,10
 	_upd=upd_betpage
 	_drw=drw_betpage
-	
 end
 
 function upd_betpage()
@@ -110,6 +108,22 @@ function upd_betpage()
 end
 
 function drw_betpage()
+
+end
+
+
+--main page
+function init_ticket()
+	tx,ty=20,10
+	_upd=upd_ticket
+	_drw=drw_ticket
+end
+
+function upd_ticket()
+	
+end
+
+function drw_ticket()
 	
 	local _arx,_plx,_odx=tx+2,tx+26,tx+66
 	--ticket
