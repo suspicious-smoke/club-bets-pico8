@@ -217,6 +217,8 @@ function draw_winning_calc()
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
+	bt=arr_display(bet_amount)
+	print(bt,21-#bt*2,105,0)
 	if arena_sel==5 then
 		rrect(4,103,36,10,0,9)
 	end
@@ -224,9 +226,9 @@ function draw_winning_calc()
 	print("odds",45,96,0)
 	line(64,94,64,112,1)--vline2
 	_str=print_bet_odds()
-	print(_str,64-#_str*3,105,0)
-
-	print("payout",82,96,0)
+	print(_str,57-#_str*2,105,0)
+	print("payout",83,96,0)
+	print(total_pay,94-#total_pay*2,105,0)
 	--button
 	rrectfill(34,116,59,9,1,1)
 	print("place all bets",36,118,7)
