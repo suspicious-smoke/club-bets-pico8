@@ -53,7 +53,7 @@ function _init()
 			.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046
 	}
 	--prob of 3d6 from 3-18
-	
+	bet_sel=1--the currently selected bet (betpage/quickbetpage)
 	
 	_upd=blank
 	_drw=blank
@@ -105,7 +105,7 @@ function init_betpage()
 	_upd=upd_betpage
 	_drw=drw_betpage
 	arena_sel=1
-	plyr_sel=1
+	plyr_menu_sel=1
 	current_bet=1
 	md_sel_plyr=false
 end
@@ -113,10 +113,14 @@ end
 function upd_betpage()
 	if md_sel_plyr then
 		if btnp(⬆️) then
-			plyr_sel=(plyr_sel-2)%4+1
+			plyr_menu_sel=(plyr_menu_sel-2)%4+1
 		elseif btnp(⬇️) then
-			plyr_sel=(plyr_sel%4)+1
-		elseif btnp(🅾️) or btnp(❎) then
+			plyr_menu_sel=(plyr_menu_sel%4)+1
+		elseif btnp(🅾️) then
+			player_sel=plyr_menu_sel+(arena_sel-1)*4
+			toggle_bet()
+			md_sel_plyr=false
+		elseif btnp(❎) then
 			md_sel_plyr=false
 		end
 	else
@@ -129,7 +133,7 @@ function upd_betpage()
 				--complete bets
 			else
 				md_sel_plyr=true
-				plyr_sel=1
+				plyr_menu_sel=1
 			end
 		elseif btnp(❎) then
 			--open up window to see
@@ -161,17 +165,22 @@ function drw_betpage()
 		if arena_sel==i and not md_sel_plyr then
 			rrect(42,16+i*14,80,9,1,9)
 		end
-		spr(106+i%2,8,16+i*14)
+		
+
+		
 		print(i,18,18+i*14,0)
 		spr(101+i,27,16+i*14)--planet
 		--get player
+		chk_spr=106
 		local plyr_str="who to bet on?"
 		for plyr=1,4 do 
 			local _arloc=(i-1)*4+plyr
 			if bets[current_bet][_arloc] then
 				plyr_str=players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
+				chk_spr=107
 			end
 		end
+		spr(chk_spr,8,16+i*14)--check mark
 		print(plyr_str,52,18+i*14,0)
 		spr(68,115,19+i*14)
 	end
@@ -189,7 +198,7 @@ function draw_dropdown()
 	rrectfill(42,26+arena_sel*14,80,40,1,6)
 	for plyr=1,4 do
 		local _arloc=(arena_sel-1)*4+plyr
-		if plyr_sel==plyr then
+		if plyr_menu_sel==plyr then
 			rrectfill(44,20+arena_sel*14+plyr*9,76,9,1,5)	
 		end
 		print(get_player_string(_arloc),52,22+arena_sel*14+plyr*9,0)
