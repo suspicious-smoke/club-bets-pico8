@@ -129,6 +129,7 @@ function upd_betpage()
 				--complete bets
 			else
 				md_sel_plyr=true
+				plyr_sel=1
 			end
 		elseif btnp(❎) then
 			--open up window to see
@@ -166,9 +167,9 @@ function drw_betpage()
 		--get player
 		local plyr_str="who to bet on?"
 		for plyr=1,4 do 
-			local _pid=arenas[(i-1)*4+plyr]--get player id
-			if bets[current_bet][_pid] then
-				plyr_str=players[_pid][1].." "..bet_odds[_pid]..":1"
+			local _arloc=(i-1)*4+plyr
+			if bets[current_bet][_arloc] then
+				plyr_str=players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
 			end
 		end
 		print(plyr_str,52,18+i*14,0)
@@ -179,14 +180,25 @@ function drw_betpage()
 	
 	--player select area
 	if md_sel_plyr then
-		--draw sel player menu
-		rrectfill(42,26+arena_sel*14,80,40,1,6)
-		for i=1,4 do
-			if plyr_sel==i then
-				--draw rect around
-			end
-		end
+		draw_dropdown()
 	end
+end
+
+function draw_dropdown()
+	--draw sel player menu
+	rrectfill(42,26+arena_sel*14,80,40,1,6)
+	for plyr=1,4 do
+		local _arloc=(arena_sel-1)*4+plyr
+		if plyr_sel==plyr then
+			rrectfill(44,20+arena_sel*14+plyr*9,76,9,1,5)	
+		end
+		print(get_player_string(_arloc),52,22+arena_sel*14+plyr*9,0)
+		
+	end
+end
+
+function get_player_string(_arloc)
+	return players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
 end
 
 function draw_winning_calc()
@@ -570,8 +582,43 @@ function arr_mult(a,b)
 	while #r>1 and r[1]==0 do
 		deli(r,1)
 	end
-
 	return r
+end
+
+function arr_sub(a,b)--subtraction
+ -- result array
+ local r={}
+ local borrow=0
+ local i=#a
+ local j=#b
+ -- subtract digits from right to left
+ while i>0 do
+  -- subtract the two digits and any borrow
+  local n=a[i]-(b[j] or 0)-borrow
+  -- borrow from the next digit if needed
+  if n<0 then
+   n+=10
+   borrow=1
+  else
+   borrow=0
+  end
+  -- store the result digit
+  add(r,n)
+  -- move to the next digits
+  i-=1
+  j-=1
+ end
+ -- digits were calculated right-to-left,
+ -- so reverse the result
+ for i=1,#r\2 do
+  r[i],r[#r-i+1]=r[#r-i+1],r[i]
+ end
+ -- remove leading zeroes
+ while #r>1 and r[1]==0 do
+  deli(r,1)
+ end
+
+ return r
 end
 
 __gfx__
