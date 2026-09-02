@@ -106,11 +106,12 @@ function init_betpage()
 	_drw=drw_betpage
 	arena_sel=1
 	plyr_menu_sel=1
-	current_bet=1
+	bet_sel=1
 	md_sel_plyr=false
 end
 
 function upd_betpage()
+	get_total_odds_and_pay()
 	if md_sel_plyr then
 		if btnp(⬆️) then
 			plyr_menu_sel=(plyr_menu_sel-2)%4+1
@@ -165,9 +166,6 @@ function drw_betpage()
 		if arena_sel==i and not md_sel_plyr then
 			rrect(42,16+i*14,80,9,1,9)
 		end
-		
-
-		
 		print(i,18,18+i*14,0)
 		spr(101+i,27,16+i*14)--planet
 		--get player
@@ -175,7 +173,7 @@ function drw_betpage()
 		local plyr_str="who to bet on?"
 		for plyr=1,4 do 
 			local _arloc=(i-1)*4+plyr
-			if bets[current_bet][_arloc] then
+			if bets[bet_sel][_arloc] then
 				plyr_str=players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
 				chk_spr=107
 			end
@@ -186,7 +184,6 @@ function drw_betpage()
 	end
 	
 	draw_winning_calc()
-	
 	--player select area
 	if md_sel_plyr then
 		draw_dropdown()
@@ -202,7 +199,6 @@ function draw_dropdown()
 			rrectfill(44,20+arena_sel*14+plyr*9,76,9,1,5)	
 		end
 		print(get_player_string(_arloc),52,22+arena_sel*14+plyr*9,0)
-		
 	end
 end
 
@@ -223,9 +219,12 @@ function draw_winning_calc()
 		rrect(4,103,36,10,0,9)
 	end
 	line(40,94,40,112,1)--vline1
-	print("odds",44,96,0)
-	line(61,94,61,112,1)--vline2
-	print("payout",80,96,0)
+	print("odds",45,96,0)
+	line(64,94,64,112,1)--vline2
+	_str=print_bet_odds()
+	print(_str,64-#_str*3,105,0)
+
+	print("payout",82,96,0)
 	--button
 	rrectfill(34,116,59,9,1,1)
 	print("place all bets",36,118,7)
@@ -383,14 +382,20 @@ function draw_quickbetpage()
 	--info area
 	rrectfill(0,120,128,7,0,5)
 	print("bet \f9#"..bet_sel,2,121,7)
+	
+	print("odds "..print_bet_odds(),34,121,7)
+	print("pays \f9$"..total_pay,74,121,7)
+end
+
+function print_bet_odds()
 	local _odds_clr="\f9"
 	int_clmp_odds=arr_display(clmp_odds)
 	if int_clmp_odds=="500" then
 		_odds_clr="\f8"
 	end
-	print("odds".._odds_clr..int_clmp_odds..":1",34,121,7)
-	print("pays \f9$"..total_pay,74,121,7)
+	return _odds_clr..int_clmp_odds..":1"
 end
+
 -->8
 --calculations
 function calculate_odds()
