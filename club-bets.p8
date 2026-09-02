@@ -105,9 +105,11 @@ function init_betpage()
 	_upd=upd_betpage
 	_drw=drw_betpage
 	arena_sel=1
+	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	bet_sel=1
 	md_sel_plyr=false
+	bet_mode=1
 end
 
 function upd_betpage()
@@ -129,11 +131,18 @@ function upd_betpage()
 			arena_sel=(arena_sel-2)%6+1
 		elseif btnp(⬇️) then
 			arena_sel=(arena_sel%6)+1
+		elseif btnp(➡️) then
+			_bet_amt_tmr=10
+			bet_sel=(bet_sel%10)+1
+		elseif btnp(⬅️) then
+			_bet_amt_tmr=10
+			bet_sel=(bet_sel-2)%10+1
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				--complete bets
 			elseif arena_sel==5 then
 				--change money
+				
 			else
 				md_sel_plyr=true
 				plyr_menu_sel=1
@@ -143,15 +152,18 @@ function upd_betpage()
 			--more info or switch menus
 		end
 	end
-
+	bet_off=0
+	if _bet_amt_tmr>0 then
+		_bet_amt_tmr-=1
+		bet_off=-1
+	end
 end
 
 function drw_betpage()
 	print("round:#",4,3,6)	
-	print("bet:\f9#1",52,3,6)	
-	spr(108,83,1)
+	print("bet:\f9#"..bet_sel,52,3+bet_off,6+3*bet_off)	
+	spr(108,83,1)--money
 	print("100",92,3,9)
-	
 	rrectfill(4,10,120,74,0,7)--ticket
 	rrect(3,9,122,75,0,1)--outline
 	rrectfill(4,10,120,9,0,2)--red area
@@ -217,8 +229,11 @@ function draw_winning_calc()
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
-	bt=arr_display(bet_amount)
-	print(bt,21-#bt*2,105,0)
+	
+	for i=1,4 do
+		print(bet_amount[i] or 0,9+i*4,105,0)
+	end
+
 	if arena_sel==5 then
 		rrect(4,103,36,10,0,9)
 	end
