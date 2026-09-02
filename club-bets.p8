@@ -109,11 +109,11 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	rrectfill(4,2,120,81,0,7)--ticket
-	rrect(3,1,122,83,0,1)--outline
-	rrectfill(4,2,120,17,0,2)--red area
-	print("round:#",8,4,6)	
-	print("bet:\f9#1",54,4,6)	
+	rrectfill(4,10,120,81,0,7)--ticket
+	rrect(3,9,122,83,0,1)--outline
+	rrectfill(4,10,120,9,0,2)--red area
+	print("round:#",4,3,6)	
+	print("bet:\f9#1",52,3,6)	
 
 	print("place a bet",42,12,7)
 	rrectfill(4,20,120,8,0,5)--grey area
