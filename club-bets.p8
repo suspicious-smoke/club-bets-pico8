@@ -21,7 +21,9 @@ function _init()
 			add(bets[i],false)
 		end
 	end
-	
+	-- for i=1,4 do
+	-- 	bets[1][i*4]=true
+	-- end
 	players={
 		--{name,abreiv,strength,{categories}}
 		{"slime","slm",10},
@@ -104,25 +106,26 @@ function init_betpage()
 	_drw=drw_betpage
 	arena_sel=1
 	plyr_sel=1
+	current_bet=1
 	md_sel_plyr=false
 end
 
 function upd_betpage()
 	if md_sel_plyr then
 		if btnp(⬆️) then
-			plyr_sel=(plyr_sel-2)%5+1
+			plyr_sel=(plyr_sel-2)%4+1
 		elseif btnp(⬇️) then
-			plyr_sel=(plyr_sel%5)+1
+			plyr_sel=(plyr_sel%4)+1
 		elseif btnp(🅾️) or btnp(❎) then
 			md_sel_plyr=false
 		end
 	else
 		if btnp(⬆️) then
-			arena_sel=(arena_sel-2)%5+1
+			arena_sel=(arena_sel-2)%6+1
 		elseif btnp(⬇️) then
-			arena_sel=(arena_sel%5)+1
+			arena_sel=(arena_sel%6)+1
 		elseif btnp(🅾️) then
-			if arena_sel==5 then
+			if arena_sel==6 then
 				--complete bets
 			else
 				md_sel_plyr=true
@@ -160,7 +163,15 @@ function drw_betpage()
 		spr(106+i%2,8,16+i*14)
 		print(i,18,18+i*14,0)
 		spr(101+i,27,16+i*14)--planet
-		print("who to bet on?",52,18+i*14,0)
+		--get player
+		local plyr_str="who to bet on?"
+		for plyr=1,4 do 
+			local _pid=arenas[(i-1)*4+plyr]--get player id
+			if bets[current_bet][_pid] then
+				plyr_str=players[_pid][1].." "..bet_odds[_pid]..":1"
+			end
+		end
+		print(plyr_str,52,18+i*14,0)
 		spr(68,115,19+i*14)
 	end
 	
@@ -176,7 +187,6 @@ function drw_betpage()
 			end
 		end
 	end
-	
 end
 
 function draw_winning_calc()
@@ -188,6 +198,9 @@ function draw_winning_calc()
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
+	if arena_sel==5 then
+		rrect(4,103,36,10,0,9)
+	end
 	line(40,94,40,112,1)--vline1
 	print("odds",44,96,0)
 	line(61,94,61,112,1)--vline2
@@ -195,7 +208,7 @@ function draw_winning_calc()
 	--button
 	rrectfill(34,116,59,9,1,1)
 	print("place all bets",36,118,7)
-	if arena_sel==5 then
+	if arena_sel==6 then
 		rrect(34,116,59,9,1,9)
 	end
 end
