@@ -132,6 +132,8 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				--complete bets
+			elseif arena_sel==5 then
+				--change money
 			else
 				md_sel_plyr=true
 				plyr_menu_sel=1
