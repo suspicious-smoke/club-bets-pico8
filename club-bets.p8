@@ -130,17 +130,21 @@ function drw_betpage()
 	end
 	
 	--winning calculator
-	rrectfill(14,87,100,26,0,7)--ticket
-	rrect(13,86,102,28,0,1)--outline
-	rrectfill(14,87,100,8,0,5)--title
+	rrectfill(4,87,120,26,0,7)--ticket
+	rrect(3,86,122,28,0,1)--outline
+	rrectfill(4,87,120,8,0,5)--title
 	print("winnings calculator",26,88,0)
-	line(13,94,114,94,1)--hline1
-	line(13,102,114,102,1)--hline2
-	print("bet amt",16,96,0)
-	line(44,94,44,112,1)--vline1
-	print("odds",48,96,0)
-	line(65,94,65,112,1)--vline2
-	print("payout",78,96,0)
+	line(3,94,124,94,1)--hline1
+	line(3,102,124,102,1)--hline2
+	print("bet amt",8,96,0)
+	line(40,94,40,112,1)--vline1
+	print("odds",44,96,0)
+	line(61,94,61,112,1)--vline2
+	print("payout",80,96,0)
+	--button
+	rrectfill(34,116,59,9,1,1)
+
+	print("place all bets",36,118,7)
 end
 
 
