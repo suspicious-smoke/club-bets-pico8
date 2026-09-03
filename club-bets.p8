@@ -28,7 +28,7 @@ function _init()
 		--{name,abreiv,strength,{categories}}
 		{"slime","slm",10},
 		{"knight","knt",11},
-		{"dark knight","dkt",12},
+		{"dk knight","dkt",12},
 		{"dragon","dgn",13},
 		{"pegasus","pgs",14},
 		{"demon","dmn",15},
@@ -319,7 +319,9 @@ function drw_confirm()
 
 	print("bet",5,21-scroller,0)
 	line(17,20-scroller,17,max_scroll+107-scroller,1)--bet/player v-line
-	line(72,20-scroller,72,max_scroll+107-scroller,1)--end plyr line
+	print("player",31,21-scroller,0)
+	line(70,20-scroller,70,max_scroll+107-scroller,1)--end plyr line
+	print("odds/winnings",72,21-scroller,0)
 	--selection area
 	bet_count=0
 	p_count=1
