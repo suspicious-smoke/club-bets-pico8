@@ -58,9 +58,11 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
+	dummy_bets()
 	--init_quickbetpage()
 	--init_ticket()
-	init_betpage()
+	--init_betpage()
+	init_confirm()
 end
 
 function blank() end
@@ -87,6 +89,18 @@ function odds_debug()
 	end
 end
 
+function dummy_bets()
+	for _bet=1,10 do
+		for _arena=1,4 do
+			local _arloc=(_arena-1)*4	
+			_r=rnd_rng(1,5)
+			if _r!= 5 then
+				bets[_bet][_arloc+_r]=true
+			end
+		end
+	end
+end
+
 function _draw()
 	cls()
 	
@@ -100,7 +114,7 @@ function _draw()
 	end
 end
 -->8
---main page
+--bet page
 function init_betpage()
 	_upd=upd_betpage
 	_drw=drw_betpage
@@ -203,7 +217,7 @@ function drw_betpage()
 		for plyr=1,4 do 
 			local _arloc=(i-1)*4+plyr
 			if bets[bet_sel][_arloc] then
-				plyr_str=players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
+				plyr_str=get_player_string(_arloc)
 				chk_spr=107
 			end
 		end
@@ -270,55 +284,66 @@ function draw_winning_calc()
 		rrect(34,116,59,9,1,9)
 	end
 end
--->8
---ticket
-function init_ticket()
-	tx,ty=20,10
-	_upd=upd_ticket
-	_drw=drw_ticket
+
+--confirm bet page
+function init_confirm()
+	_upd=upd_confirm
+	_drw=drw_confirm
+	scroller=0
 end
 
-function upd_ticket()
-	
-end
-
-function drw_ticket()
-	
-	local _arx,_plx,_odx=tx+2,tx+26,tx+66
-	--ticket
-	for i=1,15 do
-		rrect(tx-5+6*i,ty-1,3,1,0,7)
+--confirm bet page
+function upd_confirm()
+	if btn(⬇️) then
+		scroller=min(scroller+10,1000)
+	elseif btn(⬆️) then
+		scroller=max(scroller-10,0)
 	end
-	rrectfill(tx,ty,90,81,0,7)--ticket
-	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
-	spr(128,tx-2,ty+81,1,3)--left leaf
-	spr(129,tx+89,ty+81,1,3)--right leaf
-	for i=1,3 do
-		_wmoff=0
-		if i==3 then
-			_wmoff=1
+end
+
+--confirm bet page
+function drw_confirm()
+	print("round:#",4,3-scroller,6)	
+	
+	spr(108,83,1-scroller)--money
+	print("100",92,3-scroller,9)--my money
+	rrectfill(4,10-scroller,120,107,0,7)--ticket
+	rrect(3,9-scroller,122,109,0,1)--outline
+	rrectfill(4,10-scroller,120,9,0,2)--red area
+	print("current bets",42,12-scroller,7)
+	rrectfill(4,20-scroller,120,8,0,5)--grey area
+	rrect(3,19-scroller,122,10,0,1)--grey outline
+	--print("arena",12,21,0)
+	--print("player",72,21,0)
+	--selection area
+	bet_count=0
+	p_count=1
+	o_pcount=0
+	for _bet=1,10 do
+		p_count=1
+		--bets[_bet]
+		--line(3,13+i*14,124,13+i*14,1)
+		--rrectfill(42,16+i*14,80,9,1,6)
+		--spr(101+i,27,16+i*14)--planet
+		_cbet=bets[_bet]
+		print(_bet,10,22+o_pcount-scroller+8,0)
+		for _arloc=1,16 do
+			if _cbet[_arloc] then
+				print(players[arenas[_arloc]][1],30,15+p_count*7+o_pcount-scroller+8,0)
+				p_count+=1
+			end
 		end
-		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
+		if p_count>1 then
+			rrect(3,20+o_pcount-scroller+8,122,p_count*6,0,1)
+			o_pcount+=p_count*6-1
+			bet_count+=1
+		end
 	end
-	--text
-	rrectfill(tx+2,ty+2,86,10,0,2)--red area
-	print("★galaxy club bets★",tx+5,ty+5,7)
-	print("round #1784",tx+22,ty+15,0)
-	print("----------------------",tx+2,ty+22,0)
-	print("arena",_arx,ty+28,0)
-	print("player",_plx+4,ty+28,0)
-	print("odds",_odx,ty+28,0)
-	print("----------------------",tx+2,ty+22,0)
-	for i=1,4 do
-		print(i,_arx+8,ty+34+8*i,0)
-		print("the dude",_plx,ty+34+8*i,0)
-		print("11:1",_odx,ty+34+8*i,0)
-	end
-	print("----------------------",tx+3,ty+80,0)
-	print("bet:",_arx+1,ty+85)
-	print("odds:",tx+41,ty+85)
-	print("payout:",_arx+2,ty+93)
+	
+	-- rrectfill(36,118,55,9,1,1)
+	-- print("confirm bets",40,120,7)
 end
+
 -->8
 --quick bet page
 
@@ -434,6 +459,55 @@ function print_bet_odds()
 	return _odds_clr..int_clmp_odds..":1"
 end
 
+-->8
+--ticket
+function init_ticket()
+	tx,ty=20,10
+	_upd=upd_ticket
+	_drw=drw_ticket
+end
+
+function upd_ticket()
+	
+end
+
+function drw_ticket()
+	
+	local _arx,_plx,_odx=tx+2,tx+26,tx+66
+	--ticket
+	for i=1,15 do
+		rrect(tx-5+6*i,ty-1,3,1,0,7)
+	end
+	rrectfill(tx,ty,90,81,0,7)--ticket
+	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
+	spr(128,tx-2,ty+81,1,3)--left leaf
+	spr(129,tx+89,ty+81,1,3)--right leaf
+	for i=1,3 do
+		_wmoff=0
+		if i==3 then
+			_wmoff=1
+		end
+		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
+	end
+	--text
+	rrectfill(tx+2,ty+2,86,10,0,2)--red area
+	print("★galaxy club bets★",tx+5,ty+5,7)
+	print("round #1784",tx+22,ty+15,0)
+	print("----------------------",tx+2,ty+22,0)
+	print("arena",_arx,ty+28,0)
+	print("player",_plx+4,ty+28,0)
+	print("odds",_odx,ty+28,0)
+	print("----------------------",tx+2,ty+22,0)
+	for i=1,4 do
+		print(i,_arx+8,ty+34+8*i,0)
+		print("the dude",_plx,ty+34+8*i,0)
+		print("11:1",_odx,ty+34+8*i,0)
+	end
+	print("----------------------",tx+3,ty+80,0)
+	print("bet:",_arx+1,ty+85)
+	print("odds:",tx+41,ty+85)
+	print("payout:",_arx+2,ty+93)
+end
 -->8
 --calculations
 function calculate_odds()
