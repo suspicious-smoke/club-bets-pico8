@@ -46,7 +46,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
-	bet_amount={1,0,0}
+	bet_amount={0,1,0,0}
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -108,13 +108,16 @@ function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	bet_sel=1
-	md_sel_plyr=false
-	bet_mode=1
+	bet_mode=1--main,plyr sel,amt sel
+	i_amt=1
 end
 
 function upd_betpage()
+debug[1]=i_amt
+debug[2]=#bet_amount
 	get_total_odds_and_pay()
-	if md_sel_plyr then
+	--player select mode
+	if bet_mode==2 then
 		if btnp(⬆️) then
 			plyr_menu_sel=(plyr_menu_sel-2)%4+1
 		elseif btnp(⬇️) then
@@ -122,9 +125,22 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			player_sel=plyr_menu_sel+(arena_sel-1)*4
 			toggle_bet()
-			md_sel_plyr=false
+			bet_mode=1
 		elseif btnp(❎) then
-			md_sel_plyr=false
+			bet_mode=1
+		end
+	--bet select mode
+	elseif bet_mode==3 then
+		if btnp(⬆️) then
+			bet_amount[i_amt]=(bet_amount[i_amt]+1)%10
+		elseif btnp(⬇️) then
+			bet_amount[i_amt]=(bet_amount[i_amt]-1)%10
+		elseif btnp(➡️) then
+			i_amt=(i_amt%4)+1
+		elseif btnp(⬅️) then
+			i_amt=(i_amt-2)%4+1
+		elseif btnp(🅾️) or btnp(❎) then
+			bet_mode=1
 		end
 	else
 		if btnp(⬆️) then
@@ -142,9 +158,10 @@ function upd_betpage()
 				--complete bets
 			elseif arena_sel==5 then
 				--change money
-				
+				i_amt=1
+				bet_mode=3
 			else
-				md_sel_plyr=true
+				bet_mode=2--player sel
 				plyr_menu_sel=1
 			end
 		elseif btnp(❎) then
@@ -177,7 +194,7 @@ function drw_betpage()
 	for i=1,4 do
 		line(3,13+i*14,124,13+i*14,1)
 		rrectfill(42,16+i*14,80,9,1,6)
-		if arena_sel==i and not md_sel_plyr then
+		if arena_sel==i and bet_mode!=2 then
 			rrect(42,16+i*14,80,9,1,9)
 		end
 		print(i,18,18+i*14,0)
@@ -199,7 +216,7 @@ function drw_betpage()
 	
 	draw_winning_calc()
 	--player select area
-	if md_sel_plyr then
+	if bet_mode==2 then
 		draw_dropdown()
 	end
 end
@@ -231,7 +248,11 @@ function draw_winning_calc()
 	print("bet amt",8,96,0)
 	
 	for i=1,4 do
-		print(bet_amount[i] or 0,9+i*4,105,0)
+		i_clr=0
+		if i==i_amt and bet_mode==3 then
+			i_clr=9
+		end
+		print(bet_amount[i] or 0,9+i*4,105,i_clr)
 	end
 
 	if arena_sel==5 then
@@ -338,7 +359,7 @@ function get_total_odds_and_pay()
 			total_odds*=bet_odds[aplyr]
 		end
 	end
-	clmp_odds=int_to_arr(min(total_odds,500))
+	clmp_odds=int_to_arr(min(total_odds,999))
 	total_pay=arr_display(arr_mult(clmp_odds,bet_amount))
 end
 
@@ -409,7 +430,7 @@ end
 function print_bet_odds()
 	local _odds_clr="\f9"
 	int_clmp_odds=arr_display(clmp_odds)
-	if int_clmp_odds=="500" then
+	if int_clmp_odds=="999" then
 		_odds_clr="\f8"
 	end
 	return _odds_clr..int_clmp_odds..":1"
