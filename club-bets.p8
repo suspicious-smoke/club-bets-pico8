@@ -54,7 +54,7 @@ function _init()
 	}
 	--prob of 3d6 from 3-18
 	bet_sel=1--the currently selected bet (betpage/quickbetpage)
-	
+	arena_sel=1
 	_upd=blank
 	_drw=blank
 	fill_arenas()
@@ -119,10 +119,9 @@ end
 function init_betpage()
 	_upd=upd_betpage
 	_drw=drw_betpage
-	arena_sel=1
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
-	bet_sel=1
+	
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
 end
@@ -169,6 +168,7 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				--complete bets
+				init_confirm()
 			elseif arena_sel==5 then
 				--change money
 				i_amt=1
@@ -303,6 +303,8 @@ function upd_confirm()
 			scroller=min(scroller+7,max_scroll)
 		elseif btn(⬆️) then
 			scroller=max(scroller-7,0)
+		elseif btnp(❎) then
+			init_betpage()
 		end
 	end
 end
@@ -348,7 +350,7 @@ function drw_confirm()
 			end
 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
 			get_total_odds_and_pay(_bet)
-			print(" "..arr_display(clmp_odds)..":1\n$"..total_pay,88,22+o_pcount-scroller+8,0)
+			print(" "..arr_display(clmp_odds)..":1\n$"..total_pay,84,22+o_pcount-scroller+8,0)
 
 			o_pcount+=p_count*pc_mult-1
 			bet_count+=1
