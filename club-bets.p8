@@ -287,17 +287,20 @@ end
 
 --confirm bet page
 function init_confirm()
+	scroller=0
+	max_scroll=1000
 	_upd=upd_confirm
 	_drw=drw_confirm
-	scroller=0
+	
+
 end
 
 --confirm bet page
 function upd_confirm()
 	if btn(⬇️) then
-		scroller=min(scroller+10,1000)
+		scroller=min(scroller+7,max_scroll)
 	elseif btn(⬆️) then
-		scroller=max(scroller-10,0)
+		scroller=max(scroller-7,0)
 	end
 end
 
@@ -307,39 +310,43 @@ function drw_confirm()
 	
 	spr(108,83,1-scroller)--money
 	print("100",92,3-scroller,9)--my money
-	rrectfill(4,10-scroller,120,107,0,7)--ticket
-	rrect(3,9-scroller,122,109,0,1)--outline
+	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
+	rrect(3,9-scroller,122,10,0,1)--outline
 	rrectfill(4,10-scroller,120,9,0,2)--red area
 	print("current bets",42,12-scroller,7)
 	rrectfill(4,20-scroller,120,8,0,5)--grey area
-	rrect(3,19-scroller,122,10,0,1)--grey outline
-	--print("arena",12,21,0)
-	--print("player",72,21,0)
+	rrect(3,19-scroller,122,9,0,1)--grey outline
+
+	print("bet",5,21-scroller,0)
+	line(17,20-scroller,17,max_scroll+107-scroller,1)--bet/player v-line
+	line(72,20-scroller,72,max_scroll+107-scroller,1)--end plyr line
 	--selection area
 	bet_count=0
 	p_count=1
 	o_pcount=0
 	for _bet=1,10 do
 		p_count=1
-		--bets[_bet]
-		--line(3,13+i*14,124,13+i*14,1)
-		--rrectfill(42,16+i*14,80,9,1,6)
-		--spr(101+i,27,16+i*14)--planet
 		_cbet=bets[_bet]
-		print(_bet,10,22+o_pcount-scroller+8,0)
+		print(_bet,6,21+o_pcount-scroller+8,0)
 		for _arloc=1,16 do
 			if _cbet[_arloc] then
-				print(players[arenas[_arloc]][1],30,15+p_count*7+o_pcount-scroller+8,0)
+				print(players[arenas[_arloc]][1],28,14+p_count*9+o_pcount-scroller+8,0)
+				spr(101+ceil(_arloc/4),19,12+p_count*9+o_pcount-scroller+8)--planet
 				p_count+=1
 			end
 		end
 		if p_count>1 then
-			rrect(3,20+o_pcount-scroller+8,122,p_count*6,0,1)
-			o_pcount+=p_count*6-1
+			pc_mult=8
+			if p_count==2 then
+				pc_mult=9
+			end
+			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
+			
+			o_pcount+=p_count*pc_mult-1
 			bet_count+=1
 		end
 	end
-	
+	max_scroll=o_pcount-80
 	-- rrectfill(36,118,55,9,1,1)
 	-- print("confirm bets",40,120,7)
 end
