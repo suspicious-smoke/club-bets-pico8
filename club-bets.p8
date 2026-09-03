@@ -113,8 +113,6 @@ function init_betpage()
 end
 
 function upd_betpage()
-debug[1]=i_amt
-debug[2]=#bet_amount
 	get_total_odds_and_pay()
 	--player select mode
 	if bet_mode==2 then
@@ -124,6 +122,7 @@ debug[2]=#bet_amount
 			plyr_menu_sel=(plyr_menu_sel%4)+1
 		elseif btnp(🅾️) then
 			player_sel=plyr_menu_sel+(arena_sel-1)*4
+			debug[1]=player_sel
 			toggle_bet()
 			bet_mode=1
 		elseif btnp(❎) then
@@ -371,16 +370,16 @@ function toggle_bet()
 	end
 	--switch off other bets in arena
 	arena_start=0
-	if player_sel<5 then
+	if player_sel<=4 then
 		arena_start=1
-	elseif player_sel<9 then
+	elseif player_sel<=8 then
 		arena_start=5
-	elseif player_sel<13 then
+	elseif player_sel<=12 then
 		arena_start=9
 	else
 		arena_start=13
 	end
-	for i=arena_start,arena_start+4 do
+	for i=arena_start,arena_start+3 do
 		bets[bet_sel][i]=false
 	end
 	bets[bet_sel][player_sel]=not bets[bet_sel][player_sel]
