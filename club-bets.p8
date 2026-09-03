@@ -7,20 +7,24 @@ function _init()
 	version,t=0,0
 	debug={"","","",""}
 
-	categories={
-		"movement",
-		"precise"
-	}
-	obs={
-		{"hairpine",1,2},
-	}
+	-- categories={
+	-- 	"movement",
+	-- 	"precise"
+	-- }
+	-- obs={
+	-- 	{"hairpine",1,2},
+	-- }
+
+	--build initial bets
 	bets={}
 	for i=1,10 do
-		add(bets,{})
-		for j=1,16 do
-			add(bets[i],false)
+		local _bet={100,{}}
+		for j=1,4 do
+			local _bet_arena={false,false,false,false}
+			add(_bet[2],_bet_arena)	
 		end
 	end
+
 	-- for i=1,4 do
 	-- 	bets[1][i*4]=true
 	-- end
@@ -75,12 +79,12 @@ function _update()
 	--update_fx()--particles
 end
 
-function reset_bet_amounts()
-	bet_amounts={}
-	for i=1,10 do
-		add(bet_amounts,{0,0,0,0})
-	end
-end
+-- function reset_bet_amounts()
+-- 	bet_amounts={}
+-- 	for i=1,10 do
+-- 		add(bet_amounts,{0,0,0,0})
+-- 	end
+-- end
 
 function reset_num_array(_size,_items)
 	_num_arr={}
@@ -98,38 +102,36 @@ function reset_array(_items)
 	return _arr
 end
 
-function odds_debug()
-	local gc={1,4,2,3}--arena text colors
-	gc_ind=1--color index
-	g_off=0--space between arenas
-	for i=1,16 do
-		print(bet_odds[i]..":1",24,i*8-6,gc[gc_ind])
-		print(players[arenas[i]][1],50,i*8-6,gc[gc_ind])
-		print(odds[i].."%",10,i*8-6,gc[gc_ind])
-		if i%4==0 then
-			gc_ind+=1
-			g_off+=2
-		end
-	end
-end
+-- function odds_debug()
+-- 	local gc={1,4,2,3}--arena text colors
+-- 	gc_ind=1--color index
+-- 	g_off=0--space between arenas
+-- 	for i=1,16 do
+-- 		print(bet_odds[i]..":1",24,i*8-6,gc[gc_ind])
+-- 		print(players[arenas[i]][1],50,i*8-6,gc[gc_ind])
+-- 		print(odds[i].."%",10,i*8-6,gc[gc_ind])
+-- 		if i%4==0 then
+-- 			gc_ind+=1
+-- 			g_off+=2
+-- 		end
+-- 	end
+-- end
 
-function dummy_bets()
-	for _bet=1,10 do
-		for _arena=1,4 do
-			local _arloc=(_arena-1)*4	
-			_r=rnd_rng(1,5)
-			if _r!= 5 then
-				bets[_bet][_arloc+_r]=true
-			end
-		end
-	end
-end
+-- function dummy_bets()
+-- 	for _bet=1,10 do
+-- 		for _arena=1,4 do
+-- 			local _arloc=(_arena-1)*4	
+-- 			_r=rnd_rng(1,5)
+-- 			if _r!= 5 then
+-- 				bets[_bet][_arloc+_r]=true
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 function _draw()
 	cls()
-	
 	_drw()
-
 	--debug
 	offst=0
 	for txt in all(debug) do
@@ -398,252 +400,249 @@ end
 -->8
 --quick bet page
 
-function init_quickbetpage()
-	bet_sel=1--1-10
-	player_sel=1--select player for each arena 1-16
-	total_odds=0
-	total_pay=0
-	_upd=upd_quickbetpage
-	_drw=draw_quickbetpage
-end
+-- function init_quickbetpage()
+-- 	bet_sel=1--1-10
+-- 	player_sel=1--select player for each arena 1-16
+-- 	total_odds=0
+-- 	total_pay=0
+-- 	_upd=upd_quickbetpage
+-- 	_drw=draw_quickbetpage
+-- end
 
-function upd_quickbetpage()
-	get_total_odds_and_pay(bet_sel)
-	if btnp(➡️) then
-		bet_sel=(bet_sel%10)+1
-	elseif btnp(⬅️) then
-		bet_sel=(bet_sel-2)%10+1
-	elseif btnp(⬆️) then
-		player_sel=(player_sel-2)%16+1
-	elseif btnp(⬇️) then
-		player_sel=(player_sel%16)+1
-	elseif btnp(🅾️) then
-		toggle_bet()
-	elseif btnp(❎) then
-		--open up window to see
-		--more info or switch menus
-	end
-end
+-- function upd_quickbetpage()
+-- 	get_total_odds_and_pay(bet_sel)
+-- 	if btnp(➡️) then
+-- 		bet_sel=(bet_sel%10)+1
+-- 	elseif btnp(⬅️) then
+-- 		bet_sel=(bet_sel-2)%10+1
+-- 	elseif btnp(⬆️) then
+-- 		player_sel=(player_sel-2)%16+1
+-- 	elseif btnp(⬇️) then
+-- 		player_sel=(player_sel%16)+1
+-- 	elseif btnp(🅾️) then
+-- 		toggle_bet()
+-- 	elseif btnp(❎) then
+-- 		--open up window to see
+-- 		--more info or switch menus
+-- 	end
+-- end
 
-function get_bet_odds(_bet)
-	for arena=1,16 do
-		if bets[_bet][arena] then
-			total_odds[_bet]*=bet_odds[arena]
-		end
-	end
-end
+-- function get_bet_odds(_bet)
+-- 	for arena=1,16 do
+-- 		if bets[_bet][arena] then
+-- 			total_odds[_bet]*=bet_odds[arena]
+-- 		end
+-- 	end
+-- end
 
-function get_total_odds_and_pay()
-	total_payout={0,0,0,0,0,0,0,0,0,0,0}
-	for i_bet=1,10 do
-		bet_total_odds=reset_array(10)
-		bet_pays=reset_num_array(10,4)
-		for i_arena=1,16 do
-		if bets[i_bet][i_arena] then
-			total_odds[i_bet]*=bet_odds[i_arena]
-		end
-	end
-	--bet's total odds
-	_odds=min(total_odds,999)
-	bet_total_odds[i_bet]=_odds
-	--get payout for bet
-	clmp_odds=int_to_arr(_odds)--make an array	
+-- function get_total_odds_and_pay()
+-- 	total_payout={0,0,0,0,0,0,0,0,0,0,0}
+-- 	for i_bet=1,10 do
+-- 		bet_total_odds=reset_array(10)
+-- 		bet_pays=reset_num_array(10,4)
+-- 		for i_arena=1,16 do
+-- 		if bets[i_bet][i_arena] then
+-- 			total_odds[i_bet]*=bet_odds[i_arena]
+-- 		end
+-- 	end
+-- 	--bet's total odds
+-- 	_odds=min(total_odds,999)
+-- 	bet_total_odds[i_bet]=_odds
+-- 	--get payout for bet
+-- 	clmp_odds=int_to_arr(_odds)--make an array	
 
-	total_payout=arr_mult(clmp_odds,bet_amounts[i])
-end
+-- 	total_payout=arr_mult(clmp_odds,bet_amounts[i])
+-- end
 
 
-function toggle_bet()
-	--toggle bet if already selected
-	if bets[bet_sel][player_sel] then
-		bets[bet_sel][player_sel]=false
-		return
-	end
-	--switch off other bets in arena
-	arena_start=0
-	if player_sel<=4 then
-		arena_start=1
-	elseif player_sel<=8 then
-		arena_start=5
-	elseif player_sel<=12 then
-		arena_start=9
-	else
-		arena_start=13
-	end
-	for i=arena_start,arena_start+3 do
-		bets[bet_sel][i]=false
-	end
-	bets[bet_sel][player_sel]=not bets[bet_sel][player_sel]
-end
+-- function toggle_bet()
+-- 	--toggle bet if already selected
+-- 	if bets[bet_sel][player_sel] then
+-- 		bets[bet_sel][player_sel]=false
+-- 		return
+-- 	end
+-- 	--switch off other bets in arena
+-- 	arena_start=0
+-- 	if player_sel<=4 then
+-- 		arena_start=1
+-- 	elseif player_sel<=8 then
+-- 		arena_start=5
+-- 	elseif player_sel<=12 then
+-- 		arena_start=9
+-- 	else
+-- 		arena_start=13
+-- 	end
+-- 	for i=arena_start,arena_start+3 do
+-- 		bets[bet_sel][i]=false
+-- 	end
+-- 	bets[bet_sel][player_sel]=not bets[bet_sel][player_sel]
+-- end
 
-function draw_quickbetpage()
-	local gc={1,4,2,3}--arena text colors
-	gc_ind=1--color index
-	g_off=0--space between arenas
-	for ap_id=1,16 do--players in arenas
-		local _py=ap_id*7+g_off
-		rrectfill(1,_py-6,126,7,0,6+ap_id%2)--row background
-		--print player string
-		local _pstring=players[arenas[ap_id]][2].." "
-		if bet_odds[ap_id] < 10 then
-			_pstring=_pstring.." "
-		end
-		_pstring=_pstring..bet_odds[ap_id]..":1"
-		print(_pstring,3,_py-5,gc[gc_ind])
-		--bet buttons
-		for k=1,10 do
-			bet_clr=5
-			if bets[k][ap_id] then
-				bet_clr=3
-			end
-			if bet_sel==k and player_sel==ap_id then
-				print("\f7\^oc5a●",29+k*9,_py-5)
-			end
-			print("●",29+k*9,_py-5,bet_clr)
-		end
+-- function draw_quickbetpage()
+-- 	local gc={1,4,2,3}--arena text colors
+-- 	gc_ind=1--color index
+-- 	g_off=0--space between arenas
+-- 	for ap_id=1,16 do--players in arenas
+-- 		local _py=ap_id*7+g_off
+-- 		rrectfill(1,_py-6,126,7,0,6+ap_id%2)--row background
+-- 		--print player string
+-- 		local _pstring=players[arenas[ap_id]][2].." "
+-- 		if bet_odds[ap_id] < 10 then
+-- 			_pstring=_pstring.." "
+-- 		end
+-- 		_pstring=_pstring..bet_odds[ap_id]..":1"
+-- 		print(_pstring,3,_py-5,gc[gc_ind])
+-- 		--bet buttons
+-- 		for k=1,10 do
+-- 			bet_clr=5
+-- 			if bets[k][ap_id] then
+-- 				bet_clr=3
+-- 			end
+-- 			if bet_sel==k and player_sel==ap_id then
+-- 				print("\f7\^oc5a●",29+k*9,_py-5)
+-- 			end
+-- 			print("●",29+k*9,_py-5,bet_clr)
+-- 		end
 
-		if ap_id%4==0 then
-			gc_ind+=1
-			g_off+=2
-		end
-	end
-	--bet selector
-	rrect(28+bet_sel*9,0,9,120,0,12)
-	--info area
-	rrectfill(0,120,128,7,0,5)
-	print("bet \f9#"..bet_sel,2,121,7)
+-- 		if ap_id%4==0 then
+-- 			gc_ind+=1
+-- 			g_off+=2
+-- 		end
+-- 	end
+-- 	--bet selector
+-- 	rrect(28+bet_sel*9,0,9,120,0,12)
+-- 	--info area
+-- 	rrectfill(0,120,128,7,0,5)
+-- 	print("bet \f9#"..bet_sel,2,121,7)
 	
-	print("odds "..print_bet_odds(),34,121,7)
-	print("pays \f9$"..total_pay,74,121,7)
-end
+-- 	print("odds "..print_bet_odds(),34,121,7)
+-- 	print("pays \f9$"..total_pay,74,121,7)
+-- end
 
-function print_bet_odds()
-	local _odds_clr="\f9"
-	int_clmp_odds=arr_display(clmp_odds)
-	if int_clmp_odds=="999" then
-		_odds_clr="\f8"
-	end
-	return _odds_clr..int_clmp_odds..":1"
-end
+-- function print_bet_odds()
+-- 	local _odds_clr="\f9"
+-- 	int_clmp_odds=arr_display(clmp_odds)
+-- 	if int_clmp_odds=="999" then
+-- 		_odds_clr="\f8"
+-- 	end
+-- 	return _odds_clr..int_clmp_odds..":1"
+-- end
 
 -->8
 --ticket
-function init_ticket()
-	tx,ty=20,10
-	_upd=upd_ticket
-	_drw=drw_ticket
-end
+-- function init_ticket()
+-- 	tx,ty=20,10
+-- 	_upd=upd_ticket
+-- 	_drw=drw_ticket
+-- end
 
-function upd_ticket()
+-- function upd_ticket()
 	
-end
+-- end
 
-function drw_ticket()
+-- function drw_ticket()
 	
-	local _arx,_plx,_odx=tx+2,tx+26,tx+66
-	--ticket
-	for i=1,15 do
-		rrect(tx-5+6*i,ty-1,3,1,0,7)
-	end
-	rrectfill(tx,ty,90,81,0,7)--ticket
-	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
-	spr(128,tx-2,ty+81,1,3)--left leaf
-	spr(129,tx+89,ty+81,1,3)--right leaf
-	for i=1,3 do
-		_wmoff=0
-		if i==3 then
-			_wmoff=1
-		end
-		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
-	end
-	--text
-	rrectfill(tx+2,ty+2,86,10,0,2)--red area
-	print("★galaxy club bets★",tx+5,ty+5,7)
-	print("round #1784",tx+22,ty+15,0)
-	print("----------------------",tx+2,ty+22,0)
-	print("arena",_arx,ty+28,0)
-	print("player",_plx+4,ty+28,0)
-	print("odds",_odx,ty+28,0)
-	print("----------------------",tx+2,ty+22,0)
-	for i=1,4 do
-		print(i,_arx+8,ty+34+8*i,0)
-		print("the dude",_plx,ty+34+8*i,0)
-		print("11:1",_odx,ty+34+8*i,0)
-	end
-	print("----------------------",tx+3,ty+80,0)
-	print("bet:",_arx+1,ty+85)
-	print("odds:",tx+41,ty+85)
-	print("payout:",_arx+2,ty+93)
-end
--->8
---calculations
+-- 	local _arx,_plx,_odx=tx+2,tx+26,tx+66
+-- 	--ticket
+-- 	for i=1,15 do
+-- 		rrect(tx-5+6*i,ty-1,3,1,0,7)
+-- 	end
+-- 	rrectfill(tx,ty,90,81,0,7)--ticket
+-- 	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
+-- 	spr(128,tx-2,ty+81,1,3)--left leaf
+-- 	spr(129,tx+89,ty+81,1,3)--right leaf
+-- 	for i=1,3 do
+-- 		_wmoff=0
+-- 		if i==3 then
+-- 			_wmoff=1
+-- 		end
+-- 		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
+-- 	end
+-- 	--text
+-- 	rrectfill(tx+2,ty+2,86,10,0,2)--red area
+-- 	print("★galaxy club bets★",tx+5,ty+5,7)
+-- 	print("round #1784",tx+22,ty+15,0)
+-- 	print("----------------------",tx+2,ty+22,0)
+-- 	print("arena",_arx,ty+28,0)
+-- 	print("player",_plx+4,ty+28,0)
+-- 	print("odds",_odx,ty+28,0)
+-- 	print("----------------------",tx+2,ty+22,0)
+-- 	for i=1,4 do
+-- 		print(i,_arx+8,ty+34+8*i,0)
+-- 		print("the dude",_plx,ty+34+8*i,0)
+-- 		print("11:1",_odx,ty+34+8*i,0)
+-- 	end
+-- 	print("----------------------",tx+3,ty+80,0)
+-- 	print("bet:",_arx+1,ty+85)
+-- 	print("odds:",tx+41,ty+85)
+-- 	print("payout:",_arx+2,ty+93)
+-- end
+-- -->8
+-- --calculations
 function calculate_odds()
-	--loop through the players
-	odds={}
-	arena_opp_off=0
-	for _arena_index=1,16 do
-		local _plyr_id=arenas[_arena_index]
-		local total_prob=0
-		local p_base=players[_plyr_id][3]
-		for die=3,18 do
-			local p_prob=d6x3[die]
-			local p_score=p_base+die
-			--we have our die roll
-			--opponent probabilities
-			for _copp=1,4 do
-				local _opp_id=arenas[arena_opp_off+_copp]
-				if _opp_id!=_plyr_id then
-					local o_prob=0
-					local o_base=players[_opp_id][3]
-					for o_die=3,18 do
-						--get player scores that beat opponent's score
-						if o_base+o_die<p_score then
-							o_prob+=d6x3[o_die]
+	--each of 4 arenas looks like arena={p_id,p_odds}
+	for i_arena=1,4 do
+		for i_a_player=1,4 do
+			local _arena=arenas[i_arena]
+			local _plyr_id=_arena[i_a_player]
+			local total_prob=0
+			p_base=players[_plyr_id][3]
+			for die=3,18 do
+				local p_prob=d6x3[die]
+				local p_score=p_base+die
+				--we have our die roll
+				--opponent probabilities
+				for _copp=1,4 do
+					local _opp_id=_arena[_copp]
+					if _opp_id!=_plyr_id then
+						local o_prob=0
+						local o_base=players[_opp_id][3]
+						for o_die=3,18 do
+							--get player scores that beat opponent's score
+							if o_base+o_die<p_score then
+								o_prob+=d6x3[o_die]
+							end
 						end
-					end
-					--multiply opponent prob to player prob
-					p_prob=p_prob*o_prob
-				end 
+						--multiply opponent prob to player prob
+						p_prob=p_prob*o_prob
+					end 
+				end
+				total_prob+=p_prob
 			end
-			total_prob+=p_prob
-		end
-		if _arena_index%4==0 then
-			arena_opp_off+=4
-		end
-		add(odds,ceil(total_prob*100))
-	end
-	get_bet_odds()
-end
-
-function get_bet_odds()
-	bet_odds={}
-	for oi=1,16 do--odds index
-		local _percs={40,30,25,20,15,10,7, 5, 3, 4, 0}
-		local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
-		local found=false
-		for i=1,#_percs do
-			if odds[oi]>=_percs[i] and not found then
-				add(bet_odds,_podds[i])
-				found=true
-			end
+			arenas[i_arena][2]=ceil(total_prob*100)
 		end
 	end
 end
 
 function fill_arenas()
-	arenas={}
+	arenas={{},{},{},{}}
 	--array of 1,2,...,16 for random players
 	local _rplrs={}
 	for i=1,16 do
 		add(_rplrs,i)
 	end
-	--fill pirates in arenas
+	i_arena=1
+	--fill players in arenas
 	for i=1,16 do
-		local _rplyr=rnd(_rplrs)
-		add(arenas,_rplyr)
-		del(_rplrs,_rplyr)
+		local _rp=rnd(_rplrs)
+		add(arenas[i_arena],_rp)
+		del(_rplrs,_rp)
+		if i%4==0 then--next arena
+			i_arena+=1
+		end 
 	end
 	calculate_odds()
+end
+
+--turns percentage into number x used in x:1 format.
+function x_to_one_format(_bet_perc)
+	local _percs={40,30,25,20,15,10,7, 5, 3, 4, 0}
+	local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
+	for i=1,#_percs do
+		if _bet_perc>=_percs[i] then
+			return add(bet_odds,_podds[i])
+		end
+	end
 end
 
 -->8
