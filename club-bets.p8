@@ -59,6 +59,7 @@ function _init()
 	_drw=blank
 	fill_arenas()
 	dummy_bets()
+
 	--init_quickbetpage()
 	--init_ticket()
 	--init_betpage()
@@ -127,7 +128,7 @@ function init_betpage()
 end
 
 function upd_betpage()
-	get_total_odds_and_pay()
+	get_total_odds_and_pay(bet_sel)
 	--player select mode
 	if bet_mode==2 then
 		if btnp(⬆️) then
@@ -288,7 +289,7 @@ end
 --confirm bet page
 function init_confirm()
 	scroller=0
-	max_scroll=1000
+	max_scroll=0
 	_upd=upd_confirm
 	_drw=drw_confirm
 	
@@ -297,10 +298,12 @@ end
 
 --confirm bet page
 function upd_confirm()
-	if btn(⬇️) then
-		scroller=min(scroller+7,max_scroll)
-	elseif btn(⬆️) then
-		scroller=max(scroller-7,0)
+	if max_scroll>0 then
+		if btn(⬇️) then
+			scroller=min(scroller+7,max_scroll)
+		elseif btn(⬆️) then
+			scroller=max(scroller-7,0)
+		end
 	end
 end
 
@@ -328,6 +331,7 @@ function drw_confirm()
 	o_pcount=0
 	for _bet=1,10 do
 		p_count=1
+		_cbet_odds=1
 		_cbet=bets[_bet]
 		print(_bet,6,21+o_pcount-scroller+8,0)
 		for _arloc=1,16 do
@@ -343,12 +347,15 @@ function drw_confirm()
 				pc_mult=9
 			end
 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
-			
+			get_total_odds_and_pay(_bet)
+			print(" "..arr_display(clmp_odds)..":1\n$"..total_pay,88,22+o_pcount-scroller+8,0)
+
 			o_pcount+=p_count*pc_mult-1
 			bet_count+=1
 		end
 	end
 	max_scroll=o_pcount-80
+	
 	-- rrectfill(36,118,55,9,1,1)
 	-- print("confirm bets",40,120,7)
 end
@@ -366,7 +373,7 @@ function init_quickbetpage()
 end
 
 function upd_quickbetpage()
-	get_total_odds_and_pay()
+	get_total_odds_and_pay(bet_sel)
 	if btnp(➡️) then
 		bet_sel=(bet_sel%10)+1
 	elseif btnp(⬅️) then
@@ -383,11 +390,11 @@ function upd_quickbetpage()
 	end
 end
 
-function get_total_odds_and_pay()
+function get_total_odds_and_pay(_bet_sel)
 	total_odds=1
 	total_pay=0
 	for aplyr=1,16 do
-		if bets[bet_sel][aplyr] then
+		if bets[_bet_sel][aplyr] then
 			total_odds*=bet_odds[aplyr]
 		end
 	end
