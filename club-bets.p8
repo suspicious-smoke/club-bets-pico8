@@ -46,7 +46,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
-	bet_amount={0,1,0,0}
+	bet_amounts=reset_num_array(10,4)
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -73,6 +73,29 @@ function _update()
 	_upd()
 	
 	--update_fx()--particles
+end
+
+function reset_bet_amounts()
+	bet_amounts={}
+	for i=1,10 do
+		add(bet_amounts,{0,0,0,0})
+	end
+end
+
+function reset_num_array(_size,_items)
+	_num_arr={}
+	for i=1,_size do
+		add(_num_arr,reset_array(_items))
+	end
+	return _num_arr
+end
+
+function reset_array(_items)
+	_arr={}
+	for i=1,_items do
+		add(_arr,0)
+	end
+	return _arr
 end
 
 function odds_debug()
@@ -144,9 +167,9 @@ function upd_betpage()
 	--bet select mode
 	elseif bet_mode==3 then
 		if btnp(⬆️) then
-			bet_amount[i_amt]=(bet_amount[i_amt]+1)%10
+			bet_amounts[bet_sel][i_amt]=(bet_amounts[bet_sel][i_amt]+1)%10
 		elseif btnp(⬇️) then
-			bet_amount[i_amt]=(bet_amount[i_amt]-1)%10
+			bet_amounts[bet_sel][i_amt]=(bet_amounts[bet_sel][i_amt]-1)%10
 		elseif btnp(➡️) then
 			i_amt=(i_amt%4)+1
 		elseif btnp(⬅️) then
@@ -265,7 +288,7 @@ function draw_winning_calc()
 		if i==i_amt and bet_mode==3 then
 			i_clr=9
 		end
-		print(bet_amount[i] or 0,9+i*4,105,i_clr)
+		print(bet_amounts[bet_sel][i] or 0,9+i*4,105,i_clr)
 	end
 
 	if arena_sel==5 then
@@ -402,27 +425,33 @@ function upd_quickbetpage()
 	end
 end
 
-function get_total_odds_and_pay(_bet_sel)
-	total_odds=1
-	total_pay=0
-	for aplyr=1,16 do
-		if bets[_bet_sel][aplyr] then
-			total_odds*=bet_odds[aplyr]
+function get_bet_odds(_bet)
+	for arena=1,16 do
+		if bets[_bet][arena] then
+			total_odds[_bet]*=bet_odds[arena]
 		end
 	end
-	clmp_odds=int_to_arr(min(total_odds,999))
-	raw_total_pay=arr_mult(clmp_odds,bet_amount)
-	total_pay=arr_display(raw_total_pay)
 end
 
-function get_payout()
-	payout={0,0,0,0}
-	for i=1,10 do
-		get_total_odds_and_pay(i)
-		debug[i]=arr_display(raw_total_pay)
-		payout=arr_add(payout,raw_total_pay)
+function get_total_odds_and_pay()
+	total_payout={0,0,0,0,0,0,0,0,0,0,0}
+	for i_bet=1,10 do
+		bet_total_odds=reset_array(10)
+		bet_pays=reset_num_array(10,4)
+		for i_arena=1,16 do
+		if bets[i_bet][i_arena] then
+			total_odds[i_bet]*=bet_odds[i_arena]
+		end
 	end
+	--bet's total odds
+	_odds=min(total_odds,999)
+	bet_total_odds[i_bet]=_odds
+	--get payout for bet
+	clmp_odds=int_to_arr(_odds)--make an array	
+
+	total_payout=arr_mult(clmp_odds,bet_amounts[i])
 end
+
 
 function toggle_bet()
 	--toggle bet if already selected
@@ -585,7 +614,6 @@ function calculate_odds()
 	end
 	get_bet_odds()
 end
-
 
 function get_bet_odds()
 	bet_odds={}
@@ -804,11 +832,11 @@ __gfx__
 0003bbbbb1000000000eccccc1000000000b33333310000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000047047000055555000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000028000000000000004444400040740700555551500000000600000000000000000000000000000000000000000000000000000000000000000000000
-00000000222800001555dd008444114004704070085cc51500000000066666600000000000000000000000000000000000000000000000000000000000000000
-1cccdd005222222d855566d00499441404004700085dd51541008550066556c60000000000000000000000000000000000000000000000000000000000000000
-8cc66cd022e2e2001566555084449440084595440555551544ccc5550866666c0000000000000000000000000000000000000000000000000000000000000000
-1c6ccccc5222222d005555000444440004944940005555500000855506d666d60000000000000000000000000000000000000000000000000000000000000000
+00000000028000000000000004444400040740700555551500000000600000000000000000000000000000000000000000000000006660000006660000000000
+00000000222800001555dd008444114004704070085cc51500000000066666600000000000000000000000000000000000000000006600000000660000000000
+1cccdd005222222d855566d00499441404004700085dd51541008550066556c60000000000000000000000000000000000000000555666666666655500000000
+8cc66cd022e2e2001566555084449440084595440555551544ccc5550866666c0000000000000000000000000000000000000000555666600666655500000000
+1c6ccccc5222222d005555000444440004944940005555500000855506d666d60000000000000000000000000000000000000000555666000066655500000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000cc0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
