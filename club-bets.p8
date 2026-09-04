@@ -53,7 +53,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
-	bet_amounts=reset_num_array(10,4)
+
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -81,13 +81,6 @@ function _update()
 	
 	--update_fx()--particles
 end
-
--- function reset_bet_amounts()
--- 	bet_amounts={}
--- 	for i=1,10 do
--- 		add(bet_amounts,{0,0,0,0})
--- 	end
--- end
 
 function reset_num_array(_size,_items,_val)
 	_num_arr={}
@@ -131,7 +124,6 @@ function upd_betpage()
 	get_bet_summary()
 	--player select mode
 	if bet_mode==2 then
-		debug[1]=plyr_menu_sel
 		if btnp(⬆️) then
 			plyr_menu_sel=(plyr_menu_sel-2)%4+1
 		elseif btnp(⬇️) then
@@ -226,8 +218,7 @@ function drw_betpage()
 		print(plyr_str,52,18+i_arena*14,0)
 		spr(68,115,19+i_arena*14)
 	end
-	
-	--draw_winning_calc()
+	draw_winning_calc()
 	--player select area
 	if bet_mode==2 then
 		draw_dropdown()
@@ -250,41 +241,41 @@ function get_player_string(i_arena,i_aplyr)
 	return players[arena_player[1]][1].." "..bet_colon_format(arena_player[2])..":1"
 end
 
--- function draw_winning_calc()
--- 	--winning calculator
--- 	rrectfill(4,87,120,26,0,7)--ticket
--- 	rrect(3,86,122,28,0,1)--outline
--- 	rrectfill(4,87,120,8,0,5)--title
--- 	print("winnings calculator",26,88,0)
--- 	line(3,94,124,94,1)--hline1
--- 	line(3,102,124,102,1)--hline2
--- 	print("bet amt",8,96,0)
-	
--- 	for i=1,4 do
--- 		i_clr=0
--- 		if i==i_amt and bet_mode==3 then
--- 			i_clr=9
--- 		end
--- 		print(bet_amounts[bet_sel][i] or 0,9+i*4,105,i_clr)
--- 	end
+function draw_winning_calc()
+	--winning calculator
+	rrectfill(4,87,120,26,0,7)--ticket
+	rrect(3,86,122,28,0,1)--outline
+	rrectfill(4,87,120,8,0,5)--title
+	print("winnings calculator",26,88,0)
+	line(3,94,124,94,1)--hline1
+	line(3,102,124,102,1)--hline2
+	print("bet amt",8,96,0)
+	for i=1,4 do
+		i_clr=0
+		if i==i_amt and bet_mode==3 then
+			i_clr=9
+		end
+		print(bets[bet_sel][1][i] or 0,9+i*4,105,i_clr)
+	end
 
--- 	if arena_sel==5 then
--- 		rrect(4,103,36,10,0,9)
--- 	end
--- 	line(40,94,40,112,1)--vline1
--- 	print("odds",45,96,0)
--- 	line(64,94,64,112,1)--vline2
--- 	_str=print_bet_odds()
--- 	print(_str,57-#_str*2,105,0)
--- 	print("payout",83,96,0)
--- 	print(total_pay,94-#total_pay*2,105,0)
--- 	--button
--- 	rrectfill(34,116,59,9,1,1)
--- 	print("place all bets",36,118,7)
--- 	if arena_sel==6 then
--- 		rrect(34,116,59,9,1,9)
--- 	end
--- end
+	if arena_sel==5 then
+		rrect(4,103,36,10,0,9)
+	end
+	line(40,94,40,112,1)--vline1
+	print("odds",45,96,0)
+	line(64,94,64,112,1)--vline2
+	total_odds=print_bet_odds(bets_odds[bet_sel])
+	print(total_odds,57-#total_odds*2,105,0)
+	print("payout",83,96,0)
+	_winnings=arr_to_str(bets_winnings[bet_sel])
+	print(_winnings,94-#_winnings*2,105,0)
+	--button
+	rrectfill(34,116,59,9,1,1)
+	print("place all bets",36,118,7)
+	if arena_sel==6 then
+		rrect(34,116,59,9,1,9)
+	end
+end
 
 --confirm bet page
 -- function init_confirm()
@@ -351,7 +342,7 @@ end
 -- 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
 -- 			get_total_odds_and_pay(_bet)
 			
--- 			print(""..arr_display(clmp_odds)..":1",84,30+o_pcount-scroller,0)
+-- 			print(""..arr_to_str(clmp_odds)..":1",84,30+o_pcount-scroller,0)
 -- 			spr(108,78,36+o_pcount-scroller)--coin
 -- 			print(total_pay,86,38+o_pcount-scroller,0)
 -- 			o_pcount+=p_count*pc_mult-1
@@ -412,25 +403,32 @@ end
 
 --gets odds and winnings for each bet and total payout
 function get_bet_summary()
+
+	--global summary arrays to use elsewhere
 	bets_odds=reset_array(10,1)
-	bets_winnings=reset_array(10,0)
+	bets_winnings=reset_array(10,7,0)
+	total_winnings={0,0,0,0,0,0,0,0,0,0,0}
+	--get bets and odds
 	for i_bet=1,10 do
 		_bet_arena=bets[i_bet][2]
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
 				if _bet_arena[i_arena][i_aplyr] then
-					bets_odds[i_bet]*=arenas[i_arena][i_aplyr][2]
+					bets_odds[i_bet]*=bet_colon_format(arenas[i_arena][i_aplyr][2])
 				end
 			end
 		end
 		bets_odds[i_bet]=min(bets_odds[i_bet],999)--clamp bets_odds
-		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bet_amounts[i_bet])
+		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bets[i_bet][1])
+		if #bets_winnings[i_bet] >= 7 then
+			bets_winnings[bet_sel]={1,0,0,0,0,0,0}
+		end
 	end
 	--calculate total payout
-	total_payout={0,0,0,0,0,0,0,0,0,0,0}
 	for i_bet=1,10 do
-		arr_add(total_payout,bets_winnings[i_bet])
+		total_winnings=arr_add(total_winnings,bets_winnings[i_bet])
 	end
+
 end
 
 
@@ -488,14 +486,15 @@ end
 -- 	print("pays \f9$"..total_pay,74,121,7)
 -- end
 
--- function print_bet_odds()
--- 	local _odds_clr="\f9"
--- 	int_clmp_odds=arr_display(clmp_odds)
--- 	if int_clmp_odds=="999" then
--- 		_odds_clr="\f8"
--- 	end
--- 	return _odds_clr..int_clmp_odds..":1"
--- end
+function print_bet_odds(_odds)
+	local _odds_clr="\f9"
+	if _odds==999 then
+		_odds_clr="\f8"
+	end
+	str_odds=tostr(_odds)
+	
+	return _odds_clr..str_odds..":1"
+end
 
 -->8
 --ticket
@@ -680,7 +679,7 @@ function int_to_arr(n)
 end
 
 
-function arr_display(_arr)
+function arr_to_str(_arr)
 	anum=""
 	if _arr then
 		for i=1,#_arr do
