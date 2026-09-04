@@ -68,8 +68,8 @@ function _init()
 	dummy_bets()
 
 	--init_quickbetpage()
-	--init_ticket()
-	init_betpage()
+	init_ticket()
+	--init_betpage()
 	--init_confirm()
 end
 
@@ -416,49 +416,7 @@ end
 -- 	end
 -- end
 
---gets odds and winnings for each bet and total payout
-function get_bet_summary()
 
-	--global summary arrays to use elsewhere
-	bets_odds=reset_array(10,1)--array follows the bet_id
-	bets_winnings=reset_array(10,7,0)
-	total_winnings={0}
-	--get bets and odds
-	for i_bet=1,10 do
-		_bet_arena=bets[i_bet][2]
-		for i_arena=1,4 do
-			for i_aplyr=1,4 do
-				if _bet_arena[i_arena][i_aplyr] then
-					bets_odds[i_bet]*=bet_colon_format(arenas[i_arena][i_aplyr][2])
-				end
-			end
-		end
-		bets_odds[i_bet]=min(bets_odds[i_bet],999)--clamp bets_odds
-		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bets[i_bet][1])
-		if #bets_winnings[i_bet] >= 7 then
-			bets_winnings[bet_sel]={1,0,0,0,0,0,0}
-		end
-	end
-	--calculate total payout
-	for i_bet=1,10 do
-		total_winnings=arr_add(total_winnings,bets_winnings[i_bet])
-	end
-
-end
-
-
-function toggle_bet()
-	--toggle bet if already selected
-	if bets[bet_sel][2][arena_sel][plyr_menu_sel] then
-		bets[bet_sel][2][arena_sel][plyr_menu_sel]=false
-		return
-	end
-	--turn off other bets
-	for i_plyr=1,4 do
-		bets[bet_sel][2][arena_sel][i_plyr]=false
-	end
-	bets[bet_sel][2][arena_sel][plyr_menu_sel]=true
-end
 
 -- function draw_quickbetpage()
 -- 	local gc={1,4,2,3}--arena text colors
@@ -501,70 +459,58 @@ end
 -- 	print("pays \f9$"..total_pay,74,121,7)
 -- end
 
-function print_bet_odds(_odds,dynamic_color)
-	local return_str=""
-	if dynamic_color then
-		return_str="\f9"
-		if _odds==999 then
-			return_str="\f8"
-		end
+-->8
+--ticket
+function init_ticket()
+	tx,ty=20,10
+	_upd=upd_ticket
+	_drw=drw_ticket
+end
+
+function upd_ticket()
+	
+end
+
+function drw_ticket()
+	
+	local _arx,_plx,_odx=tx+2,tx+26,tx+66
+	--ticket
+	for i=1,15 do
+		rrect(tx-5+6*i,ty-1,3,1,0,7)
 	end
-	str_odds=tostr(_odds)
-	return_str=return_str..str_odds..":1"
-	return return_str
+	rrectfill(tx,ty,90,81,0,7)--ticket
+	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
+	spr(128,tx-2,ty+81,1,3)--left leaf
+	spr(129,tx+89,ty+81,1,3)--right leaf
+	for i=1,3 do
+		_wmoff=0
+		if i==3 then
+			_wmoff=1
+		end
+		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
+	end
+	--text
+	rrectfill(tx+2,ty+2,86,10,0,2)--red area
+	print("★galaxy club bets★",tx+5,ty+5,7)
+	print("round #1784",tx+22,ty+15,0)
+	print("----------------------",tx+2,ty+22,0)
+	print("arena",_arx,ty+28,0)
+	print("player",_plx+4,ty+28,0)
+	print("odds",_odx,ty+28,0)
+	print("----------------------",tx+2,ty+22,0)
+	for i=1,4 do
+		print(i,_arx+8,ty+34+8*i,0)
+		print("the dude",_plx,ty+34+8*i,0)
+		print("11:1",_odx,ty+34+8*i,0)
+	end
+	print("----------------------",tx+3,ty+80,0)
+	print("bet:",_arx+1,ty+85)
+	print("odds:",tx+41,ty+85)
+	print("payout:",_arx+2,ty+93)
 end
 
 -->8
---ticket
--- function init_ticket()
--- 	tx,ty=20,10
--- 	_upd=upd_ticket
--- 	_drw=drw_ticket
--- end
-
--- function upd_ticket()
-	
--- end
-
--- function drw_ticket()
-	
--- 	local _arx,_plx,_odx=tx+2,tx+26,tx+66
--- 	--ticket
--- 	for i=1,15 do
--- 		rrect(tx-5+6*i,ty-1,3,1,0,7)
--- 	end
--- 	rrectfill(tx,ty,90,81,0,7)--ticket
--- 	rrectfill(tx+6,ty+81,84,24,0,7)--lwr ticket
--- 	spr(128,tx-2,ty+81,1,3)--left leaf
--- 	spr(129,tx+89,ty+81,1,3)--right leaf
--- 	for i=1,3 do
--- 		_wmoff=0
--- 		if i==3 then
--- 			_wmoff=1
--- 		end
--- 		print("★galaxy club★",tx+15,ty-13+i*32+_wmoff,6)	
--- 	end
--- 	--text
--- 	rrectfill(tx+2,ty+2,86,10,0,2)--red area
--- 	print("★galaxy club bets★",tx+5,ty+5,7)
--- 	print("round #1784",tx+22,ty+15,0)
--- 	print("----------------------",tx+2,ty+22,0)
--- 	print("arena",_arx,ty+28,0)
--- 	print("player",_plx+4,ty+28,0)
--- 	print("odds",_odx,ty+28,0)
--- 	print("----------------------",tx+2,ty+22,0)
--- 	for i=1,4 do
--- 		print(i,_arx+8,ty+34+8*i,0)
--- 		print("the dude",_plx,ty+34+8*i,0)
--- 		print("11:1",_odx,ty+34+8*i,0)
--- 	end
--- 	print("----------------------",tx+3,ty+80,0)
--- 	print("bet:",_arx+1,ty+85)
--- 	print("odds:",tx+41,ty+85)
--- 	print("payout:",_arx+2,ty+93)
--- end
--- -->8
--- --calculations
+--calculations
 function calculate_odds()
 	--each of 4 arenas looks like arena={p_id,p_odds}
 	for i_arena=1,4 do
@@ -629,6 +575,61 @@ function bet_colon_format(_bet_perc)
 			return add(bet_odds,_podds[i])
 		end
 	end
+end
+
+--gets odds and winnings for each bet and total payout
+function get_bet_summary()
+
+	--global summary arrays to use elsewhere
+	bets_odds=reset_array(10,1)--array follows the bet_id
+	bets_winnings=reset_array(10,7,0)
+	total_winnings={0}
+	--get bets and odds
+	for i_bet=1,10 do
+		_bet_arena=bets[i_bet][2]
+		for i_arena=1,4 do
+			for i_aplyr=1,4 do
+				if _bet_arena[i_arena][i_aplyr] then
+					bets_odds[i_bet]*=bet_colon_format(arenas[i_arena][i_aplyr][2])
+				end
+			end
+		end
+		bets_odds[i_bet]=min(bets_odds[i_bet],999)--clamp bets_odds
+		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bets[i_bet][1])
+		if #bets_winnings[i_bet] >= 7 then
+			bets_winnings[bet_sel]={1,0,0,0,0,0,0}
+		end
+	end
+	--calculate total payout
+	for i_bet=1,10 do
+		total_winnings=arr_add(total_winnings,bets_winnings[i_bet])
+	end
+end
+
+function toggle_bet()
+	--toggle bet if already selected
+	if bets[bet_sel][2][arena_sel][plyr_menu_sel] then
+		bets[bet_sel][2][arena_sel][plyr_menu_sel]=false
+		return
+	end
+	--turn off other bets
+	for i_plyr=1,4 do
+		bets[bet_sel][2][arena_sel][i_plyr]=false
+	end
+	bets[bet_sel][2][arena_sel][plyr_menu_sel]=true
+end
+
+function print_bet_odds(_odds,dynamic_color)
+	local return_str=""
+	if dynamic_color then
+		return_str="\f9"
+		if _odds==999 then
+			return_str="\f8"
+		end
+	end
+	str_odds=tostr(_odds)
+	return_str=return_str..str_odds..":1"
+	return return_str
 end
 
 -->8
