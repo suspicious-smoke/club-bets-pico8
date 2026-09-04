@@ -91,7 +91,7 @@ function _init()
 		{"pontoon","ptn",14},
 		{"sailer","slr",15},
 		{"bucket","bkt",16},
-		{"pod engine","pde",17},
+		{"pod eng","pde",17},
 		{"merchant","mch",10},
 		{"scuttle","sct",11},
 		{"beluga","blg",12},
@@ -105,7 +105,7 @@ function _init()
 	arenas={}
 	odds={}
 	bet_odds={}
-
+	money={1,0,0,0}
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	d6x3={
 		0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,
@@ -118,10 +118,10 @@ function _init()
 	_drw=blank
 	fill_arenas()
 	dummy_bets()
-	init_quickbetpage()
+	--init_quickbetpage()
 	--init_ticket()
 	init_betpage()
-	init_confirm()
+	--init_confirm()
 end
 
 function dummy_bets()
@@ -249,7 +249,7 @@ function drw_betpage()
 	print("round:#",4,3+bet_off,6)	
 	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
 	spr(108,85,1+bet_off)--coin
-	print("1000",94,3+bet_off,9)
+	print(arr_to_str(money,true),94,3+bet_off,9)
 	rrectfill(4,10+bet_off,120,74,0,7)--ticket
 	rrect(3,9+bet_off,122,75,0,1)--outline
 	rrectfill(4,10+bet_off,120,9,0,2)--red area
@@ -367,8 +367,8 @@ end
 function drw_confirm()
 	print("round:#",4,3-scroller,6)	
 	
-	spr(108,83,1-scroller)--money
-	print("100",92,3-scroller,9)--my money
+	spr(108,83,1-scroller)--coin
+	print(arr_to_str(money,true),92,3-scroller,9)--my money
 	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
 	rrect(3,9-scroller,122,10,0,1)--outline
 	rrectfill(4,10-scroller,120,9,0,2)--red area
