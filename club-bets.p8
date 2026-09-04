@@ -237,12 +237,11 @@ end
 function draw_dropdown()
 	--draw sel player menu
 	rrectfill(42,26+arena_sel*14,80,40,1,6)
-	for plyr=1,4 do
-		local _arloc=(arena_sel-1)*4+plyr
-		if plyr_menu_sel==plyr then
-			rrectfill(44,20+arena_sel*14+plyr*9,76,9,1,5)	
+	for a_plyr=1,4 do
+		if plyr_menu_sel==a_plyr then
+			rrectfill(44,20+arena_sel*14+a_plyr*9,76,9,1,5)	
 		end
-		print(get_player_string(_arloc),52,22+arena_sel*14+plyr*9,0)
+		print(get_player_string(arena_sel,a_plyr),52,22+arena_sel*14+a_plyr*9,0)
 	end
 end
 
