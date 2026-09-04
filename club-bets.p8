@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
---race club bets
+--galaxy club bets
 --by olivander65
 function _init()
 	version,t=0,0
@@ -16,13 +16,16 @@ function _init()
 	-- }
 
 	--build initial bets
+	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
+	-- where { {t,f,f,f},... } is the arenas and selected players
 	bets={}
 	for i=1,10 do
-		local _bet={100,{}}
+		local _bet={{0,1,0,0},{}}
 		for j=1,4 do
-			local _bet_arena={false,false,false,false}
-			add(_bet[2],_bet_arena)	
+			local _selected_player={false,false,false,false}
+			add(_bet[2],_selected_player)	
 		end
+		add(bets,_bet)
 	end
 
 	-- for i=1,4 do
@@ -66,7 +69,7 @@ function _init()
 
 	--init_quickbetpage()
 	--init_ticket()
-	--init_betpage()
+	init_betpage()
 	--init_confirm()
 end
 
@@ -86,48 +89,21 @@ end
 -- 	end
 -- end
 
-function reset_num_array(_size,_items)
+function reset_num_array(_size,_items,_val)
 	_num_arr={}
 	for i=1,_size do
-		add(_num_arr,reset_array(_items))
+		add(_num_arr,reset_array(_items,_val))
 	end
 	return _num_arr
 end
 
-function reset_array(_items)
+function reset_array(_items,_val)
 	_arr={}
 	for i=1,_items do
-		add(_arr,0)
+		add(_arr,_val)
 	end
 	return _arr
 end
-
--- function odds_debug()
--- 	local gc={1,4,2,3}--arena text colors
--- 	gc_ind=1--color index
--- 	g_off=0--space between arenas
--- 	for i=1,16 do
--- 		print(bet_odds[i]..":1",24,i*8-6,gc[gc_ind])
--- 		print(players[arenas[i]][1],50,i*8-6,gc[gc_ind])
--- 		print(odds[i].."%",10,i*8-6,gc[gc_ind])
--- 		if i%4==0 then
--- 			gc_ind+=1
--- 			g_off+=2
--- 		end
--- 	end
--- end
-
--- function dummy_bets()
--- 	for _bet=1,10 do
--- 		for _arena=1,4 do
--- 			local _arloc=(_arena-1)*4	
--- 			_r=rnd_rng(1,5)
--- 			if _r!= 5 then
--- 				bets[_bet][_arloc+_r]=true
--- 			end
--- 		end
--- 	end
--- end
 
 function _draw()
 	cls()
@@ -152,7 +128,7 @@ function init_betpage()
 end
 
 function upd_betpage()
-	get_total_odds_and_pay(bet_sel)
+	get_bet_summary()
 	--player select mode
 	if bet_mode==2 then
 		if btnp(⬆️) then
@@ -161,7 +137,7 @@ function upd_betpage()
 			plyr_menu_sel=(plyr_menu_sel%4)+1
 		elseif btnp(🅾️) then
 			player_sel=plyr_menu_sel+(arena_sel-1)*4
-			toggle_bet()
+			--toggle_bet()
 			bet_mode=1
 		elseif btnp(❎) then
 			bet_mode=1
@@ -169,9 +145,9 @@ function upd_betpage()
 	--bet select mode
 	elseif bet_mode==3 then
 		if btnp(⬆️) then
-			bet_amounts[bet_sel][i_amt]=(bet_amounts[bet_sel][i_amt]+1)%10
+			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]+1)%10
 		elseif btnp(⬇️) then
-			bet_amounts[bet_sel][i_amt]=(bet_amounts[bet_sel][i_amt]-1)%10
+			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]-1)%10
 		elseif btnp(➡️) then
 			i_amt=(i_amt%4)+1
 		elseif btnp(⬅️) then
@@ -193,7 +169,7 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				--complete bets
-				init_confirm()
+				--init_confirm()
 			elseif arena_sel==5 then
 				--change money
 				i_amt=1
@@ -230,7 +206,7 @@ function drw_betpage()
 	print("player",72,21,0)
 	--arenas
 	for i_arena=1,4 do
-		line(3,13+i_arena*14,124,13+i*14,1)
+		line(3,13+i_arena*14,124,13+i_arena*14,1)
 		rrectfill(42,16+i_arena*14,80,9,1,6)
 		if arena_sel==i_arena and bet_mode!=2 then
 			rrect(42,16+i_arena*14,80,9,1,9)
@@ -241,7 +217,7 @@ function drw_betpage()
 		chk_spr=106
 		local plyr_str="who to bet on?"
 		for i_aplyr=1,4 do 
-			if bets[bet_sel][2][i_aplyr] then
+			if bets[bet_sel][2][i_arena][i_aplyr] then
 				plyr_str=get_player_string(i_arena,i_aplyr)
 				chk_spr=107
 			end
@@ -435,24 +411,28 @@ end
 -- 	end
 -- end
 
--- function get_total_odds_and_pay()
--- 	total_payout={0,0,0,0,0,0,0,0,0,0,0}
--- 	for i_bet=1,10 do
--- 		bet_total_odds=reset_array(10)
--- 		bet_pays=reset_num_array(10,4)
--- 		for i_arena=1,16 do
--- 		if bets[i_bet][i_arena] then
--- 			total_odds[i_bet]*=bet_odds[i_arena]
--- 		end
--- 	end
--- 	--bet's total odds
--- 	_odds=min(total_odds,999)
--- 	bet_total_odds[i_bet]=_odds
--- 	--get payout for bet
--- 	clmp_odds=int_to_arr(_odds)--make an array	
-
--- 	total_payout=arr_mult(clmp_odds,bet_amounts[i])
--- end
+--gets odds and winnings for each bet and total payout
+function get_bet_summary()
+	bets_odds=reset_array(10,1)
+	bets_winnings=reset_array(10,0)
+	for i_bet=1,10 do
+		_bet_arena=bets[i_bet][2]
+		for i_arena=1,4 do
+			for i_aplyr=1,4 do
+				if _bet_arena[i_arena][i_aplyr] then
+					bets_odds[i_bet]*=arenas[i_arena][i_aplyr][2]
+				end
+			end
+		end
+		bets_odds[i_bet]=min(bets_odds[i_bet],999)--clamp bets_odds
+		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bet_amounts[i_bet])
+	end
+	--calculate total payout
+	total_payout={0,0,0,0,0,0,0,0,0,0,0}
+	for i_bet=1,10 do
+		arr_add(total_payout,bets_winnings[i_bet])
+	end
+end
 
 
 -- function toggle_bet()
@@ -632,11 +612,6 @@ function fill_arenas()
 		end 
 	end
 	calculate_odds()
-	-- for i=1,4 do
-	-- 	for j=1,4 do
-	-- 		debug[i]=debug[i].." "..arenas[i][j][1]
-	-- 	end
-	-- end
 end
 
 --turns percentage into number x used in x:1 format.
