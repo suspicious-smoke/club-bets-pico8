@@ -131,13 +131,13 @@ function upd_betpage()
 	get_bet_summary()
 	--player select mode
 	if bet_mode==2 then
+		debug[1]=plyr_menu_sel
 		if btnp(⬆️) then
 			plyr_menu_sel=(plyr_menu_sel-2)%4+1
 		elseif btnp(⬇️) then
 			plyr_menu_sel=(plyr_menu_sel%4)+1
 		elseif btnp(🅾️) then
-			player_sel=plyr_menu_sel+(arena_sel-1)*4
-			--toggle_bet()
+			toggle_bet()
 			bet_mode=1
 		elseif btnp(❎) then
 			bet_mode=1
@@ -434,28 +434,18 @@ function get_bet_summary()
 end
 
 
--- function toggle_bet()
--- 	--toggle bet if already selected
--- 	if bets[bet_sel][player_sel] then
--- 		bets[bet_sel][player_sel]=false
--- 		return
--- 	end
--- 	--switch off other bets in arena
--- 	arena_start=0
--- 	if player_sel<=4 then
--- 		arena_start=1
--- 	elseif player_sel<=8 then
--- 		arena_start=5
--- 	elseif player_sel<=12 then
--- 		arena_start=9
--- 	else
--- 		arena_start=13
--- 	end
--- 	for i=arena_start,arena_start+3 do
--- 		bets[bet_sel][i]=false
--- 	end
--- 	bets[bet_sel][player_sel]=not bets[bet_sel][player_sel]
--- end
+function toggle_bet()
+	--toggle bet if already selected
+	if bets[bet_sel][2][arena_sel][plyr_menu_sel] then
+		bets[bet_sel][2][arena_sel][plyr_menu_sel]=false
+		return
+	end
+	--turn off other bets
+	for i_plyr=1,4 do
+		bets[bet_sel][2][arena_sel][i_plyr]=false
+	end
+	bets[bet_sel][2][arena_sel][plyr_menu_sel]=true
+end
 
 -- function draw_quickbetpage()
 -- 	local gc={1,4,2,3}--arena text colors
