@@ -65,13 +65,25 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	--dummy_bets()
+	dummy_bets()
 
 	--init_quickbetpage()
 	--init_ticket()
-	init_betpage()
-	--init_confirm()
+	--init_betpage()
+	init_confirm()
 end
+
+function dummy_bets()
+	for i_bet=1,10 do
+		for i_arena=1,4 do
+			_r=rnd_rng(1,5)
+			if _r!= 5 then
+				bets[i_bet][2][i_arena][_r]=true
+			end
+		end
+	end
+end
+
 
 function blank() end
 
@@ -111,13 +123,13 @@ end
 -->8
 --bet page
 function init_betpage()
-	_upd=upd_betpage
-	_drw=drw_betpage
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
+	_upd=upd_betpage
+	_drw=drw_betpage
 end
 
 function upd_betpage()
@@ -161,7 +173,7 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				--complete bets
-				--init_confirm()
+				init_confirm()
 			elseif arena_sel==5 then
 				--change money
 				i_amt=1
@@ -264,7 +276,7 @@ function draw_winning_calc()
 	line(40,94,40,112,1)--vline1
 	print("odds",45,96,0)
 	line(64,94,64,112,1)--vline2
-	total_odds=print_bet_odds(bets_odds[bet_sel])
+	total_odds=print_bet_odds(bets_odds[bet_sel],true)
 	print(total_odds,57-#total_odds*2,105,0)
 	print("payout",83,96,0)
 	_winnings=arr_to_str(bets_winnings[bet_sel])
@@ -278,90 +290,92 @@ function draw_winning_calc()
 end
 
 --confirm bet page
--- function init_confirm()
--- 	scroller=0
--- 	max_scroll=0
--- 	--get total payout
--- 	get_payout()
--- 	_upd=upd_confirm
--- 	_drw=drw_confirm
--- end
+function init_confirm()
+	scroller=0
+	max_scroll=0
+	get_bet_summary()
+	_upd=upd_confirm
+	_drw=drw_confirm
+end
 
--- --confirm bet page
--- function upd_confirm()
--- 	if max_scroll>0 then
--- 		if btn(⬇️) then
--- 			scroller=min(scroller+7,max_scroll)
--- 		elseif btn(⬆️) then
--- 			scroller=max(scroller-7,0)
--- 		elseif btnp(❎) then
--- 			init_betpage()
--- 		end
--- 	end
--- end
+--confirm bet page
+function upd_confirm()
+	if max_scroll>0 then
+		if btn(⬇️) then
+			scroller=min(scroller+7,max_scroll)
+		elseif btn(⬆️) then
+			scroller=max(scroller-7,0)
+		elseif btnp(❎) then
+			init_betpage()
+		end
+	end
+end
 
--- --confirm bet page
--- function drw_confirm()
--- 	print("round:#",4,3-scroller,6)	
+--confirm bet page
+function drw_confirm()
+	print("round:#",4,3-scroller,6)	
 	
--- 	spr(108,83,1-scroller)--money
--- 	print("100",92,3-scroller,9)--my money
--- 	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
--- 	rrect(3,9-scroller,122,10,0,1)--outline
--- 	rrectfill(4,10-scroller,120,9,0,2)--red area
--- 	print("current bets",42,12-scroller,7)
--- 	rrectfill(4,20-scroller,120,8,0,5)--grey area
--- 	rrect(3,19-scroller,122,9,0,1)--grey outline
+	spr(108,83,1-scroller)--money
+	print("100",92,3-scroller,9)--my money
+	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
+	rrect(3,9-scroller,122,10,0,1)--outline
+	rrectfill(4,10-scroller,120,9,0,2)--red area
+	print("current bets",42,12-scroller,7)
+	rrectfill(4,20-scroller,120,8,0,5)--grey area
+	rrect(3,19-scroller,122,9,0,1)--grey outline
 
--- 	print("bet",5,21-scroller,0)
--- 	line(17,20-scroller,17,max_scroll+106-scroller,1)--bet/player v-line
--- 	print("player",31,21-scroller,0)
--- 	line(70,20-scroller,70,max_scroll+106-scroller,1)--end plyr line
--- 	print("odds/winnings",72,21-scroller,0)
--- 	--selection area
--- 	bet_count=0
--- 	p_count=1
--- 	o_pcount=0
--- 	for _bet=1,10 do
--- 		p_count=1
--- 		_cbet_odds=1
--- 		_cbet=bets[_bet]
--- 		print(_bet,6,21+o_pcount-scroller+8,0)
--- 		for _arloc=1,16 do
--- 			if _cbet[_arloc] then
--- 				print(players[arenas[_arloc]][1],28,14+p_count*9+o_pcount-scroller+8,0)
--- 				spr(101+ceil(_arloc/4),19,12+p_count*9+o_pcount-scroller+8)--planet
--- 				p_count+=1
--- 			end
--- 		end
--- 		if p_count>1 then
--- 			pc_mult=8
--- 			if p_count==2 then
--- 				pc_mult=9
--- 			end
--- 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
--- 			get_total_odds_and_pay(_bet)
+	print("bet",5,21-scroller,0)
+	line(17,20-scroller,17,max_scroll+106-scroller,1)--bet/player v-line
+	print("player",31,21-scroller,0)
+	line(70,20-scroller,70,max_scroll+106-scroller,1)--end plyr line
+	print("odds/winnings",72,21-scroller,0)
+	bet_count=0
+	p_count=1
+	o_pcount=0
+	for i_bet=1,10 do
+		p_count=1
+		_cbet_odds=1
+		_cbet=bets[i_bet]
+		print(i_bet,6,21+o_pcount-scroller+8,0)
+
+		for i_arena=1,4 do
+			for i_aplyr=1,4 do
+				if _cbet[2][i_arena][i_aplyr] then
+					print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)
+					spr(101+i_arena,19,12+p_count*9+o_pcount-scroller+8)--planet
+					p_count+=1		
+				end
+			end
+		end
+
+		if p_count>1 then
+			pc_mult=8
+			if p_count==2 then
+				pc_mult=9
+			end
+			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
 			
--- 			print(""..arr_to_str(clmp_odds)..":1",84,30+o_pcount-scroller,0)
--- 			spr(108,78,36+o_pcount-scroller)--coin
--- 			print(total_pay,86,38+o_pcount-scroller,0)
--- 			o_pcount+=p_count*pc_mult-1
--- 			bet_count+=1
--- 		end
--- 	end
--- 	max_scroll=o_pcount-60
--- 	--total winnings box
--- 	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
--- 	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
--- 	print("possible winnings",10,34+o_pcount-scroller,0)
--- 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
--- 	spr(108,81,32+o_pcount-scroller)--coin
--- 	for i=1,#payout do
--- 		print(payout[i],86+i*4,34+o_pcount-scroller,0)
--- 	end
+			print(""..print_bet_odds(bets_odds[i_bet]),84,30+o_pcount-scroller,0)
+			spr(108,78,36+o_pcount-scroller)--coin
+			winnings_str=arr_to_str(bets_winnings[i_bet])
+			print(winnings_str,86,38+o_pcount-scroller,0)
+			o_pcount+=p_count*pc_mult-1
+			bet_count+=1
+		end
+	end
+	max_scroll=o_pcount-60
+	--total winnings box
+	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
+	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
+	print("possible winnings",10,34+o_pcount-scroller,0)
+	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
+	spr(108,81,32+o_pcount-scroller)--coin
+	for i=1,#total_winnings do
+		print(total_winnings[i],86+i*4,34+o_pcount-scroller,0)
+	end
 	
--- 	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
--- end
+	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+end
 
 -->8
 --quick bet page
@@ -405,9 +419,9 @@ end
 function get_bet_summary()
 
 	--global summary arrays to use elsewhere
-	bets_odds=reset_array(10,1)
+	bets_odds=reset_array(10,1)--array follows the bet_id
 	bets_winnings=reset_array(10,7,0)
-	total_winnings={0,0,0,0,0,0,0,0,0,0,0}
+	total_winnings={0}
 	--get bets and odds
 	for i_bet=1,10 do
 		_bet_arena=bets[i_bet][2]
@@ -486,14 +500,17 @@ end
 -- 	print("pays \f9$"..total_pay,74,121,7)
 -- end
 
-function print_bet_odds(_odds)
-	local _odds_clr="\f9"
-	if _odds==999 then
-		_odds_clr="\f8"
+function print_bet_odds(_odds,dynamic_color)
+	local return_str=""
+	if dynamic_color then
+		return_str="\f9"
+		if _odds==999 then
+			return_str="\f8"
+		end
 	end
 	str_odds=tostr(_odds)
-	
-	return _odds_clr..str_odds..":1"
+	return_str=return_str..str_odds..":1"
+	return return_str
 end
 
 -->8
