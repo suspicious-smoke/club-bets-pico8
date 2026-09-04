@@ -66,9 +66,8 @@ function _init()
 	_drw=blank
 	fill_arenas()
 	dummy_bets()
-
-	--init_quickbetpage()
-	init_ticket()
+	init_quickbetpage()
+	--init_ticket()
 	--init_betpage()
 	--init_confirm()
 end
@@ -381,83 +380,81 @@ end
 -->8
 --quick bet page
 
--- function init_quickbetpage()
--- 	bet_sel=1--1-10
--- 	player_sel=1--select player for each arena 1-16
--- 	total_odds=0
--- 	total_pay=0
--- 	_upd=upd_quickbetpage
--- 	_drw=draw_quickbetpage
--- end
+function init_quickbetpage()
+	bet_sel=1--1-10
+	plyr_menu_sel=1--select player for each arena 1-16
+	total_odds=0
+	total_pay=0
+	_upd=upd_quickbetpage
+	_drw=drw_quickbetpage
+end
 
--- function upd_quickbetpage()
--- 	get_total_odds_and_pay(bet_sel)
--- 	if btnp(➡️) then
--- 		bet_sel=(bet_sel%10)+1
--- 	elseif btnp(⬅️) then
--- 		bet_sel=(bet_sel-2)%10+1
--- 	elseif btnp(⬆️) then
--- 		player_sel=(player_sel-2)%16+1
--- 	elseif btnp(⬇️) then
--- 		player_sel=(player_sel%16)+1
--- 	elseif btnp(🅾️) then
--- 		toggle_bet()
--- 	elseif btnp(❎) then
--- 		--open up window to see
--- 		--more info or switch menus
--- 	end
--- end
+function upd_quickbetpage()
+	get_bet_summary()
+	if btnp(➡️) then
+		bet_sel=(bet_sel%10)+1
+	elseif btnp(⬅️) then
+		bet_sel=(bet_sel-2)%10+1
 
--- function get_bet_odds(_bet)
--- 	for arena=1,16 do
--- 		if bets[_bet][arena] then
--- 			total_odds[_bet]*=bet_odds[arena]
--- 		end
--- 	end
--- end
+	elseif btnp(⬆️) then
+		if plyr_menu_sel==1 then
+			arena_sel=(arena_sel-2)%4+1
+		end
+		plyr_menu_sel=(plyr_menu_sel-2)%4+1
+	elseif btnp(⬇️) then
+		if plyr_menu_sel==4 then
+			arena_sel=(arena_sel%4)+1
+		end
+		plyr_menu_sel=(plyr_menu_sel%4)+1
+	elseif btnp(🅾️) then
+		toggle_bet()
+	elseif btnp(❎) then
+		--open up window to see
+		--more info or switch menus
+	end
+end
 
+function drw_quickbetpage()
+	local arena_clr={1,4,2,3}--arena text colors
+	g_off=0--space between arenas
 
+	for i_arena=1,4 do
+		for i_aplyr=1,4 do
+			_py=((i_arena-1)*4+i_aplyr)*7+g_off
+			rrectfill(1,_py-6,126,7,0,6+i_aplyr%2)--row background
+			print("qwr 10:1",3,_py-5,arena_clr[i_arena])
+			--bet buttons
+			for k=1,10 do
+				bet_clr=5
+				--bet is checked
+				if bets[k][2][i_arena][i_aplyr] then
+					bet_clr=3
+				end
+				--bet selected
+				if bet_sel==k and plyr_menu_sel==i_aplyr and arena_sel==i_arena then
+					print("\f7\^oc5a●",29+k*9,_py-5)
+				end
+				print("●",29+k*9,_py-5,bet_clr)
+			end
 
--- function draw_quickbetpage()
--- 	local gc={1,4,2,3}--arena text colors
--- 	gc_ind=1--color index
--- 	g_off=0--space between arenas
--- 	for ap_id=1,16 do--players in arenas
--- 		local _py=ap_id*7+g_off
--- 		rrectfill(1,_py-6,126,7,0,6+ap_id%2)--row background
--- 		--print player string
--- 		local _pstring=players[arenas[ap_id]][2].." "
--- 		if bet_odds[ap_id] < 10 then
--- 			_pstring=_pstring.." "
--- 		end
--- 		_pstring=_pstring..bet_odds[ap_id]..":1"
--- 		print(_pstring,3,_py-5,gc[gc_ind])
--- 		--bet buttons
--- 		for k=1,10 do
--- 			bet_clr=5
--- 			if bets[k][ap_id] then
--- 				bet_clr=3
--- 			end
--- 			if bet_sel==k and player_sel==ap_id then
--- 				print("\f7\^oc5a●",29+k*9,_py-5)
--- 			end
--- 			print("●",29+k*9,_py-5,bet_clr)
--- 		end
+		end
+		g_off+=2
+	end
 
--- 		if ap_id%4==0 then
--- 			gc_ind+=1
--- 			g_off+=2
--- 		end
--- 	end
--- 	--bet selector
--- 	rrect(28+bet_sel*9,0,9,120,0,12)
--- 	--info area
--- 	rrectfill(0,120,128,7,0,5)
--- 	print("bet \f9#"..bet_sel,2,121,7)
-	
--- 	print("odds "..print_bet_odds(),34,121,7)
--- 	print("pays \f9$"..total_pay,74,121,7)
--- end
+	--bet selector
+	rrect(28+bet_sel*9,0,9,120,0,12)
+	--info area
+	rrectfill(1,120,126,7,0,5)
+	print("bet \f9#"..bet_sel,2,121,7)
+	line(31,120,31,126,8)
+	print(bets_odds[bet_sel]..":1",34,121,7)
+	line(55,120,55,126,8)
+	spr(108,57,119)--coin
+	print(arr_to_str(bets[bet_sel][1],true),64,121,9)
+	line(81,120,81,126,8)
+	spr(108,83,119)--coin
+	print(arr_to_str(bets_winnings[bet_sel]),90,121,9)
+end
 
 -->8
 --ticket
@@ -697,12 +694,20 @@ function int_to_arr(n)
  return r
 end
 
-
-function arr_to_str(_arr)
+--_0clean means get ride of leading zero when printing. Defaults to false.
+function arr_to_str(_arr,_0clean)
 	anum=""
 	if _arr then
+		leading_zero=true
 		for i=1,#_arr do
-			anum=anum.._arr[i]
+			if leading_zero and _0clean then
+				if _arr[i]!=0 then
+					anum=anum.._arr[i]
+					leading_zero=false
+				end
+			else
+				anum=anum.._arr[i]
+			end
 		end
 	end
 	return anum
