@@ -422,7 +422,8 @@ function drw_quickbetpage()
 		for i_aplyr=1,4 do
 			_py=((i_arena-1)*4+i_aplyr)*7+g_off
 			rrectfill(1,_py-6,126,7,0,6+i_aplyr%2)--row background
-			print("qwr 10:1",3,_py-5,arena_clr[i_arena])
+			local a_plyr=arenas[i_arena][i_aplyr]
+			print(players[a_plyr[1]][2].." "..bet_colon_format(a_plyr[2])..":1",3,_py-5,arena_clr[i_arena])
 			--bet buttons
 			for k=1,10 do
 				bet_clr=5
@@ -436,11 +437,9 @@ function drw_quickbetpage()
 				end
 				print("●",29+k*9,_py-5,bet_clr)
 			end
-
 		end
 		g_off+=2
 	end
-
 	--bet selector
 	rrect(28+bet_sel*9,0,9,120,0,12)
 	--info area
