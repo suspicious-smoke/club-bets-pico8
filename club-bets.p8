@@ -62,12 +62,12 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	dummy_bets()
+	--dummy_bets()
 
 	--init_quickbetpage()
 	--init_ticket()
 	--init_betpage()
-	init_confirm()
+	--init_confirm()
 end
 
 function blank() end
@@ -228,31 +228,30 @@ function drw_betpage()
 	line(39,19,39,83,1)--vline
 	print("arena",12,21,0)
 	print("player",72,21,0)
-	--selection area
-	for i=1,4 do
-		line(3,13+i*14,124,13+i*14,1)
-		rrectfill(42,16+i*14,80,9,1,6)
-		if arena_sel==i and bet_mode!=2 then
-			rrect(42,16+i*14,80,9,1,9)
+	--arenas
+	for i_arena=1,4 do
+		line(3,13+i_arena*14,124,13+i*14,1)
+		rrectfill(42,16+i_arena*14,80,9,1,6)
+		if arena_sel==i_arena and bet_mode!=2 then
+			rrect(42,16+i_arena*14,80,9,1,9)
 		end
-		print(i,18,18+i*14,0)
-		spr(101+i,27,16+i*14)--planet
+		print(i_arena,18,18+i_arena*14,0)
+		spr(101+i_arena,27,16+i_arena*14)--planet
 		--get player
 		chk_spr=106
 		local plyr_str="who to bet on?"
-		for plyr=1,4 do 
-			local _arloc=(i-1)*4+plyr
-			if bets[bet_sel][_arloc] then
-				plyr_str=get_player_string(_arloc)
+		for i_aplyr=1,4 do 
+			if bets[bet_sel][2][i_aplyr] then
+				plyr_str=get_player_string(i_arena,i_aplyr)
 				chk_spr=107
 			end
 		end
-		spr(chk_spr,8,16+i*14)--check mark
-		print(plyr_str,52,18+i*14,0)
-		spr(68,115,19+i*14)
+		spr(chk_spr,8,16+i_arena*14)--check mark
+		print(plyr_str,52,18+i_arena*14,0)
+		spr(68,115,19+i_arena*14)
 	end
 	
-	draw_winning_calc()
+	--draw_winning_calc()
 	--player select area
 	if bet_mode==2 then
 		draw_dropdown()
@@ -271,131 +270,132 @@ function draw_dropdown()
 	end
 end
 
-function get_player_string(_arloc)
-	return players[arenas[_arloc]][1].." "..bet_odds[_arloc]..":1"
+function get_player_string(i_arena,i_aplyr)
+	local arena_player=arenas[i_arena][i_aplyr]
+	return players[arena_player[1]][1].." "..bet_colon_format(arena_player[2])..":1"
 end
 
-function draw_winning_calc()
-	--winning calculator
-	rrectfill(4,87,120,26,0,7)--ticket
-	rrect(3,86,122,28,0,1)--outline
-	rrectfill(4,87,120,8,0,5)--title
-	print("winnings calculator",26,88,0)
-	line(3,94,124,94,1)--hline1
-	line(3,102,124,102,1)--hline2
-	print("bet amt",8,96,0)
+-- function draw_winning_calc()
+-- 	--winning calculator
+-- 	rrectfill(4,87,120,26,0,7)--ticket
+-- 	rrect(3,86,122,28,0,1)--outline
+-- 	rrectfill(4,87,120,8,0,5)--title
+-- 	print("winnings calculator",26,88,0)
+-- 	line(3,94,124,94,1)--hline1
+-- 	line(3,102,124,102,1)--hline2
+-- 	print("bet amt",8,96,0)
 	
-	for i=1,4 do
-		i_clr=0
-		if i==i_amt and bet_mode==3 then
-			i_clr=9
-		end
-		print(bet_amounts[bet_sel][i] or 0,9+i*4,105,i_clr)
-	end
+-- 	for i=1,4 do
+-- 		i_clr=0
+-- 		if i==i_amt and bet_mode==3 then
+-- 			i_clr=9
+-- 		end
+-- 		print(bet_amounts[bet_sel][i] or 0,9+i*4,105,i_clr)
+-- 	end
 
-	if arena_sel==5 then
-		rrect(4,103,36,10,0,9)
-	end
-	line(40,94,40,112,1)--vline1
-	print("odds",45,96,0)
-	line(64,94,64,112,1)--vline2
-	_str=print_bet_odds()
-	print(_str,57-#_str*2,105,0)
-	print("payout",83,96,0)
-	print(total_pay,94-#total_pay*2,105,0)
-	--button
-	rrectfill(34,116,59,9,1,1)
-	print("place all bets",36,118,7)
-	if arena_sel==6 then
-		rrect(34,116,59,9,1,9)
-	end
-end
-
---confirm bet page
-function init_confirm()
-	scroller=0
-	max_scroll=0
-	--get total payout
-	get_payout()
-	_upd=upd_confirm
-	_drw=drw_confirm
-end
+-- 	if arena_sel==5 then
+-- 		rrect(4,103,36,10,0,9)
+-- 	end
+-- 	line(40,94,40,112,1)--vline1
+-- 	print("odds",45,96,0)
+-- 	line(64,94,64,112,1)--vline2
+-- 	_str=print_bet_odds()
+-- 	print(_str,57-#_str*2,105,0)
+-- 	print("payout",83,96,0)
+-- 	print(total_pay,94-#total_pay*2,105,0)
+-- 	--button
+-- 	rrectfill(34,116,59,9,1,1)
+-- 	print("place all bets",36,118,7)
+-- 	if arena_sel==6 then
+-- 		rrect(34,116,59,9,1,9)
+-- 	end
+-- end
 
 --confirm bet page
-function upd_confirm()
-	if max_scroll>0 then
-		if btn(⬇️) then
-			scroller=min(scroller+7,max_scroll)
-		elseif btn(⬆️) then
-			scroller=max(scroller-7,0)
-		elseif btnp(❎) then
-			init_betpage()
-		end
-	end
-end
+-- function init_confirm()
+-- 	scroller=0
+-- 	max_scroll=0
+-- 	--get total payout
+-- 	get_payout()
+-- 	_upd=upd_confirm
+-- 	_drw=drw_confirm
+-- end
 
---confirm bet page
-function drw_confirm()
-	print("round:#",4,3-scroller,6)	
+-- --confirm bet page
+-- function upd_confirm()
+-- 	if max_scroll>0 then
+-- 		if btn(⬇️) then
+-- 			scroller=min(scroller+7,max_scroll)
+-- 		elseif btn(⬆️) then
+-- 			scroller=max(scroller-7,0)
+-- 		elseif btnp(❎) then
+-- 			init_betpage()
+-- 		end
+-- 	end
+-- end
+
+-- --confirm bet page
+-- function drw_confirm()
+-- 	print("round:#",4,3-scroller,6)	
 	
-	spr(108,83,1-scroller)--money
-	print("100",92,3-scroller,9)--my money
-	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
-	rrect(3,9-scroller,122,10,0,1)--outline
-	rrectfill(4,10-scroller,120,9,0,2)--red area
-	print("current bets",42,12-scroller,7)
-	rrectfill(4,20-scroller,120,8,0,5)--grey area
-	rrect(3,19-scroller,122,9,0,1)--grey outline
+-- 	spr(108,83,1-scroller)--money
+-- 	print("100",92,3-scroller,9)--my money
+-- 	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
+-- 	rrect(3,9-scroller,122,10,0,1)--outline
+-- 	rrectfill(4,10-scroller,120,9,0,2)--red area
+-- 	print("current bets",42,12-scroller,7)
+-- 	rrectfill(4,20-scroller,120,8,0,5)--grey area
+-- 	rrect(3,19-scroller,122,9,0,1)--grey outline
 
-	print("bet",5,21-scroller,0)
-	line(17,20-scroller,17,max_scroll+106-scroller,1)--bet/player v-line
-	print("player",31,21-scroller,0)
-	line(70,20-scroller,70,max_scroll+106-scroller,1)--end plyr line
-	print("odds/winnings",72,21-scroller,0)
-	--selection area
-	bet_count=0
-	p_count=1
-	o_pcount=0
-	for _bet=1,10 do
-		p_count=1
-		_cbet_odds=1
-		_cbet=bets[_bet]
-		print(_bet,6,21+o_pcount-scroller+8,0)
-		for _arloc=1,16 do
-			if _cbet[_arloc] then
-				print(players[arenas[_arloc]][1],28,14+p_count*9+o_pcount-scroller+8,0)
-				spr(101+ceil(_arloc/4),19,12+p_count*9+o_pcount-scroller+8)--planet
-				p_count+=1
-			end
-		end
-		if p_count>1 then
-			pc_mult=8
-			if p_count==2 then
-				pc_mult=9
-			end
-			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
-			get_total_odds_and_pay(_bet)
+-- 	print("bet",5,21-scroller,0)
+-- 	line(17,20-scroller,17,max_scroll+106-scroller,1)--bet/player v-line
+-- 	print("player",31,21-scroller,0)
+-- 	line(70,20-scroller,70,max_scroll+106-scroller,1)--end plyr line
+-- 	print("odds/winnings",72,21-scroller,0)
+-- 	--selection area
+-- 	bet_count=0
+-- 	p_count=1
+-- 	o_pcount=0
+-- 	for _bet=1,10 do
+-- 		p_count=1
+-- 		_cbet_odds=1
+-- 		_cbet=bets[_bet]
+-- 		print(_bet,6,21+o_pcount-scroller+8,0)
+-- 		for _arloc=1,16 do
+-- 			if _cbet[_arloc] then
+-- 				print(players[arenas[_arloc]][1],28,14+p_count*9+o_pcount-scroller+8,0)
+-- 				spr(101+ceil(_arloc/4),19,12+p_count*9+o_pcount-scroller+8)--planet
+-- 				p_count+=1
+-- 			end
+-- 		end
+-- 		if p_count>1 then
+-- 			pc_mult=8
+-- 			if p_count==2 then
+-- 				pc_mult=9
+-- 			end
+-- 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
+-- 			get_total_odds_and_pay(_bet)
 			
-			print(""..arr_display(clmp_odds)..":1",84,30+o_pcount-scroller,0)
-			spr(108,78,36+o_pcount-scroller)--coin
-			print(total_pay,86,38+o_pcount-scroller,0)
-			o_pcount+=p_count*pc_mult-1
-			bet_count+=1
-		end
-	end
-	max_scroll=o_pcount-60
-	--total winnings box
-	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
-	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
-	print("possible winnings",10,34+o_pcount-scroller,0)
-	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	spr(108,81,32+o_pcount-scroller)--coin
-	for i=1,#payout do
-		print(payout[i],86+i*4,34+o_pcount-scroller,0)
-	end
+-- 			print(""..arr_display(clmp_odds)..":1",84,30+o_pcount-scroller,0)
+-- 			spr(108,78,36+o_pcount-scroller)--coin
+-- 			print(total_pay,86,38+o_pcount-scroller,0)
+-- 			o_pcount+=p_count*pc_mult-1
+-- 			bet_count+=1
+-- 		end
+-- 	end
+-- 	max_scroll=o_pcount-60
+-- 	--total winnings box
+-- 	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
+-- 	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
+-- 	print("possible winnings",10,34+o_pcount-scroller,0)
+-- 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
+-- 	spr(108,81,32+o_pcount-scroller)--coin
+-- 	for i=1,#payout do
+-- 		print(payout[i],86+i*4,34+o_pcount-scroller,0)
+-- 	end
 	
-	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
-end
+-- 	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+-- end
 
 -->8
 --quick bet page
@@ -584,7 +584,7 @@ function calculate_odds()
 	for i_arena=1,4 do
 		for i_a_player=1,4 do
 			local _arena=arenas[i_arena]
-			local _plyr_id=_arena[i_a_player]
+			local _plyr_id=_arena[i_a_player][1]
 			local total_prob=0
 			p_base=players[_plyr_id][3]
 			for die=3,18 do
@@ -593,7 +593,7 @@ function calculate_odds()
 				--we have our die roll
 				--opponent probabilities
 				for _copp=1,4 do
-					local _opp_id=_arena[_copp]
+					local _opp_id=_arena[_copp][1]
 					if _opp_id!=_plyr_id then
 						local o_prob=0
 						local o_base=players[_opp_id][3]
@@ -609,7 +609,7 @@ function calculate_odds()
 				end
 				total_prob+=p_prob
 			end
-			arenas[i_arena][2]=ceil(total_prob*100)
+			_arena[i_a_player][2]=ceil(total_prob*100)
 		end
 	end
 end
@@ -625,17 +625,22 @@ function fill_arenas()
 	--fill players in arenas
 	for i=1,16 do
 		local _rp=rnd(_rplrs)
-		add(arenas[i_arena],_rp)
+		add(arenas[i_arena],{_rp})
 		del(_rplrs,_rp)
 		if i%4==0 then--next arena
 			i_arena+=1
 		end 
 	end
 	calculate_odds()
+	-- for i=1,4 do
+	-- 	for j=1,4 do
+	-- 		debug[i]=debug[i].." "..arenas[i][j][1]
+	-- 	end
+	-- end
 end
 
 --turns percentage into number x used in x:1 format.
-function x_to_one_format(_bet_perc)
+function bet_colon_format(_bet_perc)
 	local _percs={40,30,25,20,15,10,7, 5, 3, 4, 0}
 	local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
 	for i=1,#_percs do
