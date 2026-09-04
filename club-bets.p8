@@ -65,12 +65,12 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	--dummy_bets()
+	dummy_bets()
 
 	--init_quickbetpage()
 	--init_ticket()
-	--init_betpage()
-	init_confirm()
+	init_betpage()
+	--init_confirm()
 end
 
 function dummy_bets()
