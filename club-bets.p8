@@ -195,28 +195,28 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	print("round:#",4,3,6)	
-	print("bet:\f9#"..bet_sel,52,3+bet_off,6+3*bet_off)	
-	spr(108,83,1)--money
-	print("100",92,3,9)
-	rrectfill(4,10,120,74,0,7)--ticket
-	rrect(3,9,122,75,0,1)--outline
-	rrectfill(4,10,120,9,0,2)--red area
-	print("place a bet",42,12,7)
-	rrectfill(4,20,120,8,0,5)--grey area
-	line(3,19,124,19,1)--hline
-	line(39,19,39,83,1)--vline
-	print("arena",12,21,0)
-	print("player",72,21,0)
+	print("round:#",4,3+bet_off,6)	
+	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
+	spr(108,85,1+bet_off)--coin
+	print("1000",94,3+bet_off,9)
+	rrectfill(4,10+bet_off,120,74,0,7)--ticket
+	rrect(3,9+bet_off,122,75,0,1)--outline
+	rrectfill(4,10+bet_off,120,9,0,2)--red area
+	print("place a bet",42,12+bet_off,7)
+	rrectfill(4,20+bet_off,120,8,0,5)--grey area
+	line(3,19+bet_off,124,19+bet_off,1)--hline
+	line(39,19+bet_off,39,83+bet_off,1)--vline
+	print("arena",12,21+bet_off,0)
+	print("player",72,21+bet_off,0)
 	--arenas
 	for i_arena=1,4 do
-		line(3,13+i_arena*14,124,13+i_arena*14,1)
-		rrectfill(42,16+i_arena*14,80,9,1,6)
+		line(3,13+i_arena*14+bet_off,124,13+i_arena*14+bet_off,1)
+		rrectfill(42,16+i_arena*14+bet_off,80,9,1,6)
 		if arena_sel==i_arena and bet_mode!=2 then
-			rrect(42,16+i_arena*14,80,9,1,9)
+			rrect(42,16+i_arena*14+bet_off,80,9,1,9)
 		end
-		print(i_arena,18,18+i_arena*14,0)
-		spr(101+i_arena,27,16+i_arena*14)--planet
+		print(i_arena,18,18+i_arena*14+bet_off,0)
+		spr(101+i_arena,27,16+i_arena*14+bet_off)--planet
 		--get player
 		chk_spr=106
 		local plyr_str="who to bet on?"
@@ -226,9 +226,9 @@ function drw_betpage()
 				chk_spr=107
 			end
 		end
-		spr(chk_spr,8,16+i_arena*14)--check mark
-		print(plyr_str,52,18+i_arena*14,0)
-		spr(68,115,19+i_arena*14)
+		spr(chk_spr,8,16+i_arena*14+bet_off)--check mark
+		print(plyr_str,52,18+i_arena*14+bet_off,0)
+		spr(68,115,19+i_arena*14+bet_off)
 	end
 	draw_winning_calc()
 	--player select area
