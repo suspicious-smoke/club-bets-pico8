@@ -7,13 +7,67 @@ function _init()
 	version,t=0,0
 	debug={"","","",""}
 
-	-- categories={
-	-- 	"movement",
-	-- 	"precise"
-	-- }
-	-- obs={
-	-- 	{"hairpine",1,2},
-	-- }
+	arena_category={
+		"movement",
+		"obstacle",
+		"powerup",
+		"weather",
+		"terrain",
+		"ship-mod",
+		"event",
+		"section",
+		"physics",
+		"visibility",
+		"condition",
+		"hazard"
+	}
+	arena_features={
+
+		{"hairpin",1,2},
+		{"u-turn",1,2},
+		{"long_straight",1},
+		{"jump",1,9},
+
+		{"lava_pit",2,12},
+		{"spike_trap",2,12},
+		{"falling_rocks",2,7},
+
+		{"boost_pad",3,1},
+		{"oil_slick",3,11},
+		{"cannon_shot",3,12},
+
+		{"rain",4,11},
+		{"high_wind",4,9},
+		{"extreme_heat",4,12},
+
+		{"off-road",5,11},
+		{"ice",5,11},
+		{"glass",5,11},
+
+		{"extra_boosters",6,1},
+		{"glider",6,9},
+
+		{"meteor_shower",7,12},
+		{"kaiju_attack",7,12},
+		{"wormhole",7,9},
+
+		{"castle",8,5},
+		{"crystal_caves",8,10},
+		{"volcano",8,4},
+
+		{"zero-g",9,1},
+		{"reverse_gravity",9,1},
+
+		{"darkness",10},
+		{"fog",10,4},
+
+		{"narrow_path",11,1},
+		{"crumbling_track",11,2},
+
+		{"electric_field",12,9},
+		{"fire",12,4},
+
+	}
 
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
@@ -68,8 +122,8 @@ function _init()
 	dummy_bets()
 	init_quickbetpage()
 	--init_ticket()
-	--init_betpage()
-	--init_confirm()
+	init_betpage()
+	init_confirm()
 end
 
 function dummy_bets()
