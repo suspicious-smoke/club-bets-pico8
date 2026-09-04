@@ -65,7 +65,7 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	dummy_bets()
+	--dummy_bets()
 
 	--init_quickbetpage()
 	--init_ticket()
@@ -305,9 +305,10 @@ function upd_confirm()
 			scroller=min(scroller+7,max_scroll)
 		elseif btn(⬆️) then
 			scroller=max(scroller-7,0)
-		elseif btnp(❎) then
-			init_betpage()
 		end
+	end
+	if btnp(❎) then
+		init_betpage()
 	end
 end
 
