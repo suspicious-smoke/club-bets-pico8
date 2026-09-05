@@ -22,49 +22,38 @@ function _init()
 		"hazard"
 	}
 	arena_features={
-		{"hairpin",1,2},
-		{"u-turn",1,2},
-		{"long_straight",1},
-		{"jump",1,9},
-
-		{"lava_pit",2,12},
-		{"spike_trap",2,12},
-		{"falling_rocks",2,7},
-
-		{"boost_pad",3,1},
-		{"oil_slick",3,11},
-		{"cannon_shot",3,12},
-
-		{"rain",4,11},
-		{"high_wind",4,9},
-		{"extreme_heat",4,12},
-
-		{"off-road",5,11},
-		{"ice",5,11},
-		{"glass",5,11},
-
-		{"extra_boosters",6,1},
-		{"glider",6,9},
-
-		{"meteor_shower",7,12},
-		{"kaiju_attack",7,12},
-		{"wormhole",7,9},
-
-		{"castle",8,5},
-		{"crystal_caves",8,10},
-		{"volcano",8,4},
-
-		{"zero-g",9,1},
-		{"reverse_gravity",9,1},
-
-		{"darkness",10},
-		{"fog",10,4},
-
-		{"narrow_path",11,1},
-		{"crumbling_track",11,2},
-
-		{"electric_field",12,9},
-		{"fire",12,4},
+		{"hairpin",{1,2}},
+		{"u-turn",{1,2}},
+		{"long_straight",{1}},
+		{"jump",{1,9}},
+		{"lava_pit",{2,12}},
+		{"spike_trap",{2,12}},
+		{"falling_rocks",{2,7}},
+		{"boost_pad",{3,1}},
+		{"oil_slick",{3,11}},
+		{"cannon_shot",{3,12}},
+		{"rain",{4,11}},
+		{"high_wind",{4,9}},
+		{"extreme_heat",{4,12}},
+		{"off-road",{5,11}},
+		{"ice",{5,11}},
+		{"glass",{5,11}},
+		{"extra_boosters",{6,1}},
+		{"glider",{6,9}},
+		{"meteor_shower",{7,12}},
+		{"kaiju_attack",{7,12}},
+		{"wormhole",{7,9}},
+		{"castle",{8,5}},
+		{"crystal_caves",{8,10}},
+		{"volcano",{8,4}},
+		{"zero-g",{9,1}},
+		{"reverse_gravity",{9,1}},
+		{"darkness",{10}},
+		{"fog",{10,4}},
+		{"narrow_path",{11,1}},
+		{"crumbling_track",{11,2}},
+		{"electric_field",{12,9}},
+		{"fire",{12,4}},
 	}
 
 	--build initial bets
@@ -80,29 +69,27 @@ function _init()
 		add(bets,_bet)
 	end
 
-	-- for i=1,4 do
-	-- 	bets[1][i*4]=true
-	-- end
+	--{name,abreiv,base,{strengths category},weakness category}
 	players={
-		--{name,abreiv,strength,{categories}}
-		{"bosco","bco",10},
-		{"admiral","adm",11},
-		{"dexter","dxt",12},
-		{"pontoon","ptn",14},
-		{"sailer","slr",15},
-		{"bucket","bkt",16},
-		{"pod eng","pde",17},
-		{"merchant","mch",10},
-		{"scuttle","sct",11},
-		{"beluga","blg",12},
-		{"ant","ant",13},
-		{"turtle","trt",14},
-		{"beholder","bhd",15},
-		{"trident","trd",16},
-		{"kingshot","kng",17},
-		{"ufo","ufo",13},
-	}
+    {"bosco","bco",10,{1,3},8},
+    {"admiral","adm",11,{1,4},10},
+    {"dexter","dxt",12,{2,7,12},5},
+    {"pontoon","ptn",14,{4,8},2},
+    {"sailer","slr",15,{5},7},
+    {"bucket","bkt",16,{6},11},
+    {"pod eng","pde",17,{1,6,9},10},
+    {"merchant","mch",10,{2,3},8},
+    {"scuttle","sct",11,{4,9},6},
+    {"beluga","blg",12,{9},3},
+    {"ant","ant",13,{10},5},
+    {"turtle","trt",14,{2,11},4},
+    {"beholder","bhd",15,{9},1},
+    {"trident","trd",16,{12},6},
+    {"kingshot","kng",17,{8},5},
+    {"ufo","ufo",13,{1},4},
+}
 	arenas={}
+	arena_features={}
 	odds={}
 	bet_odds={}
 	money={1,0,0,0}
@@ -120,8 +107,8 @@ function _init()
 	dummy_bets()
 	--init_quickbetpage()
 	--init_ticket()
-	--init_betpage()
-	init_confirm()
+	init_betpage()
+	--init_confirm()
 end
 
 function dummy_bets()
@@ -601,6 +588,7 @@ end
 
 function fill_arenas()
 	arenas={{},{},{},{}}
+	arena_features={{},{},{},{}}
 	--array of 1,2,...,16 for random players
 	local _rplrs={}
 	for i=1,16 do
@@ -616,7 +604,48 @@ function fill_arenas()
 			i_arena+=1
 		end 
 	end
+	--give each arena 8 items
+	local _rnd_features={}
+	for i=1,32 do
+		add(_rnd_features,i)
+	end
+	for i_arena=1,4 do
+		for i_feature=1,8 do
+			local _rnd_feature=rnd(_rnd_features)
+			add(arena_features[i_arena],_rnd_feature)
+			del(_rnd_features,_rnd_feature)
+		end
+	end
+
 	calculate_odds()
+end
+
+function get_player_mods()
+	--get player base
+
+	for i_arena=1,4 do
+		for i_a_player=1,4 do
+			local _arena=arenas[i_arena]
+			local _plyr_id=_arena[i_a_player][1]
+			local p_mod=players[_plyr_id][3]
+
+			for i_feature=1,8 do
+				--plus for str, minus for weakness
+				local p_strs=players[_plyr_id][4]
+				for stri=1,#p_strs do
+					arenafeature=arena_features[i_feature][2]
+					for afi=1,#arenafeature do
+						if p_strs[stri]==arenafeature[afi] then
+							p_mod+=1
+						elseif players[_plyr_id][5]==arenafeature[afi]--weakness
+							p_mod-=1
+						end
+					end
+					
+				end
+			end
+		end
+	end
 end
 
 --turns percentage into number x used in x:1 format.
@@ -632,7 +661,6 @@ end
 
 --gets odds and winnings for each bet and total payout
 function get_bet_summary()
-
 	--global summary arrays to use elsewhere
 	bets_odds=reset_array(10,1)--array follows the bet_id
 	bets_winnings=reset_array(10,7,0)
@@ -685,6 +713,11 @@ function print_bet_odds(_odds,dynamic_color)
 	return return_str
 end
 
+
+
+function run_race()
+	
+end
 -->8
 --helpers
 function explode_d6()
