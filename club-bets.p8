@@ -120,8 +120,8 @@ function _init()
 	dummy_bets()
 	--init_quickbetpage()
 	--init_ticket()
-	init_betpage()
-	--init_confirm()
+	--init_betpage()
+	init_confirm()
 end
 
 function dummy_bets()
@@ -393,8 +393,8 @@ function drw_confirm()
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
 				if _cbet[2][i_arena][i_aplyr] then
-					print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)
 					spr(101+i_arena,19,12+p_count*9+o_pcount-scroller+8)--planet
+					print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)--player name
 					p_count+=1		
 				end
 			end
@@ -406,11 +406,11 @@ function drw_confirm()
 				pc_mult=9
 			end
 			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
-			
-			print(""..print_bet_odds(bets_odds[i_bet]),84,30+o_pcount-scroller,0)
-			spr(108,78,36+o_pcount-scroller)--coin
+			_p_odds=print_bet_odds(bets_odds[i_bet])
+			print(_p_odds,98-#_p_odds*2,30+o_pcount-scroller,0)
 			winnings_str=arr_to_str(bets_winnings[i_bet])
-			print(winnings_str,86,38+o_pcount-scroller,0)
+			spr(108,90-#winnings_str*2,36+o_pcount-scroller)--coin
+			print(winnings_str,98-#winnings_str*2,38+o_pcount-scroller,0)
 			o_pcount+=p_count*pc_mult-1
 			bet_count+=1
 		end
@@ -421,10 +421,15 @@ function drw_confirm()
 	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
 	print("possible winnings",10,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	spr(108,81,32+o_pcount-scroller)--coin
-	for i=1,#total_winnings do
-		print(total_winnings[i],86+i*4,34+o_pcount-scroller,0)
-	end
+	
+	tw_str=arr_to_str(total_winnings)
+	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
+	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+
+	-- spr(108,81,32+o_pcount-scroller)--coin
+	-- for i=1,#total_winnings do
+	-- 	print(total_winnings[i],86+i*4,34+o_pcount-scroller,0)
+	-- end
 	
 	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
 end
