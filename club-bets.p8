@@ -6,7 +6,6 @@ __lua__
 function _init()
 	version,t=0,0
 	debug={"","","",""}
-
 	category={
 		"movement",
 		"obstacle",
@@ -56,7 +55,7 @@ function _init()
 		{"fire",{12,4}},
 	}
 	round_features={{},{},{},{}}--ids of arena features for current round
-
+	round_winners={}
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
 	-- where { {t,f,f,f},... } is the arenas and selected players
@@ -109,6 +108,7 @@ function _init()
 	--init_quickbetpage()
 	--init_ticket()
 	init_betpage()
+	get_winners()
 	--init_confirm()
 end
 
@@ -714,10 +714,30 @@ function print_bet_odds(_odds,dynamic_color)
 	return return_str
 end
 
-
-
-function run_race()
-	
+function get_winners()
+	round_winners={}
+	for i_arena=1,4 do
+		scores={}
+		for i_a_player=1,4 do
+			local _arena_plyr=arenas[i_arena][i_a_player]
+			local p_score=_arena_plyr[2]+_arena_plyr[3]+explode_d6()+explode_d6()+explode_d6()
+			add(scores,p_score)
+		end
+		_rwinner=1
+		for s=1,4 do
+			if scores[s]==scores[_rwinner] then
+				if d6()>3 then--roll to beat ties
+					_rwinner=s
+				end
+			elseif scores[s]>scores[_rwinner] then
+				_rwinner=s
+			end
+		end
+		round_winners[i_arena]=_rwinner
+	end
+	-- for i=1,4 do
+	-- 	debug[i]=round_winners[i]
+	-- end
 end
 -->8
 --helpers
@@ -731,6 +751,7 @@ function explode_d6()
 			run_loop=false
 		end
 	end
+	return total
 end
 
 function hcenter(s)
