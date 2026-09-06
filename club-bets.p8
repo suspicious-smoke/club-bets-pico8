@@ -7,7 +7,7 @@ function _init()
 	version,t=0,0
 	debug={"","","",""}
 
-	arena_category={
+	category={
 		"movement",
 		"obstacle",
 		"powerup",
@@ -21,7 +21,7 @@ function _init()
 		"condition",
 		"hazard"
 	}
-	arena_features={
+	features={
 		{"hairpin",{1,2}},
 		{"u-turn",{1,2}},
 		{"long_straight",{1}},
@@ -55,6 +55,7 @@ function _init()
 		{"electric_field",{12,9}},
 		{"fire",{12,4}},
 	}
+	round_features={{},{},{},{}}--ids of arena features for current round
 
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
@@ -89,7 +90,7 @@ function _init()
     {"ufo","ufo",13,{1},4},
 }
 	arenas={}
-	arena_features={}
+	
 	odds={}
 	bet_odds={}
 	money={1,0,0,0}
@@ -288,7 +289,7 @@ end
 
 function get_player_string(i_arena,i_aplyr)
 	local arena_player=arenas[i_arena][i_aplyr]
-	return players[arena_player[1]][1].." "..bet_colon_format(arena_player[2])..":1"
+	return players[arena_player[1]][1].." "..arena_player[4]..":1"
 end
 
 function draw_winning_calc()
@@ -467,7 +468,7 @@ function drw_quickbetpage()
 			_py=((i_arena-1)*4+i_aplyr)*7+g_off
 			rrectfill(1,_py-6,126,7,0,6+i_aplyr%2)--row background
 			local a_plyr=arenas[i_arena][i_aplyr]
-			print(players[a_plyr[1]][2].." "..bet_colon_format(a_plyr[2])..":1",3,_py-5,arena_clr[i_arena])
+			print(players[a_plyr[1]][2].." "..a_plyr[4]..":1",3,_py-5,arena_clr[i_arena])
 			--bet buttons
 			for k=1,10 do
 				bet_clr=5
@@ -556,22 +557,20 @@ function calculate_odds()
 	for i_arena=1,4 do
 		for i_a_player=1,4 do
 			local _arena=arenas[i_arena]
-			local _plyr_id=_arena[i_a_player][1]
+			local _arena_plyr=_arena[i_a_player]
 			local total_prob=0
-			p_base=players[_plyr_id][3]
 			for die=3,18 do
 				local p_prob=d6x3[die]
-				local p_score=p_base+die
+				local p_score=_arena_plyr[2]+_arena_plyr[3]+die--base+p_mod
 				--we have our die roll
 				--opponent probabilities
 				for _copp=1,4 do
 					local _opp_id=_arena[_copp][1]
-					if _opp_id!=_plyr_id then
+					if _opp_id!=_arena_plyr[1] then
 						local o_prob=0
-						local o_base=players[_opp_id][3]
 						for o_die=3,18 do
 							--get player scores that beat opponent's score
-							if o_base+o_die<p_score then
+							if _arena[_copp][2]+_arena[_copp][3]+o_die<p_score then
 								o_prob+=d6x3[o_die]
 							end
 						end
@@ -581,14 +580,15 @@ function calculate_odds()
 				end
 				total_prob+=p_prob
 			end
-			_arena[i_a_player][2]=ceil(total_prob*100)
+			local col_format=bet_colon_format(ceil(total_prob*100))
+			_arena[i_a_player][4]=col_format
 		end
 	end
 end
 
 function fill_arenas()
 	arenas={{},{},{},{}}
-	arena_features={{},{},{},{}}
+	round_features={{},{},{},{}}
 	--array of 1,2,...,16 for random players
 	local _rplrs={}
 	for i=1,16 do
@@ -612,38 +612,39 @@ function fill_arenas()
 	for i_arena=1,4 do
 		for i_feature=1,8 do
 			local _rnd_feature=rnd(_rnd_features)
-			add(arena_features[i_arena],_rnd_feature)
+			add(round_features[i_arena],_rnd_feature)
 			del(_rnd_features,_rnd_feature)
 		end
 	end
-
+	get_player_mods()
 	calculate_odds()
 end
 
 function get_player_mods()
 	--get player base
-
 	for i_arena=1,4 do
 		for i_a_player=1,4 do
-			local _arena=arenas[i_arena]
-			local _plyr_id=_arena[i_a_player][1]
-			local p_mod=players[_plyr_id][3]
-
-			for i_feature=1,8 do
-				--plus for str, minus for weakness
-				local p_strs=players[_plyr_id][4]
-				for stri=1,#p_strs do
-					arenafeature=arena_features[i_feature][2]
-					for afi=1,#arenafeature do
-						if p_strs[stri]==arenafeature[afi] then
+			local _plyr_id=arenas[i_arena][i_a_player][1]
+			local p_mod=0
+			for feature_index=1,8 do
+				--get categories for feature
+				categories=features[round_features[i_arena][feature_index]][2]
+				for c=1,#categories do
+					--for each category, see if the player has them as a strength/weakness
+					if players[_plyr_id][5]==categories[c] then--weakness check
+						p_mod-=1
+					end
+					local strengths=players[_plyr_id][4]--strengths
+					for s_i=1,#strengths do
+						if strengths[s_i]==categories[c] then
 							p_mod+=1
-						elseif players[_plyr_id][5]==arenafeature[afi]--weakness
-							p_mod-=1
 						end
 					end
-					
 				end
 			end
+			--add to arena info
+			arenas[i_arena][i_a_player][2]=players[_plyr_id][3]--base
+			arenas[i_arena][i_a_player][3]=p_mod
 		end
 	end
 end
@@ -671,7 +672,7 @@ function get_bet_summary()
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
 				if _bet_arena[i_arena][i_aplyr] then
-					bets_odds[i_bet]*=bet_colon_format(arenas[i_arena][i_aplyr][2])
+					bets_odds[i_bet]*=arenas[i_arena][i_aplyr][4]
 				end
 			end
 		end
