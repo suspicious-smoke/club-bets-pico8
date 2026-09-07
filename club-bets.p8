@@ -108,7 +108,7 @@ function _init()
 	--init_quickbetpage()
 	--init_ticket()
 	init_betpage()
-	get_winners()
+	--calculate_winners()
 	--init_confirm()
 end
 
@@ -329,7 +329,9 @@ end
 function init_confirm()
 	scroller=0
 	max_scroll=0
+	bet_title="current bets"
 	get_bet_summary()
+	show_winners=false
 	_upd=upd_confirm
 	_drw=drw_confirm
 end
@@ -352,14 +354,30 @@ end
 
 --confirm bet page
 function drw_confirm()
-	print("round:#",4,3-scroller,6)	
+	draw_bet_summary()
+
+	--total winnings box
+	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
+	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
+	print("possible winnings",10,34+o_pcount-scroller,0)
+	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
 	
+	tw_str=arr_to_str(total_winnings)
+	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
+	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+
+	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+end
+
+function draw_bet_summary()
+	print("round:#",4,3-scroller,6)	
 	spr(108,83,1-scroller)--coin
 	print(arr_to_str(money,true),92,3-scroller,9)--my money
 	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
 	rrect(3,9-scroller,122,10,0,1)--outline
 	rrectfill(4,10-scroller,120,9,0,2)--red area
-	print("current bets",42,12-scroller,7)
+
+	print(bet_title,hcenter(bet_title),12-scroller,7)
 	rrectfill(4,20-scroller,120,8,0,5)--grey area
 	rrect(3,19-scroller,122,9,0,1)--grey outline
 
@@ -375,62 +393,64 @@ function drw_confirm()
 		p_count=1
 		_cbet_odds=1
 		_cbet=bets[i_bet]
-		print(i_bet,6,21+o_pcount-scroller+8,0)
 
-		for i_arena=1,4 do
-			for i_aplyr=1,4 do
-				if _cbet[2][i_arena][i_aplyr] then
-					spr(101+i_arena,19,12+p_count*9+o_pcount-scroller+8)--planet
-					print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)--player name
-					p_count+=1		
+		if show_winners==false or (show_winners==true and is_winning_bet(_cbet)) then
+			print(i_bet,6,21+o_pcount-scroller+8,0)
+
+			for i_arena=1,4 do
+				for i_aplyr=1,4 do
+					if _cbet[2][i_arena][i_aplyr] then
+						spr(101+i_arena,19,12+p_count*9+o_pcount-scroller+8)--planet
+						print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)--player name
+						p_count+=1		
+					end
 				end
 			end
-		end
 
-		if p_count>1 then
-			pc_mult=8
-			if p_count==2 then
-				pc_mult=9
+			if p_count>1 then
+				pc_mult=8
+				if p_count==2 then
+					pc_mult=9
+				end
+				rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
+				_p_odds=print_bet_odds(bets_odds[i_bet])
+				print(_p_odds,98-#_p_odds*2,30+o_pcount-scroller,0)
+				winnings_str=arr_to_str(bets_winnings[i_bet])
+				spr(108,90-#winnings_str*2,36+o_pcount-scroller)--coin
+				print(winnings_str,98-#winnings_str*2,38+o_pcount-scroller,0)
+				o_pcount+=p_count*pc_mult-1
+				bet_count+=1
 			end
-			rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
-			_p_odds=print_bet_odds(bets_odds[i_bet])
-			print(_p_odds,98-#_p_odds*2,30+o_pcount-scroller,0)
-			winnings_str=arr_to_str(bets_winnings[i_bet])
-			spr(108,90-#winnings_str*2,36+o_pcount-scroller)--coin
-			print(winnings_str,98-#winnings_str*2,38+o_pcount-scroller,0)
-			o_pcount+=p_count*pc_mult-1
-			bet_count+=1
 		end
 	end
 	max_scroll=o_pcount-60
-	--total winnings box
-	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
-	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
-	print("possible winnings",10,34+o_pcount-scroller,0)
-	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
 	
-	tw_str=arr_to_str(total_winnings)
-	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
-	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
 
-	-- spr(108,81,32+o_pcount-scroller)--coin
-	-- for i=1,#total_winnings do
-	-- 	print(total_winnings[i],86+i*4,34+o_pcount-scroller,0)
-	-- end
-	
-	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+end
+
+function is_winning_bet(_bet)
+	for i_arena=1,4 do
+		for i_plyr=1,4 do
+			if _bet[2][i_arena][i_plyr] then--player was bet on
+				if i_plyr!=round_winners[i_arena] then
+					return false
+				end
+			end
+		end
+	end
+	return true
 end
 
 function init_end_of_round()
-		get_winners()
+		calculate_winners()
 		_upd=upd_end_of_round
 		_drw=drw_end_of_round
 end
 
 function upd_end_of_round()
 	if btnp(🅾️) then
-		--start new round
-		--or go to settle bets page?
+		--winnings page
+		init_winning_bets()
 	end
 end
 
@@ -443,6 +463,62 @@ function drw_end_of_round()
 		print(get_player_string(i_arena,round_winners[i_arena]),50,17+i_arena*10)
 	end
 end
+
+
+function get_winning_cash()
+	winning_cash=reset_array(10,0)
+	--debug[1]=round_winners[1].." "..round_winners[2].." "..round_winners[3].." "..round_winners[4]
+	for i_bet=1,10 do
+		_cbet=bets[i_bet]
+		if is_winning_bet(_cbet) then
+			winning_cash=arr_add(winning_cash,bets_winnings[i_bet])
+			
+		end
+	end
+	
+end
+
+function init_winning_bets()
+	scroller=0
+	max_scroll=0
+	bet_title="collect winnings"
+	get_bet_summary()
+	get_winning_cash()
+	show_winners=true
+	_upd=upd_winning_bets
+	_drw=drw_winning_bets
+end
+
+function upd_winning_bets()
+	if max_scroll>0 then
+		if btn(⬇️) then
+			scroller=min(scroller+7,max_scroll)
+		elseif btn(⬆️) then
+			scroller=max(scroller-7,0)
+		end
+	end
+	if btnp(❎) or btnp(🅾️) then
+		init_betpage()
+	end
+end
+
+function drw_winning_bets()
+	draw_bet_summary()
+
+	--total winnings box
+	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
+	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
+	print("winnings",45,34+o_pcount-scroller,0)
+	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
+	tw_str=arr_to_str(winning_cash,true)
+	if #tw_str==0 then
+		tw_str="0"
+	end
+	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
+	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+	print("press 🅾️ to continue",25,50+o_pcount-scroller,7)
+end
+
 
 -->8
 --quick bet page
@@ -741,7 +817,7 @@ function get_player_string(i_arena,i_aplyr)
 	return players[arena_player[1]][1].." "..arena_player[4]..":1"
 end
 
-function get_winners()
+function calculate_winners()
 	round_winners={}
 	for i_arena=1,4 do
 		scores={}
@@ -762,9 +838,6 @@ function get_winners()
 		end
 		round_winners[i_arena]=_rwinner
 	end
-	-- for i=1,4 do
-	-- 	debug[i]=round_winners[i]
-	-- end
 end
 -->8
 --helpers
