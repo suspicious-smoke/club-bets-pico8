@@ -80,7 +80,6 @@ function _init()
     {"ufo","ufo",13,{1},4},
 }
 	arenas={}
-	
 	odds={}
 	bet_odds={}
 	money={1,0,0,0}
@@ -95,7 +94,7 @@ function _init()
 	_upd=blank
 	_drw=blank
 	fill_arenas()
-	dummy_bets()
+	--dummy_bets()
 	--init_quickbetpage()
 	--init_ticket()
 	init_betpage()
@@ -114,13 +113,11 @@ function dummy_bets()
 	end
 end
 
-
 function blank() end
 
 function _update()
 	t+=1
-	_upd()
-	
+	_upd()	
 	--update_fx()--particles
 end
 
@@ -290,6 +287,7 @@ function draw_winning_calc()
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
 	for i=1,4 do
+		--digit selection colors
 		i_clr=0
 		if i==i_amt and bet_mode==3 then
 			i_clr=9
@@ -323,6 +321,9 @@ function init_confirm()
 	bet_title="current bets"
 	get_bet_summary()
 	show_winners=false
+	get_bet_costs()
+	has_money=arr_greater_equal(money,total_bet)
+	made_bets=arr_to_str(total_winnings)!="0"
 	_upd=upd_confirm
 	_drw=drw_confirm
 end
@@ -339,25 +340,48 @@ function upd_confirm()
 	if btnp(❎) then
 		init_betpage()
 	elseif btnp(🅾️) then
-		init_end_of_round()
+		if has_money and made_bets then
+			init_end_of_round()
+		end
 	end
+end
+
+function get_bet_costs()
+	total_bet={}
+	for i_bet=1,10 do
+		has_bet=false
+		for i_arena=1,4 do
+			for i_plyr=1,4 do
+				if bets[i_bet][2][i_arena][i_plyr] then
+					has_bet=true
+				end
+			end
+		end
+		if has_bet then
+			total_bet=arr_add(total_bet,bets[i_bet][1])
+		end
+	end
+	return total_bet
 end
 
 --confirm bet page
 function drw_confirm()
 	draw_bet_summary()
-
 	--total winnings box
 	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
 	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
 	print("possible winnings",10,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	
 	tw_str=arr_to_str(total_winnings)
 	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
 	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
-
-	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+	if not has_money then
+		print("not enough cash. press ❎",16,50+o_pcount-scroller,8)
+	elseif not made_bets then
+		print("no bets placed. press ❎",18,50+o_pcount-scroller,8)
+	else
+		print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+	end
 end
 
 function draw_bet_summary()
@@ -415,25 +439,12 @@ function draw_bet_summary()
 		end
 	end
 	max_scroll=o_pcount-60
-	
-
-end
-
-function is_winning_bet(_bet)
-	for i_arena=1,4 do
-		for i_plyr=1,4 do
-			if _bet[2][i_arena][i_plyr] then--player was bet on
-				if i_plyr!=round_winners[i_arena] then
-					return false
-				end
-			end
-		end
-	end
-	return true
 end
 
 function init_end_of_round()
 		calculate_winners()
+			--pay for bets
+		money=arr_sub(money,total_bet)
 		_upd=upd_end_of_round
 		_drw=drw_end_of_round
 end
@@ -455,25 +466,11 @@ function drw_end_of_round()
 	end
 end
 
-
-function get_winning_cash()
-	winning_cash=reset_array(10,0)
-	--debug[1]=round_winners[1].." "..round_winners[2].." "..round_winners[3].." "..round_winners[4]
-	for i_bet=1,10 do
-		_cbet=bets[i_bet]
-		if is_winning_bet(_cbet) then
-			winning_cash=arr_add(winning_cash,bets_winnings[i_bet])
-			
-		end
-	end
-	
-end
-
 function init_winning_bets()
 	scroller=0
 	max_scroll=0
 	bet_title="collect winnings"
-	get_bet_summary()
+	get_bet_summary()	
 	get_winning_cash()
 	show_winners=true
 	_upd=upd_winning_bets
@@ -488,7 +485,7 @@ function upd_winning_bets()
 			scroller=max(scroller-7,0)
 		end
 	end
-	if btnp(❎) or btnp(🅾️) then
+	if btnp(🅾️) then
 		finish_round()
 	end
 end
@@ -507,16 +504,6 @@ function drw_winning_bets()
 	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
 	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
 	print("press 🅾️ to continue",25,50+o_pcount-scroller,7)
-end
-
-
-function finish_round()
-	--give player winnings
-	money=arr_add(winning_cash,money)
-	--refill arena
-	fill_arenas()
-	--start next bet round/bet page
-	init_betpage()
 end
 
 
@@ -788,6 +775,9 @@ function get_bet_summary()
 			end
 		end
 		bets_odds[i_bet]=min(bets_odds[i_bet],999)--clamp bets_odds
+		if bets_odds[i_bet]==1 then
+			bets_odds[i_bet]=0
+		end
 		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bets[i_bet][1])
 		if #bets_winnings[i_bet] >= 7 then
 			bets_winnings[bet_sel]={1,0,0,0,0,0,0}
@@ -821,6 +811,7 @@ function print_bet_odds(_odds,dynamic_color)
 		end
 	end
 	str_odds=tostr(_odds)
+	if str_odds=="0" then return "" end
 	return_str=return_str..str_odds..":1"
 	return return_str
 end
@@ -851,6 +842,40 @@ function calculate_winners()
 		end
 		round_winners[i_arena]=_rwinner
 	end
+end
+
+function is_winning_bet(_bet)
+	for i_arena=1,4 do
+		for i_plyr=1,4 do
+			if _bet[2][i_arena][i_plyr] then--player was bet on
+				if i_plyr!=round_winners[i_arena] then
+					return false
+				end
+			end
+		end
+	end
+	return true
+end
+
+function get_winning_cash()
+	winning_cash=reset_array(10,0)
+	--debug[1]=round_winners[1].." "..round_winners[2].." "..round_winners[3].." "..round_winners[4]
+	for i_bet=1,10 do
+		_cbet=bets[i_bet]
+		if is_winning_bet(_cbet) then
+			winning_cash=arr_add(winning_cash,bets_winnings[i_bet])		
+		end
+	end
+end
+
+function finish_round()
+	--give player winnings
+	money=arr_add(winning_cash,money)
+	winning_cash={}
+	--refill arena
+	fill_arenas()
+	--start next bet round/bet page
+	init_betpage()
 end
 -->8
 --helpers
@@ -934,6 +959,9 @@ function arr_to_str(_arr,_0clean)
 			end
 		end
 	end
+	if anum=="" then 
+		anum="0"
+	end
 	return anum
 end
 
@@ -991,41 +1019,60 @@ function arr_mult(a,b)
 	end
 	return r
 end
-
 function arr_sub(a,b)--subtraction
- -- result array
- local r={}
- local borrow=0
- local i=#a
- local j=#b
- -- subtract digits from right to left
- while i>0 do
-  -- subtract the two digits and any borrow
-  local n=a[i]-(b[j] or 0)-borrow
-  -- borrow from the next digit if needed
-  if n<0 then
-   n+=10
-   borrow=1
-  else
-   borrow=0
-  end
-  -- store the result digit
-  add(r,n)
-  -- move to the next digits
-  i-=1
-  j-=1
- end
- -- digits were calculated right-to-left,
- -- so reverse the result
- for i=1,#r\2 do
-  r[i],r[#r-i+1]=r[#r-i+1],r[i]
- end
- -- remove leading zeroes
- while #r>1 and r[1]==0 do
-  deli(r,1)
- end
+	-- result array
+	local r={}
+	local borrow=0
+	local i=#a
+	local j=#b
+	-- subtract digits from right to left
+	while i>0 do
+		local n=a[i]-(j>0 and b[j] or 0)-borrow
+		-- borrow from the next digit if needed
+		if n<0 then
+			n+=10
+			borrow=1
+		else
+			borrow=0
+		end
+		add(r,n)
+		i-=1
+		j-=1
+	end
+	-- reverse result
+	for i=1,#r\2 do
+		r[i],r[#r-i+1]=r[#r-i+1],r[i]
+	end
 
- return r
+	-- remove leading zeroes
+	while #r>1 and r[1]==0 do
+		deli(r,1)
+	end
+
+	return r
+end
+
+function arr_greater_equal(a,b)--is a>=b?
+
+	-- more digits means bigger number
+	if #a>#b then
+		return true
+	elseif #a<#b then
+		return false
+	end
+
+	-- same number of digits
+	-- compare from left to right
+	for i=1,#a do
+		if a[i]>b[i] then
+			return true
+		elseif a[i]<b[i] then
+			return false
+		end
+	end
+
+	-- numbers are equal
+	return true
 end
 
 __gfx__
