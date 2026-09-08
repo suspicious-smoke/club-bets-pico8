@@ -334,10 +334,12 @@ end
 function init_confirm()
 	scroller=0
 	max_scroll=0
+	o_pcount=0
 	bet_title="current bets"
 	get_bet_summary()
 	show_winners=false
 	get_bet_costs()
+	prep_draw_bet_summary()
 	has_money=arr_greater_equal(money,total_bet)
 	made_bets=arr_to_str(total_winnings)!="0"
 	_upd=upd_confirm
@@ -400,6 +402,33 @@ function drw_confirm()
 	end
 end
 
+function prep_draw_bet_summary()
+	bet_offsets=reset_array(10,0)
+	o_pcount=0--old_player_count
+	for i_bet=1,10 do
+		p_count=1
+		_cbet=bets[i_bet]
+		if show_winners==false or (show_winners==true and is_winning_bet(_cbet)) then
+			for i_arena=1,4 do
+				for i_aplyr=1,4 do
+					if _cbet[2][i_arena][i_aplyr] then
+						p_count+=1		
+					end
+				end
+			end
+			if p_count>1 then
+				pc_mult=8
+				if p_count==2 then
+					pc_mult=9
+				end
+				bet_offsets[i_bet]=o_pcount
+				o_pcount+=p_count*pc_mult-1--next bets bet_offset
+			end
+		end
+	end
+	max_scroll=o_pcount-60
+end
+
 function draw_bet_summary()
 	print("round:#",4,3-scroller,6)	
 	spr(108,83,1-scroller)--coin
@@ -417,52 +446,45 @@ function draw_bet_summary()
 	print("player",31,21-scroller,0)
 	line(70,20-scroller,70,max_scroll+106-scroller,1)--end plyr line
 	print("odds/winnings",72,21-scroller,0)
-	bet_count=0
-	p_count=1
-	o_pcount=0
 	for i_bet=1,10 do
 		p_count=1
-		_cbet_odds=1
 		_cbet=bets[i_bet]
-
 		if show_winners==false or (show_winners==true and is_winning_bet(_cbet)) then
-			print(i_bet,6,21+o_pcount-scroller+8,0)
-
+			local _offy=bet_offsets[i_bet]-scroller
+			--draw players from bet
 			for i_arena=1,4 do
 				for i_aplyr=1,4 do
 					if _cbet[2][i_arena][i_aplyr] then
-						spr(101+i_arena,19,12+p_count*9+o_pcount-scroller+8)--planet
-						print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+o_pcount-scroller+8,0)--player name
+						spr(101+i_arena,19,12+p_count*9+_offy+8)--planet
+						print(players[arenas[i_arena][i_aplyr][1]][1],28,14+p_count*9+_offy+8,0)--player name
 						p_count+=1		
 					end
 				end
 			end
 
 			if p_count>1 then
+				print(i_bet,6,21+_offy+8,0)
 				pc_mult=8
 				if p_count==2 then
 					pc_mult=9
 				end
-				rrect(3,19+o_pcount-scroller+8,122,p_count*pc_mult,0,1)
+				rrect(3,19+_offy+8,122,p_count*pc_mult,0,1)
 				_p_odds=print_bet_odds(bets_odds[i_bet])
-				print(_p_odds,98-#_p_odds*2,30+o_pcount-scroller,0)
+				print(_p_odds,98-#_p_odds*2,30+_offy,0)
 				winnings_str=arr_to_str(bets_winnings[i_bet])
-				spr(108,90-#winnings_str*2,36+o_pcount-scroller)--coin
-				print(winnings_str,98-#winnings_str*2,38+o_pcount-scroller,0)
-				o_pcount+=p_count*pc_mult-1
-				bet_count+=1
+				spr(108,90-#winnings_str*2,36+_offy)--coin
+				print(winnings_str,98-#winnings_str*2,38+_offy,0)
 			end
 		end
 	end
-	max_scroll=o_pcount-60
 end
 
 function init_end_of_round()
-		calculate_winners()
-			--pay for bets
-		money=arr_sub(money,total_bet)
-		_upd=upd_end_of_round
-		_drw=drw_end_of_round
+	calculate_winners()
+		--pay for bets
+	money=arr_sub(money,total_bet)
+	_upd=upd_end_of_round
+	_drw=drw_end_of_round
 end
 
 function upd_end_of_round()
@@ -485,10 +507,12 @@ end
 function init_winning_bets()
 	scroller=0
 	max_scroll=0
+	o_pcount=0
 	bet_title="collect winnings"
 	get_bet_summary()	
 	get_winning_cash()
 	show_winners=true
+	prep_draw_bet_summary()
 	_upd=upd_winning_bets
 	_drw=drw_winning_bets
 end
@@ -563,7 +587,6 @@ end
 function drw_quickbetpage()
 	local arena_clr={1,4,2,3}--arena text colors
 	g_off=0--space between arenas
-
 	for i_arena=1,4 do
 		for i_aplyr=1,4 do
 			_py=((i_arena-1)*4+i_aplyr)*7+g_off
