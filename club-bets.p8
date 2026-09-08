@@ -677,28 +677,30 @@ function drw_ticket()
 		print("round #1784",_tx+22,_ty+15,0)
 		print("----------------------",_tx+2,_ty+22,0)
 		print("arena",_tx+2,_ty+28,0)
-		print("player",_tx+30,_ty+28,0)
+		print("player",_tx+32,_ty+28,0)
 		print("odds",_tx+66,_ty+28,0)
-		print("----------------------",_tx+2,_ty+35,0)
+		print("----------------------",_tx+2,_ty+34,0)
 		p_count=1
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
 				if bets[i_bet][2][i_arena][i_aplyr] then
-					print(i_arena,_tx+10,_ty+34+8*p_count,0)
+					print(i_arena,_tx+10,_ty+33+8*p_count,0)
 					local arena_player=arenas[i_arena][i_aplyr]
-					print(players[arena_player[1]][1],_tx+26,_ty+34+8*p_count,0)
-					print(arena_player[4]..":1",_tx+66,_ty+34+8*p_count,0)
+					local _p_name=players[arena_player[1]][1]
+					print(_p_name,_tx-#_p_name*4+56,_ty+33+8*p_count,0)
+					local _odds=arena_player[4]..":1"
+					print(_odds,_tx+82-#_odds*4,_ty+33+8*p_count,0)
 					p_count+=1		
 				end
 			end
 		end
 		print("----------------------",_tx+3,_ty+80,0)
-		print("bet",_tx+6,_ty+85)
-		print(arr_to_str(bets[i_bet][1],true),_tx+22,_ty+85,0)
-		print("odds",_tx+46,_ty+85)
-		print(print_bet_odds(bets_odds[i_bet]),_tx+66,_ty+85,0)
-		print("payout ",_tx+8,_ty+94)
-		print(arr_to_str(bets_winnings[i_bet]),_tx+38,_ty+94,0)
+		print("bet:",_tx+6,_ty+85)
+		print(arr_to_str(bets[i_bet][1],true),_tx+24,_ty+85,0)
+		print("odds:",_tx+46,_ty+85)
+		print(print_bet_odds(bets_odds[i_bet]),_tx+68,_ty+85,0)
+		print("payout:",_tx+18,_ty+96)
+		print(arr_to_str(bets_winnings[i_bet]),_tx+48,_ty+96,0)
 	end
 end
 
