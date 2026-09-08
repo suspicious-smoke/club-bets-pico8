@@ -91,6 +91,7 @@ function _init()
 	--prob of 3d6 from 3-18
 	bet_sel=1--the currently selected bet (betpage/quickbetpage)
 	arena_sel=1
+	fade_tmr,fade_state,fade_r=0,0,0
 	_upd=blank
 	_drw=blank
 	fill_arenas()
@@ -140,6 +141,7 @@ end
 function _draw()
 	cls()
 	_drw()
+	drw_and_upd_fade()
 	--debug
 	offst=0
 	for txt in all(debug) do
@@ -161,41 +163,7 @@ end
 
 function upd_betpage()
 	get_bet_summary()
-	--player select mode
-	if bet_mode==2 then
-		if btnp(⬆️) then
-				sfx(0)
-			plyr_menu_sel=(plyr_menu_sel-2)%4+1
-		elseif btnp(⬇️) then
-			sfx(0)
-			plyr_menu_sel=(plyr_menu_sel%4)+1
-		elseif btnp(🅾️) then
-			sfx(4)
-			toggle_bet()
-			bet_mode=1
-		elseif btnp(❎) then
-			sfx(3)
-			bet_mode=1
-		end
-	--money amount mode
-	elseif bet_mode==3 then
-		if btnp(⬆️) then
-			sfx(0)
-			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]+1)%10			
-		elseif btnp(⬇️) then
-			sfx(0)
-			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]-1)%10
-		elseif btnp(➡️) then
-			sfx(0)
-			i_amt=(i_amt%4)+1
-		elseif btnp(⬅️) then
-			sfx(0)
-			i_amt=(i_amt-2)%4+1
-		elseif btnp(❎) then
-			sfx(3)
-			bet_mode=1
-		end
-	else
+	if bet_mode==1 then--main select mode
 		if btnp(⬆️) then
 			sfx(0)
 			arena_sel=(arena_sel-2)%6+1
@@ -229,6 +197,39 @@ function upd_betpage()
 			--open up window to see
 			--more info or switch menus
 		end
+	elseif bet_mode==2 then--player select
+		if btnp(⬆️) then
+				sfx(0)
+			plyr_menu_sel=(plyr_menu_sel-2)%4+1
+		elseif btnp(⬇️) then
+			sfx(0)
+			plyr_menu_sel=(plyr_menu_sel%4)+1
+		elseif btnp(🅾️) then
+			sfx(4)
+			toggle_bet()
+			bet_mode=1
+		elseif btnp(❎) then
+			sfx(3)
+			bet_mode=1
+		end
+	elseif bet_mode==3 then--amount select
+		if btnp(⬆️) then
+			sfx(0)
+			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]+1)%10			
+		elseif btnp(⬇️) then
+			sfx(0)
+			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]-1)%10
+		elseif btnp(➡️) then
+			sfx(0)
+			i_amt=(i_amt%4)+1
+		elseif btnp(⬅️) then
+			sfx(0)
+			i_amt=(i_amt-2)%4+1
+		elseif btnp(❎) then
+			sfx(3)
+			bet_mode=1
+		end
+	
 	end
 	bet_off=0
 	if _bet_amt_tmr>0 then
@@ -361,7 +362,7 @@ function upd_confirm()
 		init_betpage()
 	elseif btnp(🅾️) then
 		if has_money and made_bets then
-			init_end_of_round()
+			trn_state(init_end_of_round)
 		end
 	end
 end
@@ -494,7 +495,7 @@ end
 function upd_end_of_round()
 	if btnp(🅾️) then
 		--winnings page
-		init_winning_bets()
+		trn_state(init_winning_bets)
 	end
 end
 
@@ -530,7 +531,7 @@ function upd_winning_bets()
 		end
 	end
 	if btnp(🅾️) then
-		finish_round()
+		trn_state(finish_round)
 	end
 end
 
@@ -1148,6 +1149,66 @@ function arr_greater_equal(a,b)--is a>=b?
 	-- numbers are equal
 	return true
 end
+
+--fade stuff
+--initiate a pause on all player updates until fade is over
+function trn_state(fn)--transition state
+	init_fade()
+	new_fn = fn
+	_upd=upd_fade_pause
+end
+--for trn_state 
+function upd_fade_pause()--don't call directly
+	if fade_state==2 then
+		_upd=new_fn
+	end
+end
+
+function init_fade()
+	fade_tmr=0
+	fade_state=1
+	fade_r=0
+	finc,famt=40,160
+end
+
+function fade_tmr_upd()
+	fade_tmr+=1
+	if fade_tmr>3 then
+		fade_state+=1
+		fade_tmr=0
+	end
+end
+
+function drw_and_upd_fade()
+	--update fade
+	
+	if fade_state==1 then
+		fade_r=min(fade_r+finc,famt)
+		if fade_r==famt then
+			fade_tmr_upd()
+		end
+	elseif fade_state==2 then
+		fade_tmr_upd()
+	--fade in
+	elseif fade_state==3 then
+		fade_r=max(fade_r-finc,0)
+		if fade_r==0 then
+			fade_tmr+=1
+			if fade_tmr>12 then
+				fade_state=0
+			end
+		end
+	end
+	--draw fade
+	if fade_r>0 then
+		if fade_state==1 then
+			rrectfill(0,0,fade_r,128,0,0)
+		else
+			rrectfill(famt-fade_r,0,famt,128,0,0)
+		end
+	end
+end
+
 
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
