@@ -59,15 +59,6 @@ function _init()
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
 	-- where { {t,f,f,f},... } is the arenas and selected players
-	bets={}
-	for i=1,10 do
-		local _bet={{0,1,0,0},{}}
-		for j=1,4 do
-			local _selected_player={false,false,false,false}
-			add(_bet[2],_selected_player)	
-		end
-		add(bets,_bet)
-	end
 
 	--{name,abreiv,base,{strengths category},weakness category}
 	players={
@@ -498,13 +489,12 @@ function upd_winning_bets()
 		end
 	end
 	if btnp(❎) or btnp(🅾️) then
-		init_betpage()
+		finish_round()
 	end
 end
 
 function drw_winning_bets()
 	draw_bet_summary()
-
 	--total winnings box
 	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
 	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
@@ -517,6 +507,16 @@ function drw_winning_bets()
 	spr(108,96-#tw_str*2,32+o_pcount-scroller)--coin
 	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
 	print("press 🅾️ to continue",25,50+o_pcount-scroller,7)
+end
+
+
+function finish_round()
+	--give player winnings
+	money=arr_add(winning_cash,money)
+	--refill arena
+	fill_arenas()
+	--start next bet round/bet page
+	init_betpage()
 end
 
 
@@ -714,6 +714,7 @@ function fill_arenas()
 			del(_rnd_features,_rnd_feature)
 		end
 	end
+	reset_bets()
 	get_player_mods()
 	calculate_odds()
 end
@@ -744,6 +745,18 @@ function get_player_mods()
 			arenas[i_arena][i_a_player][2]=players[_plyr_id][3]--base
 			arenas[i_arena][i_a_player][3]=p_mod
 		end
+	end
+end
+
+function reset_bets()
+	bets={}
+	for i=1,10 do
+		local _bet={{0,1,0,0},{}}
+		for j=1,4 do
+			local _selected_player={false,false,false,false}
+			add(_bet[2],_selected_player)	
+		end
+		add(bets,_bet)
 	end
 end
 
