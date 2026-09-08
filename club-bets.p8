@@ -638,6 +638,11 @@ function init_ticket()
 		ty[i]=9+i
 	end
 	
+
+	get_bet_summary()
+	get_bet_costs()
+	prep_draw_bet_summary()
+
 	_upd=upd_ticket
 	_drw=drw_ticket
 end
@@ -649,8 +654,6 @@ end
 function drw_ticket()
 	for i_bet=1,#tx do
 		local _tx,_ty=tx[i_bet],ty[i_bet]
-		local _cbet=bets[i_bet]
-		local _arx,_plx,_odx=_tx+2,_tx+26,_tx+66
 		--ticket
 		rrect(_tx-5+5,_ty-1,3,1,0,5)--shadow
 		for i=1,15 do
@@ -669,35 +672,33 @@ function drw_ticket()
 			print("★galaxy club★",_tx+15,_ty-13+i*32+_wmoff,6)	
 		end
 		--text
-		rrectfill(_arx,_ty+2,86,10,0,2)--red area
+		rrectfill(_tx+2,_ty+2,86,10,0,2)--red area
 		print("★galaxy club bets★",_tx+5,_ty+5,7)
 		print("round #1784",_tx+22,_ty+15,0)
 		print("----------------------",_tx+2,_ty+22,0)
-		print("arena",_arx,_ty+28,0)
-		print("player",_plx+4,_ty+28,0)
-		print("odds",_odx,_ty+28,0)
+		print("arena",_tx+2,_ty+28,0)
+		print("player",_tx+30,_ty+28,0)
+		print("odds",_tx+66,_ty+28,0)
 		print("----------------------",_tx+2,_ty+35,0)
 		p_count=1
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
-				if _cbet[2][i_arena][i_aplyr] then
-					print(i_arena,_arx+8,_ty+34+8*p_count,0)
+				if bets[i_bet][2][i_arena][i_aplyr] then
+					print(i_arena,_tx+10,_ty+34+8*p_count,0)
 					local arena_player=arenas[i_arena][i_aplyr]
-					print(players[arena_player[1]][1],_plx,_ty+34+8*p_count,0)
-					print(arena_player[4]..":1",_odx,_ty+34+8*p_count,0)
+					print(players[arena_player[1]][1],_tx+26,_ty+34+8*p_count,0)
+					print(arena_player[4]..":1",_tx+66,_ty+34+8*p_count,0)
 					p_count+=1		
 				end
 			end
 		end
-		-- for i=1,4 do
-		-- 	print(i,_arx+8,_ty+34+8*i,0)
-		-- 	print("the dude",_plx,_ty+34+8*i,0)
-		-- 	print("11:1",_odx,_ty+34+8*i,0)
-		-- end
 		print("----------------------",_tx+3,_ty+80,0)
-		print("bet:",_arx+1,_ty+85)
-		print("odds:",_tx+41,_ty+85)
-		print("payout:",_arx+2,_ty+93)
+		print("bet",_tx+6,_ty+85)
+		print(arr_to_str(bets[i_bet][1],true),_tx+22,_ty+85,0)
+		print("odds",_tx+46,_ty+85)
+		print(print_bet_odds(bets_odds[i_bet]),_tx+66,_ty+85,0)
+		print("payout ",_tx+8,_ty+94)
+		print(arr_to_str(bets_winnings[i_bet]),_tx+38,_ty+94,0)
 	end
 end
 
