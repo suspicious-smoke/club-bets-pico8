@@ -96,7 +96,7 @@ function _init()
 	fill_arenas()
 	dummy_bets()
 	--init_quickbetpage()
-	init_ticket()
+	init_tickets()
 	--init_betpage()
 	--calculate_winners()
 	--init_confirm()
@@ -630,7 +630,7 @@ end
 
 -->8
 --ticket
-function init_ticket()
+function init_tickets()
 	tx={}
 	ty={}
 	for i=1,1 do
@@ -643,65 +643,69 @@ function init_ticket()
 	get_bet_costs()
 	prep_draw_bet_summary()
 
-	_upd=upd_ticket
-	_drw=drw_ticket
+	_upd=upd_tickets
+	_drw=drw_tickets
 end
 
-function upd_ticket()
+function upd_tickets()
 	
 end
 
-function drw_ticket()
+function drw_tickets()
 	for i_bet=1,#tx do
 		local _tx,_ty=tx[i_bet],ty[i_bet]
-		--ticket
-		rrect(_tx-5+5,_ty-1,3,1,0,5)--shadow
-		for i=1,15 do
-			rrect(_tx-5+6*i,_ty-1,3,1,0,7)
-		end
-		rrectfill(_tx-1,_ty,90,81,0,5)--shadow
-		rrectfill(_tx,_ty,90,81,0,7)--ticket
-		rrectfill(_tx+6,_ty+81,84,24,0,7)--lwr ticket
-		spr(128,_tx-2,_ty+81,1,3)--left leaf
-		spr(129,_tx+89,_ty+81,1,3)--right leaf
-		for i=1,3 do
-			_wmoff=0
-			if i==3 then
-				_wmoff=1
-			end
-			print("★galaxy club★",_tx+15,_ty-13+i*32+_wmoff,6)	
-		end
-		--text
-		rrectfill(_tx+2,_ty+2,86,10,0,2)--red area
-		print("★galaxy club bets★",_tx+5,_ty+5,7)
-		print("round #1784",_tx+22,_ty+15,0)
-		print("----------------------",_tx+2,_ty+22,0)
-		print("arena",_tx+2,_ty+28,0)
-		print("player",_tx+32,_ty+28,0)
-		print("odds",_tx+66,_ty+28,0)
-		print("----------------------",_tx+2,_ty+34,0)
-		p_count=1
-		for i_arena=1,4 do
-			for i_aplyr=1,4 do
-				if bets[i_bet][2][i_arena][i_aplyr] then
-					print(i_arena,_tx+10,_ty+33+8*p_count,0)
-					local arena_player=arenas[i_arena][i_aplyr]
-					local _p_name=players[arena_player[1]][1]
-					print(_p_name,_tx-#_p_name*4+56,_ty+33+8*p_count,0)
-					local _odds=arena_player[4]..":1"
-					print(_odds,_tx+82-#_odds*4,_ty+33+8*p_count,0)
-					p_count+=1		
-				end
-			end
-		end
-		print("----------------------",_tx+3,_ty+80,0)
-		print("bet:",_tx+6,_ty+85)
-		print(arr_to_str(bets[i_bet][1],true),_tx+24,_ty+85,0)
-		print("odds:",_tx+46,_ty+85)
-		print(print_bet_odds(bets_odds[i_bet]),_tx+68,_ty+85,0)
-		print("payout:",_tx+18,_ty+96)
-		print(arr_to_str(bets_winnings[i_bet]),_tx+48,_ty+96,0)
+		draw_ticket(i_bet,_tx,_ty)
 	end
+end
+
+function draw_ticket(i_bet,_tx,_ty)
+	--ticket
+	rrect(_tx-5+5,_ty-1,3,1,0,5)--shadow
+	for i=1,15 do
+		rrect(_tx-5+6*i,_ty-1,3,1,0,7)
+	end
+	rrectfill(_tx-1,_ty,90,81,0,5)--shadow
+	rrectfill(_tx,_ty,90,81,0,7)--ticket
+	rrectfill(_tx+6,_ty+81,84,24,0,7)--lwr ticket
+	spr(128,_tx-2,_ty+81,1,3)--left leaf
+	spr(129,_tx+89,_ty+81,1,3)--right leaf
+	for i=1,3 do
+		_wmoff=0
+		if i==3 then
+			_wmoff=1
+		end
+		print("★galaxy club★",_tx+15,_ty-13+i*32+_wmoff,6)	
+	end
+	--text
+	rrectfill(_tx+2,_ty+2,86,10,0,2)--red area
+	print("★galaxy club bets★",_tx+5,_ty+5,7)
+	print("round #1784",_tx+22,_ty+15,0)
+	print("----------------------",_tx+2,_ty+22,0)
+	print("arena",_tx+2,_ty+28,0)
+	print("player",_tx+32,_ty+28,0)
+	print("odds",_tx+66,_ty+28,0)
+	print("----------------------",_tx+2,_ty+34,0)
+	p_count=1
+	for i_arena=1,4 do
+		for i_aplyr=1,4 do
+			if bets[i_bet][2][i_arena][i_aplyr] then
+				print(i_arena,_tx+10,_ty+33+8*p_count,0)
+				local arena_player=arenas[i_arena][i_aplyr]
+				local _p_name=players[arena_player[1]][1]
+				print(_p_name,_tx-#_p_name*4+56,_ty+33+8*p_count,0)
+				local _odds=arena_player[4]..":1"
+				print(_odds,_tx+82-#_odds*4,_ty+33+8*p_count,0)
+				p_count+=1		
+			end
+		end
+	end
+	print("----------------------",_tx+3,_ty+80,0)
+	print("bet:",_tx+6,_ty+85)
+	print(arr_to_str(bets[i_bet][1],true),_tx+24,_ty+85,0)
+	print("odds:",_tx+46,_ty+85)
+	print(print_bet_odds(bets_odds[i_bet]),_tx+68,_ty+85,0)
+	print("payout:",_tx+18,_ty+96)
+	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_ty+96,0)
 end
 
 -->8
