@@ -95,9 +95,9 @@ function _init()
 	_drw=blank
 	fill_arenas()
 	--dummy_bets()
-	--init_quickbetpage()
+	init_quickbetpage()
 	--init_ticket()
-	init_betpage()
+	--init_betpage()
 	--calculate_winners()
 	--init_confirm()
 end
@@ -266,7 +266,7 @@ function drw_betpage()
 		for i_aplyr=1,4 do 
 			if bets[bet_sel][2][i_arena][i_aplyr] then
 				plyr_str="  "..get_player_string(i_arena,i_aplyr)
-				spr(47+arenas[i_arena][i_aplyr][1],48,16+i_arena*14+bet_off)
+				spr(47+arenas[i_arena][i_aplyr][1],48,16+i_arena*14+bet_off)--ship spr
 				chk_spr=107
 			end
 		end
@@ -595,6 +595,8 @@ function drw_quickbetpage()
 			rrectfill(1,_py-6,126,7,0,6+i_aplyr%2)--row background
 			local a_plyr=arenas[i_arena][i_aplyr]
 			print(players[a_plyr[1]][2].." "..a_plyr[4]..":1",3,_py-5,arena_clr[i_arena])
+			-- print(a_plyr[4]..":1",14,_py-5,arena_clr[i_arena])
+			-- spr(47+a_plyr[1],3,_py-7)--ship spr
 			--bet buttons
 			for k=1,10 do
 				bet_clr=5
