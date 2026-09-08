@@ -896,15 +896,6 @@ function hcenter(s)
 	return 64-#s*2
 end
 
---function in_list(_l,_val)
---	for _v in all(_l) do
---		if _v == _val then
---		 return true
---		end
---	end
---	return false
---end
-
 --i=2 gives num between 0,1
 --rnd never gives the limit
 --value. rnd(1) will never
@@ -1043,24 +1034,20 @@ function arr_sub(a,b)--subtraction
 	for i=1,#r\2 do
 		r[i],r[#r-i+1]=r[#r-i+1],r[i]
 	end
-
 	-- remove leading zeroes
 	while #r>1 and r[1]==0 do
 		deli(r,1)
 	end
-
 	return r
 end
 
 function arr_greater_equal(a,b)--is a>=b?
-
 	-- more digits means bigger number
 	if #a>#b then
 		return true
 	elseif #a<#b then
 		return false
 	end
-
 	-- same number of digits
 	-- compare from left to right
 	for i=1,#a do
@@ -1070,7 +1057,6 @@ function arr_greater_equal(a,b)--is a>=b?
 			return false
 		end
 	end
-
 	-- numbers are equal
 	return true
 end
