@@ -335,7 +335,7 @@ end
 function copy_bets()
 	local _bet_amt=bets[bet_sel][1]
 	for i_bet=1,10 do
-		bets[i_bet][1]=_bet_amt
+		bets[i_bet][1]=copy_list(_bet_amt)
 	end
 end
 
@@ -1219,6 +1219,14 @@ function arr_greater_equal(a,b)--is a>=b?
 	end
 	-- numbers are equal
 	return true
+end
+
+function copy_list(t)
+  local out={}
+  for i=1,#t do
+    out[i]=t[i]
+  end
+  return out
 end
 
 --fade stuff
