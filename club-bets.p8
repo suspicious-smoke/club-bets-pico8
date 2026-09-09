@@ -56,6 +56,7 @@ function _init()
 	}
 	round_features={{},{},{},{}}--ids of arena features for current round
 	round_winners={}
+	cur_round=1
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
 	-- where { {t,f,f,f},... } is the arenas and selected players
@@ -246,7 +247,7 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	print("round:#",4,3+bet_off,6)	
+	print("round:#"..cur_round,4,3+bet_off,6)	
 	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
 	spr(108,85,1+bet_off)--coin
 	print(arr_to_str(money,true),94,3+bet_off,9)
@@ -317,24 +318,13 @@ function submenu_mode()
 			if submenu_sel==1 then
 				sfx(9)
 				trn_state(init_quickbetpage)
-			elseif submenu_sel==2 then--copy bets
-				sfx(3)
-				copy_bets()
-				trn_state(init_betpage)
 			elseif submenu_sel==3 then
-			elseif submenu_sel==4 then--duplicate player
-			elseif submenu_sel==5 then--confirm page
-				sfx(4)
-				init_confirm()
+			elseif submenu_sel==4 then
 			end
 		else--qm_mode==2--on quick bet page
 			if submenu_sel==1 then
 				sfx(9)
 				trn_state(init_betpage)
-			elseif submenu_sel==2 then--copy bets
-				sfx(3)
-				copy_bets()
-				trn_state(init_quickbetpage)
 			elseif submenu_sel==3 then--duplicate player
 				select_player_row()
 				sfx(3)
@@ -345,10 +335,15 @@ function submenu_mode()
 				end
 				sfx(3)
 				bet_mode=1
-			elseif submenu_sel==5 then--confirm page
-				sfx(4)
-				init_confirm()
 			end
+		end
+		if submenu_sel==2 then--copy bets
+			sfx(2)
+			copy_bets()
+			bet_mode=1
+		elseif submenu_sel==5 then--confirm page
+			sfx(4)
+			init_confirm()
 		end
 	end
 end
@@ -506,7 +501,7 @@ function prep_draw_bet_summary()
 end
 
 function draw_bet_summary()
-	print("round:#",4,3-scroller,6)	
+	print("round:#"..cur_round,4,3-scroller,6)	
 	spr(108,83,1-scroller)--coin
 	print(arr_to_str(money,true),92,3-scroller,9)--my money
 	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
@@ -783,7 +778,7 @@ function draw_ticket(i_bet,_tx,_ty)
 	--text
 	rrectfill(_tx+2,_ty+2,86,10,0,2)--red area
 	print("★galaxy club bets★",_tx+5,_ty+5,7)
-	print("round #1784",_tx+22,_ty+15,0)
+	print("round:#"..cur_round,_tx+22,_ty+15,0)
 	print("----------------------",_tx+2,_ty+22,0)
 	print("arena",_tx+2,_ty+28,0)
 	print("player",_tx+32,_ty+28,0)
@@ -1055,7 +1050,6 @@ end
 
 function get_winning_cash()
 	winning_cash=reset_array(10,0)
-	--debug[1]=round_winners[1].." "..round_winners[2].." "..round_winners[3].." "..round_winners[4]
 	for i_bet=1,10 do
 		_cbet=bets[i_bet]
 		if is_winning_bet(_cbet) then
