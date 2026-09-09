@@ -154,10 +154,10 @@ end
 function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
-	submenu_off,submenu_sel=0,1
+	submenu_off,submenu_sel,qm_mode=0,1,1
+	submenu_txt="quick bet"
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
-	qm_mode=1--bet_page
 	_upd=upd_betpage
 	_drw=drw_betpage
 end
@@ -195,6 +195,7 @@ function upd_betpage()
 			end
 		elseif btnp(❎) then
 			sfx(3)
+			submenu_sel=1
 			bet_mode=4
 			--open up window to see
 			--more info or switch menus
@@ -244,6 +245,9 @@ function upd_betpage()
 			sfx(3)
 			bet_mode=1
 		elseif btnp(🅾️) then
+			if submenu_sel==1 then
+				init_quickbetpage()
+			end
 			--do somethings
 		end
 	end
@@ -316,6 +320,11 @@ end
 function draw_submenu()
 	_y=128-submenu_off
 	rrectfill(2,_y,124,60,0,5)
+	print(submenu_txt,4,_y+4,7)
+	print("max 10 bet",4,_y+13,7)
+	if bet_mode==4 then
+		rrect(2,_y+(submenu_sel-1)*9+2,60,9,1,9)
+	end
 end
 
 
@@ -579,7 +588,8 @@ end
 --quick bet/submenu pages
 function init_quickbetpage()
 	bet_sel=1--1-10
-	plyr_menu_sel=1--select player for each arena 1-16
+	plyr_menu_sel,arena_sel=1,1--select player for each arena 1-16
+	submenu_txt="norm bet"
 	total_odds=0
 	total_pay=0
 	_upd=upd_quickbetpage
