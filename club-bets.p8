@@ -155,7 +155,7 @@ function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	submenu_off,submenu_sel,qm_mode=0,1,1
-	submenu_txt="quick bet"
+	submenu_txts={"quick bet","copy bet amt","","","confirm bets"}
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
 	_upd=upd_betpage
@@ -212,7 +212,7 @@ function upd_betpage()
 			bet_mode=1
 		elseif btnp(❎) then
 			sfx(3)
-			clear_arena_bet()
+			clear_arena_bet(bet_sel,arena_sel)
 			bet_mode=1
 		end
 	elseif bet_mode==3 then--amount select
@@ -305,45 +305,60 @@ function submenu_mode()
 	submenu_off=min(submenu_off+10,60)
 	if btnp(⬆️) then
 		sfx(0)
-		submenu_sel=(submenu_sel-2)%4+1
+		submenu_sel=(submenu_sel-2)%5+1
 	elseif btnp(⬇️) then
 		sfx(0)
-		submenu_sel=(submenu_sel%4)+1
+		submenu_sel=(submenu_sel%5)+1
 	elseif btnp(❎) then
 		sfx(3)
 		bet_mode=1
 	elseif btnp(🅾️) then
-		if submenu_sel==1 then
-			sfx(9)
-			if qm_mode==1 then
+		if qm_mode==1 then--on regular bet page
+			if submenu_sel==1 then
+				sfx(9)
 				trn_state(init_quickbetpage)
-			elseif qm_mode==2 then
+			elseif submenu_sel==2 then--copy bets
+				sfx(3)
+				copy_bets()
 				trn_state(init_betpage)
+			elseif submenu_sel==3 then
+			elseif submenu_sel==4 then--duplicate player
+			elseif submenu_sel==5 then--confirm page
+				sfx(4)
+				init_confirm()
 			end
-		elseif submenu_sel==2 then
-			sfx(3)
-			copy_bets()
-			if qm_mode==1 then
+		else--qm_mode==2--on quick bet page
+			if submenu_sel==1 then
+				sfx(9)
 				trn_state(init_betpage)
-			elseif qm_mode==2 then
+			elseif submenu_sel==2 then--copy bets
+				sfx(3)
+				copy_bets()
 				trn_state(init_quickbetpage)
+			elseif submenu_sel==3 then--duplicate player
+				select_player_row()
+				sfx(3)
+				bet_mode=1
+			elseif submenu_sel==4 then--duplicate player
+				for ibet=1,10 do
+					clear_arena_bet(ibet,arena_sel)
+				end
+				sfx(3)
+				bet_mode=1
+			elseif submenu_sel==5 then--confirm page
+				sfx(4)
+				init_confirm()
 			end
 		end
-	end
-end
-
-function copy_bets()
-	local _bet_amt=bets[bet_sel][1]
-	for i_bet=1,10 do
-		bets[i_bet][1]=copy_list(_bet_amt)
 	end
 end
 
 function draw_submenu()
 	_y=128-submenu_off
 	rrectfill(2,_y,124,60,0,5)
-	print(submenu_txt,4,_y+4,7)
-	print("copy bet amt",4,_y+13,7)
+	for i=1,#submenu_txts do
+		print("●"..submenu_txts[i],4,_y-5+i*9,7)
+	end
 	if bet_mode==4 then
 		rrect(2,_y+(submenu_sel-1)*9+2,60,9,1,9)
 	end
@@ -413,7 +428,11 @@ function upd_confirm()
 		end
 	end
 	if btnp(❎) then
-		init_betpage()
+		if qm_mode==1 then
+			init_betpage()
+		else
+			init_quickbetpage()
+		end
 	elseif btnp(🅾️) then
 		if has_money and made_bets then
 			trn_state(init_end_of_round)
@@ -613,7 +632,7 @@ function init_quickbetpage()
 	plyr_menu_sel,arena_sel=1,1--select player for each arena 1-16
 	bet_mode=1
 	submenu_off,submenu_sel,qm_mode=0,1,2
-	submenu_txt="normal bet"
+	submenu_txts={"normal bet","copy bet amt","select row","clear arena","confirm bets"}
 	total_odds=0
 	total_pay=0
 	_upd=upd_quickbetpage
@@ -624,21 +643,25 @@ function upd_quickbetpage()
 	get_bet_summary()
 	if bet_mode==1 then
 		if btnp(➡️) then
+			sfx(0)
 			bet_sel=(bet_sel%10)+1
 		elseif btnp(⬅️) then
+			sfx(0)
 			bet_sel=(bet_sel-2)%10+1
-
 		elseif btnp(⬆️) then
+			sfx(0)
 			if plyr_menu_sel==1 then
 				arena_sel=(arena_sel-2)%4+1
 			end
 			plyr_menu_sel=(plyr_menu_sel-2)%4+1
 		elseif btnp(⬇️) then
+			sfx(0)
 			if plyr_menu_sel==4 then
 				arena_sel=(arena_sel%4)+1
 			end
 			plyr_menu_sel=(plyr_menu_sel%4)+1
 		elseif btnp(🅾️) then
+			sfx(8)
 			toggle_bet()
 		elseif btnp(❎) then
 			--submenu
@@ -894,10 +917,24 @@ function reset_bets()
 	for i=1,10 do
 		local _bet={{0,1,0,0},{}}
 		for j=1,4 do
-			local _selected_player={false,false,false,false}
+			local _selected_player=reset_array(4,false)
 			add(_bet[2],_selected_player)	
 		end
 		add(bets,_bet)
+	end
+end
+
+function copy_bets()
+	local _bet_amt=bets[bet_sel][1]
+	for i_bet=1,10 do
+		bets[i_bet][1]=copy_list(_bet_amt)
+	end
+end
+
+function select_player_row()
+	for b=1,10 do
+		clear_arena_bet(b,arena_sel)
+		bets[b][2][arena_sel][plyr_menu_sel]=true
 	end
 end
 
@@ -950,15 +987,14 @@ function toggle_bet()
 		return
 	end
 	--turn off other bets
-	for i_plyr=1,4 do
-		bets[bet_sel][2][arena_sel][i_plyr]=false
-	end
+	clear_arena_bet(bet_sel,arena_sel)
+	--select bet
 	bets[bet_sel][2][arena_sel][plyr_menu_sel]=true
 end
 
-function clear_arena_bet()
+function clear_arena_bet(_ibet,_iarena)
 	for i_plyr=1,4 do
-		bets[bet_sel][2][arena_sel][i_plyr]=false
+		bets[_ibet][2][_iarena][i_plyr]=false
 	end
 end
 
@@ -1035,7 +1071,11 @@ function finish_round()
 	--refill arena
 	fill_arenas()
 	--start next bet round/bet page
-	init_betpage()
+	if qm_mode==1 then
+		init_betpage()
+	else
+		init_quickbetpage()
+	end
 end
 -->8
 --helpers
@@ -1387,7 +1427,7 @@ __sfx__
 000100002b2500020000200002002b240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
 000100002d2500020000200002002d240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
 000300002865532655396553d6553e650000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000000000b0500c0500b0500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00010000090500105001050020500305006050080500b0500e0501205015050190501d0501e0501f0502105023050250500000000000000000000000000000000000000000000000000000000000000000000000
 3606000008650086500a6500c6500d6500f650126501465017650196501c6501f650216502365026650286502a6502c6502d6502d6502b6502965026650216501b650126500d6500965006650056500365000650
 36020000196501c6501f65023650276502a6502d6502f6502f6502c65027650236501f6501d650196501465011650106500c6500b6500a6500a6500b6500c6500f6500d6500d6500c6500c6500c6500c6500c650
