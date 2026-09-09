@@ -194,11 +194,10 @@ function upd_betpage()
 				plyr_menu_sel=1
 			end
 		elseif btnp(❎) then
+			--submenu
 			sfx(3)
 			submenu_sel=1
 			bet_mode=4
-			--open up window to see
-			--more info or switch menus
 		end
 	elseif bet_mode==2 then--player select
 		if btnp(⬆️) then
@@ -234,22 +233,7 @@ function upd_betpage()
 			bet_mode=1
 		end
 	elseif bet_mode==4 then--submenu
-		submenu_off=min(submenu_off+10,60)
-		if btnp(⬆️) then
-			sfx(0)
-			submenu_sel=(submenu_sel-2)%4+1
-		elseif btnp(⬇️) then
-			sfx(0)
-			submenu_sel=(submenu_sel%4)+1
-		elseif btnp(❎) then
-			sfx(3)
-			bet_mode=1
-		elseif btnp(🅾️) then
-			if submenu_sel==1 then
-				init_quickbetpage()
-			end
-			--do somethings
-		end
+		submenu_mode()
 	end
 	if bet_mode!=4 and submenu_off>0 then
 		submenu_off=max(submenu_off-10,0)
@@ -317,11 +301,49 @@ function draw_dropdown()
 	end
 end
 
+function submenu_mode()
+	submenu_off=min(submenu_off+10,60)
+	if btnp(⬆️) then
+		sfx(0)
+		submenu_sel=(submenu_sel-2)%4+1
+	elseif btnp(⬇️) then
+		sfx(0)
+		submenu_sel=(submenu_sel%4)+1
+	elseif btnp(❎) then
+		sfx(3)
+		bet_mode=1
+	elseif btnp(🅾️) then
+		if submenu_sel==1 then
+			sfx(9)
+			if qm_mode==1 then
+				trn_state(init_quickbetpage)
+			elseif qm_mode==2 then
+				trn_state(init_betpage)
+			end
+		elseif submenu_sel==2 then
+			sfx(3)
+			copy_bets()
+			if qm_mode==1 then
+				trn_state(init_betpage)
+			elseif qm_mode==2 then
+				trn_state(init_quickbetpage)
+			end
+		end
+	end
+end
+
+function copy_bets()
+	local _bet_amt=bets[bet_sel][1]
+	for i_bet=1,10 do
+		bets[i_bet][1]=_bet_amt
+	end
+end
+
 function draw_submenu()
 	_y=128-submenu_off
 	rrectfill(2,_y,124,60,0,5)
 	print(submenu_txt,4,_y+4,7)
-	print("max 10 bet",4,_y+13,7)
+	print("copy bet amt",4,_y+13,7)
 	if bet_mode==4 then
 		rrect(2,_y+(submenu_sel-1)*9+2,60,9,1,9)
 	end
@@ -589,7 +611,9 @@ end
 function init_quickbetpage()
 	bet_sel=1--1-10
 	plyr_menu_sel,arena_sel=1,1--select player for each arena 1-16
-	submenu_txt="norm bet"
+	bet_mode=1
+	submenu_off,submenu_sel,qm_mode=0,1,2
+	submenu_txt="normal bet"
 	total_odds=0
 	total_pay=0
 	_upd=upd_quickbetpage
@@ -598,27 +622,35 @@ end
 
 function upd_quickbetpage()
 	get_bet_summary()
-	if btnp(➡️) then
-		bet_sel=(bet_sel%10)+1
-	elseif btnp(⬅️) then
-		bet_sel=(bet_sel-2)%10+1
+	if bet_mode==1 then
+		if btnp(➡️) then
+			bet_sel=(bet_sel%10)+1
+		elseif btnp(⬅️) then
+			bet_sel=(bet_sel-2)%10+1
 
-	elseif btnp(⬆️) then
-		if plyr_menu_sel==1 then
-			arena_sel=(arena_sel-2)%4+1
+		elseif btnp(⬆️) then
+			if plyr_menu_sel==1 then
+				arena_sel=(arena_sel-2)%4+1
+			end
+			plyr_menu_sel=(plyr_menu_sel-2)%4+1
+		elseif btnp(⬇️) then
+			if plyr_menu_sel==4 then
+				arena_sel=(arena_sel%4)+1
+			end
+			plyr_menu_sel=(plyr_menu_sel%4)+1
+		elseif btnp(🅾️) then
+			toggle_bet()
+		elseif btnp(❎) then
+			--submenu
+			sfx(3)
+			submenu_sel=1
+			bet_mode=4
 		end
-		plyr_menu_sel=(plyr_menu_sel-2)%4+1
-	elseif btnp(⬇️) then
-		if plyr_menu_sel==4 then
-			arena_sel=(arena_sel%4)+1
-		end
-		plyr_menu_sel=(plyr_menu_sel%4)+1
-	elseif btnp(🅾️) then
-		toggle_bet()
-	elseif btnp(❎) then
-		
-		--open up window to see
-		--more info or switch menus
+	elseif bet_mode==4 then
+		submenu_mode()
+	end
+	if bet_mode!=4 and submenu_off>0 then
+		submenu_off=max(submenu_off-10,0)
 	end
 end
 
@@ -662,6 +694,7 @@ function drw_quickbetpage()
 	line(81,120,81,126,8)
 	spr(108,83,119)--coin
 	print(arr_to_str(bets_winnings[bet_sel]),90,121,9)
+	draw_submenu()
 end
 -->8
 --ticket
