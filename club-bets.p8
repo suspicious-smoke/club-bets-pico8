@@ -66,7 +66,7 @@ function _init()
     {"admiral","adm",11,{1,4},10},
     {"dexter","dxt",12,{2,7,12},5},
     {"pontoon","ptn",14,{4,8},2},
-    {"sailer","slr",15,{5},7},
+    {"sailor","slr",15,{5},7},
     {"bucket","bkt",16,{6},11},
     {"pod eng","pde",17,{1,6,9},10},
     {"merchant","mch",10,{2,3},8},
@@ -154,9 +154,10 @@ end
 function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
-	
+	submenu_off,submenu_sel=0,1
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
+	qm_mode=1--bet_page
 	_upd=upd_betpage
 	_drw=drw_betpage
 end
@@ -194,6 +195,7 @@ function upd_betpage()
 			end
 		elseif btnp(❎) then
 			sfx(3)
+			bet_mode=4
 			--open up window to see
 			--more info or switch menus
 		end
@@ -210,6 +212,7 @@ function upd_betpage()
 			bet_mode=1
 		elseif btnp(❎) then
 			sfx(3)
+			clear_arena_bet()
 			bet_mode=1
 		end
 	elseif bet_mode==3 then--amount select
@@ -229,7 +232,23 @@ function upd_betpage()
 			sfx(3)
 			bet_mode=1
 		end
-	
+	elseif bet_mode==4 then--submenu
+		submenu_off=min(submenu_off+10,60)
+		if btnp(⬆️) then
+			sfx(0)
+			submenu_sel=(submenu_sel-2)%4+1
+		elseif btnp(⬇️) then
+			sfx(0)
+			submenu_sel=(submenu_sel%4)+1
+		elseif btnp(❎) then
+			sfx(3)
+			bet_mode=1
+		elseif btnp(🅾️) then
+			--do somethings
+		end
+	end
+	if bet_mode!=4 and submenu_off>0 then
+		submenu_off=max(submenu_off-10,0)
 	end
 	bet_off=0
 	if _bet_amt_tmr>0 then
@@ -256,7 +275,7 @@ function drw_betpage()
 	for i_arena=1,4 do
 		line(3,13+i_arena*14+bet_off,124,13+i_arena*14+bet_off,1)
 		rrectfill(42,16+i_arena*14+bet_off,80,9,1,6)
-		if arena_sel==i_arena and bet_mode!=2 then
+		if arena_sel==i_arena and bet_mode==1 then
 			rrect(42,16+i_arena*14+bet_off,80,9,1,9)
 		end
 		print(i_arena,18,18+i_arena*14+bet_off,0)
@@ -276,8 +295,8 @@ function drw_betpage()
 		spr(68,115,19+i_arena*14+bet_off)
 	end
 	draw_winning_calc()
-	--player select area
-	if bet_mode==2 then
+	draw_submenu()
+	if bet_mode==2 then--dropdown mode
 		draw_dropdown()
 	end
 end
@@ -294,6 +313,10 @@ function draw_dropdown()
 	end
 end
 
+function draw_submenu()
+	_y=128-submenu_off
+	rrectfill(2,_y,124,60,0,5)
+end
 
 
 function draw_winning_calc()
@@ -553,8 +576,7 @@ end
 
 
 -->8
---quick bet page
-
+--quick bet/submenu pages
 function init_quickbetpage()
 	bet_sel=1--1-10
 	plyr_menu_sel=1--select player for each arena 1-16
@@ -584,6 +606,7 @@ function upd_quickbetpage()
 	elseif btnp(🅾️) then
 		toggle_bet()
 	elseif btnp(❎) then
+		
 		--open up window to see
 		--more info or switch menus
 	end
@@ -630,7 +653,6 @@ function drw_quickbetpage()
 	spr(108,83,119)--coin
 	print(arr_to_str(bets_winnings[bet_sel]),90,121,9)
 end
-
 -->8
 --ticket
 function init_tickets()
@@ -889,6 +911,12 @@ function toggle_bet()
 		bets[bet_sel][2][arena_sel][i_plyr]=false
 	end
 	bets[bet_sel][2][arena_sel][plyr_menu_sel]=true
+end
+
+function clear_arena_bet()
+	for i_plyr=1,4 do
+		bets[bet_sel][2][arena_sel][i_plyr]=false
+	end
 end
 
 function print_bet_odds(_odds,dynamic_color)
