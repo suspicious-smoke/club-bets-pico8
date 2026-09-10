@@ -99,9 +99,10 @@ function _init()
 	dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
-	init_betpage()
+	--init_betpage()
 	--calculate_winners()
 	--init_confirm()
+	init_watch_race()
 end
 
 function dummy_bets()
@@ -774,7 +775,6 @@ function lerp_ticket()
 	return false
 end
 
-
 function draw_ticket(i_bet,_tx,_ty)
 	--ticket
 	local _sy_u,_sy_d=_ty-t_sep,_ty+t_sep
@@ -840,7 +840,27 @@ function draw_ticket(i_bet,_tx,_ty)
 	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_sy_d+96,0)
 end
 
+function init_watch_race()
+	_upd=upd_watch_race
+	_drw=drw_watch_race
+end
 
+function upd_watch_race()
+
+end
+
+function drw_watch_race()
+	local _sz=48
+	for i=0,1 do
+		for j=0,1 do
+			rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
+		end
+	end
+	
+	rrectfill(0,110,128,30,0,1)
+	spr(6,-1,100,9,2)
+	spr(6,66,100,9,2)
+end
 
 -->8
 --calculations
