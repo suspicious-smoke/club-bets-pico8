@@ -100,9 +100,9 @@ function _init()
 	--init_quickbetpage()
 	--init_gameover()
 	init_betpage()
-	--calculate_winners()
+	calculate_winners()
 	--init_confirm()
-	--init_watch_race()
+	init_watch_race()
 end
 
 function dummy_bets()
@@ -832,26 +832,59 @@ function draw_ticket(i_bet,_tx,_ty)
 	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_sy_d+96,0)
 end
 
+function change_ship_pos()
+	for i_arena=1,4 do
+		for i_plyr=1,4 do
+			if rnd(1)<0.5 then
+				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,20)
+			else
+				race_px[i_arena][i_plyr]=max(race_px[i_arena][i_plyr]-1,0)
+			end
+		end
+	end
+end
+
 function init_watch_race()
+	race_px=reset_num_array(4,4,0)
+	for i_arena=1,4 do
+		for i_plyr=1,4 do
+			--debug[i_arena]=race_px[i_arena]
+			race_px[i_arena][i_plyr]=rnd_rng(1,20)
+		end
+	end
+	r_tmr=0
 	_upd=upd_watch_race
 	_drw=drw_watch_race
 end
 
 function upd_watch_race()
-
+	sn=1.5*sin(time())--crowd sin wave
+	r_tmr+=1
+	if r_tmr>5 then
+		r_tmr=0
+		change_ship_pos()
+	end
 end
 
 function drw_watch_race()
+	--screens
 	local _sz=48
 	for i=0,1 do
 		for j=0,1 do
 			rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
 		end
 	end
+	for i_arena=1,4 do 
+		for i_plyr=1,4 do
+			p_spr=47+arenas[i_arena][i_plyr][1]
+			spr(p_spr,18+race_px[i_arena][i_plyr]+(i_arena+1)%2*(_sz+2),i_plyr*8+flr((i_arena-1)/2)*(_sz+2))
+		end
+	end
 	
-	rrectfill(0,110,128,30,0,1)
-	spr(6,-1,100,9,2)
-	spr(6,66,100,9,2)
+	rrectfill(0,110,128,30,0,1)--blue bg
+	spr(6,-1,100+sn,9,2)--crowd1
+	spr(6,66,100-sn,9,2)--crowd2
+	rrectfill(0,114,128,10,0,4)--brown cover
 end
 
 -->8
