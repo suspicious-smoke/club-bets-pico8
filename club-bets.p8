@@ -843,20 +843,9 @@ function draw_ticket(i_bet,_tx,_ty)
 	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_sy_d+96,0)
 end
 
-function change_ship_pos()
-	for i_arena=1,4 do
-		for i_plyr=1,4 do
-			if rnd(1)<0.5 then
-				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,20)
-			else
-				race_px[i_arena][i_plyr]=max(race_px[i_arena][i_plyr]-1,0)
-			end
-		end
-	end
-end
-
 function init_watch_race()
 	race_px=reset_num_array(4,4,0)
+	race_over=reset_array(4,false)
 	for i_arena=1,4 do
 		for i_plyr=1,4 do
 			--debug[i_arena]=race_px[i_arena]
@@ -864,6 +853,7 @@ function init_watch_race()
 		end
 	end
 	r_tmr=0
+	state_tmr=0
 	music(0)
 	_upd=upd_watch_race
 	_drw=drw_watch_race
@@ -873,9 +863,32 @@ function upd_watch_race()
 	animatestars()
 	sn=1.5*sin(time())--crowd sin wave
 	r_tmr+=1
+	state_tmr+=1
 	if r_tmr>5 then
 		r_tmr=0
 		change_ship_pos()
+	end
+	for i_arena=1,4 do
+		if race_px[i_arena][round_winners[i_arena]]==34 and race_over[i_arena]==false then
+			race_over[i_arena]=true
+			sfx(11)
+		end
+	end
+end
+
+function change_ship_pos()
+	for i_arena=1,4 do
+		for i_plyr=1,4 do
+			if state_tmr>60 and round_winners[i_arena]==i_plyr then
+				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,34)
+			else
+				if rnd(1)<0.5 then
+					race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,20)
+				else
+					race_px[i_arena][i_plyr]=max(race_px[i_arena][i_plyr]-1,0)
+				end
+			end
+		end
 	end
 end
 
