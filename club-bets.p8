@@ -99,10 +99,10 @@ function _init()
 	dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
-	--init_betpage()
+	init_betpage()
 	--calculate_winners()
 	--init_confirm()
-	init_watch_race()
+	--init_watch_race()
 end
 
 function dummy_bets()
@@ -252,8 +252,7 @@ function drw_betpage()
 	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
 	spr(37,85,1+bet_off)--coin
 	print(arr_to_str(money,true),94,3+bet_off,9)
-	rrectfill(4,10+bet_off,120,74,0,7)--ticket
-	rrect(3,9+bet_off,122,75,0,1)--outline
+	brdr_rect(3,9+bet_off,122,75,0,7,1)
 	rrectfill(4,10+bet_off,120,9,0,2)--red area
 	print("place a bet",42,12+bet_off,7)
 	rrectfill(4,20+bet_off,120,8,0,5)--grey area
@@ -363,9 +362,9 @@ end
 
 function draw_winning_calc()
 	--winning calculator
-	rrectfill(4,87,120,26,0,7)--ticket
-	rrect(3,86,122,28,0,1)--outline
-	rrectfill(4,87,120,8,0,5)--title
+	brdr_rect(3,86,122,28,0,7,1)--ticket area
+
+	rrectfill(4,87,120,8,0,5)--grey title
 	print("winnings calculator",26,88,0)
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
@@ -458,8 +457,6 @@ end
 function drw_confirm()
 	draw_bet_summary()
 	--total winnings box
-	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
-	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
 	print("possible winnings",10,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
 	tw_str=arr_to_str(total_winnings)
@@ -505,14 +502,10 @@ function draw_bet_summary()
 	print("round:#"..cur_round,4,3-scroller,6)	
 	spr(37,83,1-scroller)--coin
 	print(arr_to_str(money,true),92,3-scroller,9)--my money
-	rrectfill(4,10-scroller,120,max_scroll+97,0,7)--ticket
-	rrect(3,9-scroller,122,10,0,1)--outline
+	brdr_rect(3,9-scroller,122,max_scroll+97,0,7,1)--ticket area
 	rrectfill(4,10-scroller,120,9,0,2)--red area
-
 	print(bet_title,hcenter(bet_title),12-scroller,7)
-	rrectfill(4,20-scroller,120,8,0,5)--grey area
-	rrect(3,19-scroller,122,9,0,1)--grey outline
-
+	brdr_rect(3,19-scroller,122,9,0,5,1)--grey area
 	print("bet",5,21-scroller,0)
 	line(17,20-scroller,17,max_scroll+106-scroller,1)--bet/player v-line
 	print("player",31,21-scroller,0)
@@ -551,6 +544,7 @@ function draw_bet_summary()
 			end
 		end
 	end
+	brdr_rect(3,27+o_pcount-scroller,122,20,0,7,1)--ticket area
 end
 
 function init_end_of_round()
@@ -607,8 +601,6 @@ end
 function drw_winning_bets()
 	draw_bet_summary()
 	--total winnings box
-	rrectfill(3,27+o_pcount-scroller,122,20,0,7)--ticket
-	rrect(3,27+o_pcount-scroller,122,20,0,1)--ticket
 	print("winnings",45,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
 	tw_str=arr_to_str(winning_cash,true)
@@ -1438,6 +1430,10 @@ function easeoutelastic(t)
 	return 1-2^(-10*t)*cos(2*t)
 end
 
+function brdr_rect(_x,_y,_w,_h,_r,_ci,_co)
+	rrectfill(_x,_y,_w,_h,_r,_ci)
+	rrect(_x,_y,_w,_h,_r,_co)
+end
 
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
