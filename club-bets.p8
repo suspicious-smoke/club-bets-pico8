@@ -719,12 +719,18 @@ end
 function init_tickets()
 	tx={}
 	ty={}
+	tx_off={}
+	t_tmr={}
+	t_delay={}
 	t_sep=0
-	for i=1,1 do
-		tx[i]=i*5
-		--ty[i]=100
-		ty[i]=12
+	for i=1,10 do
+		t_tmr[i]=0
+		tx[i]=-100
+		ty[i]=20
+		tx_off[i]=0
+		t_delay[i]=i*20
 	end
+	cur_tick=1
 	tik_tmr=0
 	get_bet_summary()
 	get_bet_costs()
@@ -734,18 +740,42 @@ function init_tickets()
 	_drw=drw_tickets
 end
 
+function lerp_tickets_up()
+	local end_loop=true
+	for i=1,#tx do
+		t_delay[i]=max(t_delay[i]-1,0)
+		if t_delay[i]==0 then
+			t_tmr[i]=min(t_tmr[i]+0.01,1)
+			local _t=easeoutquart(t_tmr[i])
+			tx_off[i]=lerp(0,300,_t)
+		end
+		if t_tmr[i]!=1 then
+		end_loop=false
+		end
+	end
+	if end_loop then
+		debug[1]="fda"
+	end
+end
+
 function upd_tickets()
-	tik_tmr+=1
+	lerp_tickets_up()
+
+	-- tik_tmr+=1
 	-- if tik_tmr<40 then
 	-- 	if rnd(1)>0.5 then
 	-- 		sfx(5)
 	-- 	else
 	-- 		sfx(6)
 	-- 	end
-	-- 	ty[1]-=2
+	-- 	ty[cur_tick]-=3
 	-- elseif tik_tmr==46 then
 	-- 	sfx(7)
-	-- 	ty[1]-=6
+	-- 	ty[cur_tick]-=8-cur_tick
+	-- 	cur_tick+=1
+	-- 	if cur_tick<11 then
+	-- 		tik_tmr=0
+	-- 	end
 	-- end
 
 	-- if tik_tmr==10 then
@@ -755,9 +785,9 @@ function upd_tickets()
 end
 
 function drw_tickets()
-	for i_bet=1,#tx do
-		local _tx,_ty=tx[i_bet],ty[i_bet]
-		draw_ticket(i_bet,_tx,_ty)
+	for i=1,#tx do
+		local _tx,_ty=tx[i]+tx_off[i],ty[i]
+		draw_ticket(i,_tx,_ty)
 	end
 end
 
@@ -765,16 +795,16 @@ function draw_ticket(i_bet,_tx,_ty)
 	--ticket
 	local _sy_u,_sy_d=_ty-t_sep,_ty+t_sep
 	--upper ticket
-	rrect(_tx-5+5,_sy_u-1,3,1,0,5)--shadow
 	for i=1,15 do
-		rrect(_tx-5+6*i,_sy_u-1,3,1,0,7)
+		rrect(_tx-6+6*i,_sy_u-1,3,1,0,5)--shadow
+		rrect(_tx-5+6*i,_sy_u-1,3,1,0,7)--top perf
 	end
 	line(_tx-1,_sy_u,_tx-1,_sy_u+43,5)--shadow
 	rrectfill(_tx,_sy_u,88,50,0,7)--ticket
 	palt(0, false)
-	spr(192,5,_sy_u+42,11,1)--top tear
+	spr(192,_tx,_sy_u+42,11,1)--top tear
 	palt()
-	spr(208,5,_sy_d+42,11,1)--bottom tear
+	spr(208,_tx,_sy_d+42,11,1)--bottom tear
 	--lower ticket
 	rrectfill(_tx,_sy_d+50,88,31,0,7)--ticket2
 	line(_tx-1,_sy_d+44,_tx-1,_sy_d+80,5)--shadow2
@@ -824,6 +854,32 @@ function draw_ticket(i_bet,_tx,_ty)
 	print(print_bet_odds(bets_odds[i_bet]),_tx+68,_sy_d+85,0)
 	print("payout:",_tx+18,_sy_d+96)
 	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_sy_d+96,0)
+end
+
+function init_print_tickets()
+	tx={}
+	ty={}
+	t_sep=0
+	for i=1,1 do
+		tx[i]=i*5
+		ty[i]=100
+		--ty[i]=12
+	end
+	tik_tmr=0
+	get_bet_summary()
+	get_bet_costs()
+	prep_draw_bet_summary()
+
+	_upd=upd_print_tickets
+	_drw=drw_print_tickets
+end
+
+function upd_print_tickets()
+
+end
+
+function drw_print_tickets()
+
 end
 
 -->8
@@ -1341,6 +1397,60 @@ function drw_and_upd_fade()
 	end
 end
 
+--do not use a changing
+--value for a silly boi
+function lerp(a,b,t)
+	return a+(b-a)*t
+end
+
+
+function easeinquad(t)
+	return t*t
+end
+
+function easeoutquad(t)
+	t-=1
+	return 1-t*t
+end
+
+function easeoutquart(t)
+	t-=1
+	return 1-t*t*t*t
+end
+
+function easeinovershoot(t)
+	return 2.7*t*t*t-1.7*t*t
+end
+
+function easeoutovershoot(t)
+	t-=1
+	return 1+2.7*t*t*t+1.7*t*t
+end
+
+function easeinoutovershoot(t)
+	if t<.5 then
+		return (2.7*8*t*t*t-1.7*4*t*t)/2
+	else
+		t-=1
+		return 1+(2.7*8*t*t*t+1.7*4*t*t)/2
+	end
+end
+
+function easeoutinovershoot(t)
+	if t<.5 then
+		t-=.5
+		return (2.7*8*t*t*t+1.7*4*t*t)/2+.5
+	else
+		t-=.5
+		return (2.7*8*t*t*t-1.7*4*t*t)/2+.5
+	end
+end
+
+function easeoutelastic(t)
+	if(t==1) return 1
+	return 1-2^(-10*t)*cos(2*t)
+end
+
 
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -1463,7 +1573,7 @@ __sfx__
 000100001e050200502205024050270502b0503105031000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000100002b2500020000200002002b240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
 000100002d2500020000200002002d240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
-000300002865532655396553d6553e650000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010300002863532635396353d6353e630000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000000000b0500c0500b0500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00010000090500105001050020500305006050080500b0500e0501205015050190501d0501e0501f0502105023050250500000000000000000000000000000000000000000000000000000000000000000000000
 3606000008650086500a6500c6500d6500f650126501465017650196501c6501f650216502365026650286502a6502c6502d6502d6502b6502965026650216501b650126500d6500965006650056500365000650
