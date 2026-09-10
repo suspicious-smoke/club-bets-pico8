@@ -98,7 +98,7 @@ function _init()
 	fill_arenas()
 	dummy_bets()
 	--init_quickbetpage()
-	init_tickets()
+	init_gameover()
 	--init_betpage()
 	--calculate_winners()
 	--init_confirm()
@@ -716,80 +716,51 @@ function drw_quickbetpage()
 end
 -->8
 --ticket
-function init_tickets()
-	tx={}
-	ty={}
-	tx_off={}
-	t_tmr={}
-	t_delay={}
-	t_sep=0
-	for i=1,10 do
-		t_tmr[i]=0
-		tx[i]=-100
-		ty[i]=20
-		tx_off[i]=0
-		t_delay[i]=i*20
-	end
-	cur_tick=1
-	tik_tmr=0
+function init_gameover()
+	gameover_mode=1
+	ty_off,t_tmr,t_sep=0,0,0
 	get_bet_summary()
 	get_bet_costs()
 	prep_draw_bet_summary()
-
-	_upd=upd_tickets
-	_drw=drw_tickets
+	_upd=upd_gameover
+	_drw=drw_gameover
 end
 
-function lerp_tickets_up()
-	local end_loop=true
-	for i=1,#tx do
-		t_delay[i]=max(t_delay[i]-1,0)
-		if t_delay[i]==0 then
-			t_tmr[i]=min(t_tmr[i]+0.01,1)
-			local _t=easeoutquart(t_tmr[i])
-			tx_off[i]=lerp(0,300,_t)
+function upd_gameover()
+	if gameover_mode==1 then
+		if lerp_ticket() then
+			t_tmr=0
+			gameover_mode=2
 		end
-		if t_tmr[i]!=1 then
-		end_loop=false
+	elseif gameover_mode==2 then
+		t_tmr=min(t_tmr+0.1,1)
+		local _t=easeinquad(t_tmr)
+		t_sep=lerp(0,12,_t)
+		if t_tmr==1 then
+			gameover_mode=3
 		end
 	end
-	if end_loop then
-		debug[1]="fda"
+
+end
+
+function drw_gameover()
+	draw_ticket(10,20,140-ty_off)
+	if gameover_mode==3 then
+		print("gameover",48,54,8)
 	end
 end
 
-function upd_tickets()
-	lerp_tickets_up()
-
-	-- tik_tmr+=1
-	-- if tik_tmr<40 then
-	-- 	if rnd(1)>0.5 then
-	-- 		sfx(5)
-	-- 	else
-	-- 		sfx(6)
-	-- 	end
-	-- 	ty[cur_tick]-=3
-	-- elseif tik_tmr==46 then
-	-- 	sfx(7)
-	-- 	ty[cur_tick]-=8-cur_tick
-	-- 	cur_tick+=1
-	-- 	if cur_tick<11 then
-	-- 		tik_tmr=0
-	-- 	end
-	-- end
-
-	-- if tik_tmr==10 then
-	-- 	t_sep=min(t_sep+1,10)
-	-- 	tik_tmr=0
-	-- end
-end
-
-function drw_tickets()
-	for i=1,#tx do
-		local _tx,_ty=tx[i]+tx_off[i],ty[i]
-		draw_ticket(i,_tx,_ty)
+function lerp_ticket()
+	t_tmr=min(t_tmr+0.01,1)
+	local _t=easeoutquart(t_tmr)
+	ty_off=lerp(0,130,_t)
+	
+	if t_tmr==1 then
+		return true
 	end
+	return false
 end
+
 
 function draw_ticket(i_bet,_tx,_ty)
 	--ticket
@@ -856,31 +827,7 @@ function draw_ticket(i_bet,_tx,_ty)
 	print(arr_to_str(bets_winnings[i_bet]),_tx+48,_sy_d+96,0)
 end
 
-function init_print_tickets()
-	tx={}
-	ty={}
-	t_sep=0
-	for i=1,1 do
-		tx[i]=i*5
-		ty[i]=100
-		--ty[i]=12
-	end
-	tik_tmr=0
-	get_bet_summary()
-	get_bet_costs()
-	prep_draw_bet_summary()
 
-	_upd=upd_print_tickets
-	_drw=drw_print_tickets
-end
-
-function upd_print_tickets()
-
-end
-
-function drw_print_tickets()
-
-end
 
 -->8
 --calculations
@@ -1137,14 +1084,21 @@ function finish_round()
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	winning_cash={}
-	--refill arena
-	fill_arenas()
-	--start next bet round/bet page
-	if qm_mode==1 then
-		init_betpage()
+	if arr_to_str(money)=="0" then
+		init_gameover()
 	else
-		init_quickbetpage()
+		--refill arena
+		fill_arenas()
+		--start next bet round/bet page
+		if qm_mode==1 then
+			init_betpage()
+		else
+			init_quickbetpage()
+		end
 	end
+
+
+	
 end
 -->8
 --helpers
