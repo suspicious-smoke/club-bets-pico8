@@ -722,6 +722,17 @@ function init_gameover()
 	get_bet_summary()
 	get_bet_costs()
 	prep_draw_bet_summary()
+	lost_bet_ind=1
+	for i_bet=1,10 do
+		for i_arena=1,4 do
+			for i_plyr=1,4 do
+				if bets[i_bet][2][i_arena][i_plyr] then
+					lost_bet_ind=i_bet
+				end
+			end
+		end
+	end
+
 	_upd=upd_gameover
 	_drw=drw_gameover
 end
@@ -744,7 +755,7 @@ function upd_gameover()
 end
 
 function drw_gameover()
-	draw_ticket(10,20,140-ty_off)
+	draw_ticket(lost_bet_ind,20,140-ty_off)
 	if gameover_mode==3 then
 		print("\^t\^o280gameover",48,54,8)
 	end
