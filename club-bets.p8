@@ -733,9 +733,9 @@ function upd_gameover()
 			gameover_mode=2
 		end
 	elseif gameover_mode==2 then
-		t_tmr=min(t_tmr+0.1,1)
+		t_tmr=min(t_tmr+0.07,1)
 		local _t=easeinquad(t_tmr)
-		t_sep=lerp(0,12,_t)
+		t_sep=lerp(0,11,_t)
 		if t_tmr==1 then
 			gameover_mode=3
 		end
@@ -746,14 +746,14 @@ end
 function drw_gameover()
 	draw_ticket(10,20,140-ty_off)
 	if gameover_mode==3 then
-		print("gameover",48,54,8)
+		print("\^t\^o280gameover",48,54,8)
 	end
 end
 
 function lerp_ticket()
 	t_tmr=min(t_tmr+0.01,1)
 	local _t=easeoutquart(t_tmr)
-	ty_off=lerp(0,130,_t)
+	ty_off=lerp(0,128,_t)
 	
 	if t_tmr==1 then
 		return true
