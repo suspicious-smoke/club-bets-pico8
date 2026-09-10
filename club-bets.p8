@@ -848,12 +848,12 @@ function init_watch_race()
 	race_over=reset_array(4,false)
 	for i_arena=1,4 do
 		for i_plyr=1,4 do
-			--debug[i_arena]=race_px[i_arena]
 			race_px[i_arena][i_plyr]=rnd_rng(1,20)
 		end
 	end
 	r_tmr=0
 	state_tmr=0
+	f_line_x=reset_array(4,0)
 	music(0)
 	_upd=upd_watch_race
 	_drw=drw_watch_race
@@ -880,7 +880,11 @@ function change_ship_pos()
 	for i_arena=1,4 do
 		for i_plyr=1,4 do
 			if state_tmr>60 and round_winners[i_arena]==i_plyr then
+				--move winner to finish line
 				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,34)
+				if race_px[i_arena][i_plyr]>30 then
+					f_line_x[i_arena]=min(f_line_x[i_arena]+1,4)
+				end
 			else
 				if rnd(1)<0.5 then
 					race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,20)
@@ -902,20 +906,39 @@ function drw_watch_race()
 	rectfill(0,49,128,52,0)
 	rectfill(61,0,64,128,0)
 	--screens
-	local _sz=48
-	for i=0,1 do
-		for j=0,1 do
-			rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
-		end
-	end
+	-- local _sz=48
+	-- for i=0,1 do
+	-- 	for j=0,1 do
+	-- 		rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
+	-- 	end
+	-- end
 	--players
 	for i_arena=1,4 do 
+		_lx=(i_arena+1)%2*50
+		_ly=flr((i_arena-1)/2)*50
+		rrect(14+_lx,2+_ly,48,48,0,7)
+		--finish line
+		if f_line_x[i_arena]>0 then
+			line(_lx+61-f_line_x[i_arena],_ly+3,_lx+61-f_line_x[i_arena],_ly+48,8)
+		end
+		--player
 		for i_plyr=1,4 do
 			p_spr=47+arenas[i_arena][i_plyr][1]
-			spr(p_spr,18+race_px[i_arena][i_plyr]+(i_arena+1)%2*(_sz+2),i_plyr*10-4+flr((i_arena-1)/2)*(_sz+2))
+			spr(p_spr,18+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly)
 		end
+
+		if race_over[i_arena] then
+			win_spr=47+arenas[i_arena][round_winners[i_arena]][1]
+			rrectfill(15+_lx,3+_ly,46,46,0,1)
+			print("winner!",_lx+24,_ly+14,9)
+			local winner=players[arenas[i_arena][round_winners[i_arena]][1]][1]
+			print(winner,_lx+24,_ly+24,9)
+
+			spr(win_spr,_lx+34,_ly+31)
+		end
+		spr(32+i_arena,16+_lx,4+_ly)--planet
 	end
-	
+
 	rrectfill(0,110,128,30,0,1)--blue bg
 	spr(6,-1,100+sn,9,2)--crowd1
 	spr(6,66,100-sn,9,2)--crowd2
