@@ -93,6 +93,17 @@ function _init()
 	bet_sel=1--the currently selected bet (betpage/quickbetpage)
 	arena_sel=1
 	fade_tmr,fade_state,fade_r=0,0,0
+
+	--starfield
+	starx={}
+	stary={}
+	starspd={}
+	for i=1,100 do
+		add(starx,flr(rnd(128)))
+		add(stary,flr(rnd(128)))
+		add(starspd,rnd(2)+0.5)		
+	end
+
 	_upd=blank
 	_drw=blank
 	fill_arenas()
@@ -858,6 +869,7 @@ function init_watch_race()
 end
 
 function upd_watch_race()
+	animatestars()
 	sn=1.5*sin(time())--crowd sin wave
 	r_tmr+=1
 	if r_tmr>5 then
@@ -867,6 +879,14 @@ function upd_watch_race()
 end
 
 function drw_watch_race()
+	draw_starfield()
+	--star covers
+	rectfill(0,0,14,128,0)
+	rectfill(111,0,128,128,0)
+	rectfill(0,0,128,2,0)
+	rectfill(0,100,128,110,0)
+	rectfill(0,49,128,52,0)
+	rectfill(61,0,64,128,0)
 	--screens
 	local _sz=48
 	for i=0,1 do
@@ -874,10 +894,11 @@ function drw_watch_race()
 			rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
 		end
 	end
+	--players
 	for i_arena=1,4 do 
 		for i_plyr=1,4 do
 			p_spr=47+arenas[i_arena][i_plyr][1]
-			spr(p_spr,18+race_px[i_arena][i_plyr]+(i_arena+1)%2*(_sz+2),i_plyr*8+flr((i_arena-1)/2)*(_sz+2))
+			spr(p_spr,18+race_px[i_arena][i_plyr]+(i_arena+1)%2*(_sz+2),i_plyr*10-4+flr((i_arena-1)/2)*(_sz+2))
 		end
 	end
 	
@@ -1468,6 +1489,40 @@ function brdr_rect(_x,_y,_w,_h,_r,_ci,_co)
 	rrect(_x,_y,_w,_h,_r,_co)
 end
 
+-->8
+--starfield
+
+--starfield
+function draw_starfield()
+	scols={6,13,1}--star colors
+	for i=1,#starx do
+		local scol=scols[1]
+		
+		if starspd[i] < 1 then
+			scol=scols[3]
+		elseif starspd[i] < 1.5 then
+			scol=scols[2]
+		end
+		
+		if starspd[i] <= 1.5 then
+			pset(starx[i],stary[i],scol)
+			else
+			line(starx[i],stary[i],starx[i]+1,stary[i],scol)
+		end
+		
+	end
+end
+
+function animatestars()
+	for i=1,#starx do
+		local _starx=starx[i]
+		_starx-=starspd[i]
+		if _starx<0 then
+			_starx+=128
+		end
+		starx[i]=_starx
+	end
+end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000003bbb1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
