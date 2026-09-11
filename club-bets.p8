@@ -1516,39 +1516,6 @@ function easeoutquart(t)
 	return 1-t*t*t*t
 end
 
-function easeinovershoot(t)
-	return 2.7*t*t*t-1.7*t*t
-end
-
-function easeoutovershoot(t)
-	t-=1
-	return 1+2.7*t*t*t+1.7*t*t
-end
-
-function easeinoutovershoot(t)
-	if t<.5 then
-		return (2.7*8*t*t*t-1.7*4*t*t)/2
-	else
-		t-=1
-		return 1+(2.7*8*t*t*t+1.7*4*t*t)/2
-	end
-end
-
-function easeoutinovershoot(t)
-	if t<.5 then
-		t-=.5
-		return (2.7*8*t*t*t+1.7*4*t*t)/2+.5
-	else
-		t-=.5
-		return (2.7*8*t*t*t-1.7*4*t*t)/2+.5
-	end
-end
-
-function easeoutelastic(t)
-	if(t==1) return 1
-	return 1-2^(-10*t)*cos(2*t)
-end
-
 function brdr_rect(_x,_y,_w,_h,_r,_ci,_co)
 	rrectfill(_x,_y,_w,_h,_r,_ci)
 	rrect(_x,_y,_w,_h,_r,_co)
