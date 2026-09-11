@@ -1227,7 +1227,7 @@ function finish_round()
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	winning_cash={}
-	if arr_to_str(money)=="0" then
+	if arr_to_str(money,true)=="0" then
 		init_gameover()
 	else
 		--refill arena
