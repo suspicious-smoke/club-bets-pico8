@@ -173,7 +173,7 @@ function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	submenu_off,submenu_sel,qm_mode=0,1,1
-	submenu_txts={"quick bet","copy bet amt","","","confirm bets"}
+	submenu_txts={"quick bet","copy bet amt","confirm bets"}
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=1
 	_upd=upd_betpage
@@ -200,7 +200,7 @@ function upd_betpage()
 		elseif btnp(🅾️) then
 			if arena_sel==6 then
 				sfx(4)
-				init_confirm()
+				trn_state(init_confirm)
 			elseif arena_sel==5 then
 				--change money
 				sfx(2)
@@ -319,13 +319,17 @@ function draw_dropdown()
 end
 
 function submenu_mode()
-	submenu_off=min(submenu_off+10,60)
+	submenu_off=min(submenu_off+10,50)
+	men_options=3
+	if qm_mode==2 then
+		men_options=5
+	end
 	if btnp(⬆️) then
 		sfx(0)
-		submenu_sel=(submenu_sel-2)%5+1
+		submenu_sel=(submenu_sel-2)%men_options+1
 	elseif btnp(⬇️) then
 		sfx(0)
-		submenu_sel=(submenu_sel%5)+1
+		submenu_sel=(submenu_sel%men_options)+1
 	elseif btnp(❎) then
 		sfx(3)
 		bet_mode=1
@@ -335,7 +339,8 @@ function submenu_mode()
 				sfx(9)
 				trn_state(init_quickbetpage)
 			elseif submenu_sel==3 then
-			elseif submenu_sel==4 then
+				sfx(4)
+				trn_state(init_confirm)
 			end
 		else--qm_mode==2--on quick bet page
 			if submenu_sel==1 then
@@ -351,28 +356,33 @@ function submenu_mode()
 				end
 				sfx(3)
 				bet_mode=1
+			elseif submenu_sel==5 then--confirm page
+				sfx(4)
+				trn_state(init_confirm)
 			end
 		end
 		if submenu_sel==2 then--copy bets
 			sfx(2)
 			copy_bets()
 			bet_mode=1
-		elseif submenu_sel==5 then--confirm page
-			sfx(4)
-			init_confirm()
 		end
 	end
 end
 
 function draw_submenu()
 	_y=128-submenu_off
-	rrectfill(2,_y,124,60,0,5)
+	brdr_rect(1,_y,126,50,0,5,1)
 	for i=1,#submenu_txts do
-		print("●"..submenu_txts[i],4,_y-5+i*9,7)
+		print("●"..submenu_txts[i],5,_y-5+i*9,7)
 	end
 	if bet_mode==4 then
-		rrect(2,_y+(submenu_sel-1)*9+2,60,9,1,9)
+		rrect(3,_y+(submenu_sel-1)*9+2,60,9,1,9)
 	end
+	line(64,_y,64,_y+128,1)
+	_txt="round:#"..cur_round
+	print(_txt,95-#_txt*2,_y+4,7)
+	_money="cash:"..arr_to_str(money,true)
+	print(_money,95-#_money*2,_y+14)
 end
 
 
@@ -439,6 +449,7 @@ function upd_confirm()
 		end
 	end
 	if btnp(❎) then
+		sfx(3)
 		if qm_mode==1 then
 			init_betpage()
 		else
@@ -446,7 +457,10 @@ function upd_confirm()
 		end
 	elseif btnp(🅾️) then
 		if has_money and made_bets then
+			sfx(5)
 			trn_state(init_watch_race)
+		else
+			sfx(3)
 		end
 	end
 end
@@ -1770,7 +1784,7 @@ __sfx__
 000200002c4402744023440214001f4001b4001b4000e4001f400234001f4001c4001e400244001c4000040000400004000040000400004000040000400004000040000400004000040000400004000040000400
 000000000b4500d450104501245000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000100001e050200502205024050270502b0503105031000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-000100002b2500020000200002002b240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
+490100001e050240502a0502e050350402f0003300000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
 000100002d2500020000200002002d240002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200002000020000200
 000300001b6302863532635396353d6353e6300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000000000b0500c0500b0500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
