@@ -116,9 +116,9 @@ function _init()
 	--init_quickbetpage()
 	--init_gameover()
 	init_betpage()
-	calculate_winners()
+	--calculate_winners()
 	--init_confirm()
-	init_watch_race()
+	--init_watch_race()
 end
 
 function dummy_bets()
@@ -446,7 +446,7 @@ function upd_confirm()
 		end
 	elseif btnp(🅾️) then
 		if has_money and made_bets then
-			trn_state(init_end_of_round)
+			trn_state(init_watch_race)
 		end
 	end
 end
@@ -563,22 +563,20 @@ function draw_bet_summary()
 	brdr_rect(3,27+o_pcount-scroller,122,20,0,7,1)--ticket area
 end
 
-function init_end_of_round()
-	calculate_winners()
-		--pay for bets
-	money=arr_sub(money,total_bet)
-	_upd=upd_end_of_round
-	_drw=drw_end_of_round
+function init_race_results()
+	sfx(13)
+	_upd=upd_race_results
+	_drw=drw_race_results
 end
 
-function upd_end_of_round()
+function upd_race_results()
 	if btnp(🅾️) then
 		--winnings page
 		trn_state(init_winning_bets)
 	end
 end
 
-function drw_end_of_round()
+function drw_race_results()
 	print("winners",hcenter("winners"),10,7)
 	for i_arena=1,4 do
 		local w_pid=arenas[i_arena][round_winners[i_arena]][1]
@@ -849,6 +847,9 @@ function draw_ticket(i_bet,_tx,_ty)
 end
 
 function init_watch_race()
+	calculate_winners()
+		--pay for bets
+	money=arr_sub(money,total_bet)
 	race_px=reset_num_array(4,4,0)
 	race_over=reset_array(4,false)
 	for i_arena=1,4 do
@@ -868,6 +869,7 @@ end
 function upd_watch_race()
 	animatestars()
 	update_fx()
+	
 	--stop crowd after race and turn of bg noise
 	if not (race_over[1] and race_over[2] and race_over[3] and race_over[4]) then
 		sn=1.5*sin(time())--crowd sin wave
@@ -886,6 +888,10 @@ function upd_watch_race()
 			race_over[i_arena]=true
 			sfx(11)
 		end
+	end
+	if btnp(🅾️) then
+		trn_state(init_race_results)
+		music(-1)
 	end
 end
 
@@ -1799,6 +1805,7 @@ __sfx__
 3606000008650086500a6500c6500d6500f650126501465017650196501c6501f650216502365026650286502a6502c6502d6502d6502b6502965026650216501b650126500d6500965006650056500365000650
 36020000196501c6501f65023650276502a6502d6502f6502f6502c65027650236501f6501d650196501465011650106500c6500b6500a6500a6500b6500c6500f6500d6500d6500c6500c6500c6500c6500c650
 931000000963009630096300c63009630096300963010630096300963009630096300f6300963009630096300b63009630096300963010630096300963009630096300f6300963009630096300c6300963009630
+01100000220552705522055240551f055240551f0552e0522e0422e032290052b0052700529005270052900529005290052b005290052b0052b0052b005000050000500005000050000500005000050000500005
 __music__
 03 0c4a4944
 00 414a4944
