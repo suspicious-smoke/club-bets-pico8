@@ -872,6 +872,7 @@ function upd_watch_race()
 	if not (race_over[1] and race_over[2] and race_over[3] and race_over[4]) then
 		sn=1.5*sin(time())--crowd sin wave
 	else
+		sn=0
 		music(-1)
 	end
 	r_tmr+=1
