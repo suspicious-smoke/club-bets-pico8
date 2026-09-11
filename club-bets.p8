@@ -401,7 +401,7 @@ function draw_winning_calc()
 	print("odds",45,96,0)
 	line(64,94,64,112,1)--vline2
 	total_odds=print_bet_odds(bets_odds[bet_sel],true)
-	print(total_odds,57-#total_odds*2,105,0)
+	print(total_odds,57-#total_odds*2,105,0)--center odds
 	print("payout",83,96,0)
 	_winnings=arr_to_str(bets_winnings[bet_sel])
 	print(_winnings,94-#_winnings*2,105,0)
@@ -858,6 +858,7 @@ function init_watch_race()
 	end
 	r_tmr=0
 	state_tmr=0
+	sn=1.5*sin(time())
 	f_line_x=reset_array(4,0)
 	music(0)
 	_upd=upd_watch_race
@@ -867,7 +868,12 @@ end
 function upd_watch_race()
 	animatestars()
 	update_fx()
-	sn=1.5*sin(time())--crowd sin wave
+	--stop crowd after race and turn of bg noise
+	if not (race_over[1] and race_over[2] and race_over[3] and race_over[4]) then
+		sn=1.5*sin(time())--crowd sin wave
+	else
+		music(-1)
+	end
 	r_tmr+=1
 	state_tmr+=1
 	if r_tmr>4 then
@@ -930,7 +936,7 @@ function drw_watch_race()
 		end
 		--player
 		for i_plyr=1,4 do
-			fire(21+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly+5,-1,0,1,6,f1c)
+			fire(20+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly+5,-1,0,1,6,f1c)
 			p_spr=47+arenas[i_arena][i_plyr][1]
 			spr(p_spr,18+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly)
 		end
@@ -940,10 +946,11 @@ function drw_watch_race()
 			rrectfill(15+_lx,3+_ly,46,46,0,1)
 			print("winner!",_lx+24,_ly+14,9)
 			local winner=players[arenas[i_arena][round_winners[i_arena]][1]][1]
-			print(winner,_lx+24,_ly+24,9)
+			print(winner,_lx+38-#winner*2,_ly+24,9)
 
 			spr(win_spr,_lx+34,_ly+31)
 		end
+		rrectfill(15+_lx,3+_ly,10,10,1,1)--planet bg
 		spr(32+i_arena,16+_lx,4+_ly)--planet
 	end
 
