@@ -115,10 +115,11 @@ function _init()
 	dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
-	init_betpage()
+	--init_betpage()
 	--calculate_winners()
 	--init_confirm()
 	--init_watch_race()
+	init_menu()
 end
 
 function dummy_bets()
@@ -130,14 +131,14 @@ function dummy_bets()
 			end
 		end
 	end
+	get_bet_summary()
 end
 
 function blank() end
 
 function _update()
 	t+=1
-	_upd()	
-	--update_fx()--particles
+	_upd()
 end
 
 function reset_num_array(_size,_items,_val)
@@ -159,6 +160,7 @@ end
 function _draw()
 	cls()
 	_drw()
+	--drw_overlay()
 	drw_and_upd_fade()
 	--debug
 	offst=0
@@ -167,6 +169,54 @@ function _draw()
 		offst+=8
 	end
 end
+
+function init_menu()
+	t_sep=0
+	sn=0
+	menu_x=100
+	wait=60
+	t_tmr=0
+	menu_items={"season mode", "bet of the day", "previous results"}
+	_upd=upd_menu
+	_drw=drw_menu
+end
+
+function upd_menu()
+	wait=max(wait-1,0)
+	sn=1.5*sin(time()*0.5)
+	if wait==0 then
+		t_tmr=min(t_tmr+0.03,1)
+		local _t=easeoutquart(t_tmr)
+		menu_x=lerp(100,0,_t)
+		
+	end
+end
+
+function drw_menu()
+	draw_ticket(1,20,10+sn)
+	brdr_rect(28+menu_x,48,70,40,0,1,5)
+	for i=1,#menu_items do
+		print(menu_items[i],hcenter(menu_items[i])+menu_x,44+i*10,7)
+	end
+	--drw_overlay()
+end
+
+-- function drw_overlay()
+--  -- screen memory as the sprite sheet
+--  poke(0x5f54,0x60)
+--  -- set overlay palette
+--  pal({1,1,1,1,1,1,1,1,1,1,1,1,1,1,1})
+--  --pal(split'1,1,1,1,1,1,1,1,1,1,1,1,1,1,1')
+--  -- draw screen to screen 
+--  -- (sprite sheet x,sprite sheet y,width,height,screen x,screen y)
+--  local _x,_y=24,40
+--  sspr(_x,_y,80,40,_x,_y) 
+--  -- reset palette
+--  pal()
+--  -- reset spritesheet
+--  poke(0x5f54,0x00)
+-- end
+
 -->8
 --bet page
 function init_betpage()
@@ -826,8 +876,6 @@ function draw_ticket(i_bet,_tx,_ty)
 		end
 		print("★galaxy club★",_tx+15,t_off-13+i*32,6)	
 	end
-	--text
-	
 	rrectfill(_tx+2,_sy_u+2,86,10,0,2)--red area
 	print("★galaxy club bets★",_tx+5,_sy_u+5,7)
 	print("round:#"..cur_round,_tx+28,_sy_u+15,0)
