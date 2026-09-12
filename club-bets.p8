@@ -788,7 +788,7 @@ function drw_gameover()
 end
 
 function lerp_ticket()
-	t_tmr=min(t_tmr+0.01,1)
+	t_tmr=min(t_tmr+0.02,1)
 	local _t=easeoutquart(t_tmr)
 	ty_off=lerp(0,128,_t)
 	
