@@ -219,7 +219,6 @@ function init_betpage()
 end
 
 function upd_betpage()
-	debug[1]=i_amt
 	get_bet_summary()
 	if bet_mode==1 then--main select mode
 		if btnp(⬆️) then
@@ -1123,7 +1122,7 @@ function reset_bets()
 	bets={}
 	for i=1,10 do
 		local amt=reset_array(9,0)
-		amt[7]=1
+		amt[7]=1--100 to start with
 		local _bet={amt,{}}
 		for j=1,4 do
 			local _selected_player=reset_array(4,false)
@@ -1280,20 +1279,34 @@ function finish_round()
 	winning_cash={}
 	if arr_to_str(money)=="0" then
 		init_gameover()
+	elseif cur_round>=20 then
+		--victory screen
 	else
 		--refill arena
 		fill_arenas()
+		cur_round+=1
 		--start next bet round/bet page
 		if qm_mode==1 then
 			init_betpage()
 		else
 			init_quickbetpage()
 		end
-	end
-
-
-	
+	end	
 end
+
+function init_victory()
+	_upd=upd_victory
+	_drw=drw_victory
+end
+
+function upd_victory()
+
+end
+
+function drw_victory()
+	--display the victory info for the game
+end
+
 -->8
 --helpers
 function explode_d6()
