@@ -136,21 +136,7 @@ function _update()
 	_upd()
 end
 
-function reset_num_array(_size,_items,_val)
-	_num_arr={}
-	for i=1,_size do
-		add(_num_arr,reset_array(_items,_val))
-	end
-	return _num_arr
-end
 
-function reset_array(_items,_val)
-	_arr={}
-	for i=1,_items do
-		add(_arr,_val)
-	end
-	return _arr
-end
 
 function _draw()
 	cls()
@@ -211,12 +197,12 @@ function reset_season()
 	arenas={}
 	odds={}
 	bet_odds={}
-	money={1,0,0,0}
+	money=reset_array(9,0)
+	money[7]=1
 	round_features={{},{},{},{}}--ids of arena features for current round
 	round_winners={}
 	cur_round=1
 	fill_arenas()
-	
 end
 
 -->8
@@ -227,12 +213,13 @@ function init_betpage()
 	submenu_off,submenu_sel,qm_mode=0,1,1
 	submenu_txts={"quick bet","copy bet amt","confirm bets"}
 	bet_mode=1--main,plyr sel,amt sel
-	i_amt=1
+	i_amt=6
 	_upd=upd_betpage
 	_drw=drw_betpage
 end
 
 function upd_betpage()
+	debug[1]=i_amt
 	get_bet_summary()
 	if bet_mode==1 then--main select mode
 		if btnp(⬆️) then
@@ -256,7 +243,7 @@ function upd_betpage()
 			elseif arena_sel==5 then
 				--change money
 				sfx(2)
-				i_amt=1
+				i_amt=6
 				bet_mode=3
 			else
 				sfx(2)
@@ -294,11 +281,11 @@ function upd_betpage()
 			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]-1)%10
 		elseif btnp(➡️) then
 			sfx(0)
-			i_amt=(i_amt%4)+1
+			i_amt=(i_amt-5)%4+6
 		elseif btnp(⬅️) then
 			sfx(0)
-			i_amt=(i_amt-2)%4+1
-		elseif btnp(❎) then
+			i_amt=(i_amt-7)%4+6
+		elseif btnp(❎) or btnp(🅾️) then
 			sfx(3)
 			bet_mode=1
 		end
@@ -319,7 +306,7 @@ function drw_betpage()
 	print("round:#"..cur_round,4,3+bet_off,6)	
 	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
 	spr(37,85,1+bet_off)--coin
-	print(arr_to_str(money,true),94,3+bet_off,9)
+	print(arr_to_str(money),94,3+bet_off,9)
 	brdr_rect(3,9+bet_off,122,75,0,7,1)
 	rrectfill(4,10+bet_off,120,9,0,2)--red area
 	print("place a bet",42,12+bet_off,7)
@@ -433,7 +420,7 @@ function draw_submenu()
 	line(64,_y,64,_y+128,1)
 	_txt="round:\f9#"..cur_round
 	print(_txt,95-#_txt*2,_y+4,7)
-	_money="cash:\f9"..arr_to_str(money,true)
+	_money="cash:\f9"..arr_to_str(money)
 	print(_money,95-#_money*2,_y+14,7)
 end
 
@@ -447,13 +434,13 @@ function draw_winning_calc()
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
-	for i=1,4 do
+	for i=6,9 do
 		--digit selection colors
 		i_clr=0
 		if i==i_amt and bet_mode==3 then
 			i_clr=9
 		end
-		print(bets[bet_sel][1][i] or 0,9+i*4,105,i_clr)
+		print(bets[bet_sel][1][i],i*4-6,105,i_clr)
 	end
 
 	if arena_sel==5 then
@@ -518,7 +505,7 @@ function upd_confirm()
 end
 
 function get_bet_costs()
-	total_bet={}
+	total_bet=reset_array(9,0)
 	for i_bet=1,10 do
 		has_bet=false
 		for i_arena=1,4 do
@@ -583,7 +570,7 @@ end
 function draw_bet_summary()
 	print("round:#"..cur_round,4,3-scroller,6)	
 	spr(37,83,1-scroller)--coin
-	print(arr_to_str(money,true),92,3-scroller,9)--my money
+	print(arr_to_str(money),92,3-scroller,9)--my money
 	brdr_rect(3,9-scroller,122,max_scroll+97,0,7,1)--ticket area
 	rrectfill(4,10-scroller,120,9,0,2)--red area
 	print(bet_title,hcenter(bet_title),12-scroller,7)
@@ -685,7 +672,7 @@ function drw_winning_bets()
 	--total winnings box
 	print("winnings",45,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	tw_str=arr_to_str(winning_cash,true)
+	tw_str=arr_to_str(winning_cash)
 	if #tw_str==0 then
 		tw_str="0"
 	end
@@ -783,7 +770,7 @@ function drw_quickbetpage()
 	print(bets_odds[bet_sel]..":1",34,121,7)
 	line(55,120,55,126,8)
 	spr(37,57,119)--coin
-	print(arr_to_str(bets[bet_sel][1],true),64,121,9)
+	print(arr_to_str(bets[bet_sel][1]),64,121,9)
 	line(81,120,81,126,8)
 	spr(37,83,119)--coin
 	print(arr_to_str(bets_winnings[bet_sel]),90,121,9)
@@ -907,7 +894,7 @@ function draw_ticket(i_bet,_tx,_ty)
 	end
 	print("---------------------",_tx+3,_sy_d+80,0)
 	print("bet:",_tx+6,_sy_d+85)
-	print(arr_to_str(bets[i_bet][1],true),_tx+24,_sy_d+85,0)
+	print(arr_to_str(bets[i_bet][1]),_tx+24,_sy_d+85,0)
 	print("odds:",_tx+46,_sy_d+85)
 	print(print_bet_odds(bets_odds[i_bet]),_tx+68,_sy_d+85,0)
 	print("payout:",_tx+18,_sy_d+96)
@@ -995,13 +982,6 @@ function drw_watch_race()
 	rectfill(0,100,128,110,0)
 	rectfill(0,49,128,52,0)
 	rectfill(61,0,64,128,0)
-	--screens
-	-- local _sz=48
-	-- for i=0,1 do
-	-- 	for j=0,1 do
-	-- 		rrect(14+i*(_sz+2),2+j*(_sz+2),_sz,_sz,0,7)
-	-- 	end
-	-- end
 	--players
 	for i_arena=1,4 do 
 		_lx=(i_arena+1)%2*50
@@ -1142,7 +1122,9 @@ end
 function reset_bets()
 	bets={}
 	for i=1,10 do
-		local _bet={{0,1,0,0},{}}
+		local amt=reset_array(9,0)
+		amt[7]=1
+		local _bet={amt,{}}
 		for j=1,4 do
 			local _selected_player=reset_array(4,false)
 			add(_bet[2],_selected_player)	
@@ -1180,8 +1162,8 @@ end
 function get_bet_summary()
 	--global summary arrays to use elsewhere
 	bets_odds=reset_array(10,1)--array follows the bet_id
-	bets_winnings=reset_array(10,7,0)
-	total_winnings={0}
+	bets_winnings=reset_num_array(10,9,0)
+	total_winnings=reset_array(9,0)
 	--get bets and odds
 	for i_bet=1,10 do
 		_bet_arena=bets[i_bet][2]
@@ -1197,8 +1179,10 @@ function get_bet_summary()
 			bets_odds[i_bet]=0
 		end
 		bets_winnings[i_bet]=arr_mult(int_to_arr(bets_odds[i_bet]),bets[i_bet][1])
-		if #bets_winnings[i_bet] >= 7 then
-			bets_winnings[bet_sel]={1,0,0,0,0,0,0}
+		max_winnings={0,0,1,0,0,0,0,0,0}--1 mil
+		arr_greater_equal(bets_winnings[i_bet],max_winnings)
+		if arr_greater_equal(bets_winnings[i_bet],max_winnings) then
+			bets_winnings[bet_sel]=copy_list(max_winnings)
 		end
 	end
 	--calculate total payout
@@ -1281,7 +1265,7 @@ function is_winning_bet(_bet)
 end
 
 function get_winning_cash()
-	winning_cash=reset_array(10,0)
+	winning_cash=reset_array(9,0)
 	for i_bet=1,10 do
 		_cbet=bets[i_bet]
 		if is_winning_bet(_cbet) then
@@ -1294,7 +1278,7 @@ function finish_round()
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	winning_cash={}
-	if arr_to_str(money,true)=="0" then
+	if arr_to_str(money)=="0" then
 		init_gameover()
 	else
 		--refill arena
@@ -1346,29 +1330,37 @@ function d6()
 	return rnd_rng(1,6)
 end
 
+function reset_num_array(_size,_items,_val)
+	_num_arr={}
+	for i=1,_size do
+		add(_num_arr,reset_array(_items,_val))
+	end
+	return _num_arr
+end
 
---array arithmatic
+function reset_array(_items,_val)
+	_arr={}
+	for i=1,_items do
+		add(_arr,_val)
+	end
+	return _arr
+end
+
+--only works for numbers<32767
 function int_to_arr(n)
- local r={}
- -- handle 0
- if n==0 then
-  return {0}
+ local r=reset_array(9,0)
+ local i=9--start at the rightmost position
+ while n>0 do--extract digits from right to left
+  r[i]=n%10--get the last digit n and store it at i
+  n=flr(n/10)--move num by one . point and remove decimal portion
+  i-=1--move one position to the left
  end
- -- extract digits from right to left
- while n>0 do
-  add(r,n%10)
-  n=flr(n/10)
- end
- -- reverse the array
- for i=1,#r\2 do
-  r[i],r[#r-i+1]=r[#r-i+1],r[i]
- end
-
  return r
 end
 
---_0clean means get ride of leading zero when printing. Defaults to false.
-function arr_to_str(_arr,_0clean)
+--_0clean means get ride of leading zero when printing. Defaults to true.
+function arr_to_str(_arr,_dont0clean)
+	local _0clean=not _dont0clean
 	anum=""
 	if _arr then
 		leading_zero=true
@@ -1389,110 +1381,90 @@ function arr_to_str(_arr,_0clean)
 	return anum
 end
 
+--array math
 function arr_add(a,b)
-	local r={} --result array and carry value
-	local c=0 --carry variable
-	--start at the rightmost digit
-	local i=#a
-	local j=#b
-	--work from right to left
-	while i>0 or j>0 do
-		--add the two digits plus any carry
-		local n=(a[i] or 0)+(b[j] or 0)+c
-		--store the ones digit
-		add(r,n%10)
-		--calculate the carry for the next digit
+	local r=reset_array(9,0)
+	local c=0
+	-- add from right to left
+	for i=9,1,-1 do
+		local n=a[i]+b[i]+c
+		-- store ones digit
+		r[i]=n%10
+		-- calculate carry
 		c=flr(n/10)
-		--move to the next digits
-		i-=1
-		j-=1
 	end
-	--add any remaining carry
-	if c>0 then add(r,c) end
-	--digits were added right-to-left,
-	--so reverse the result to normal order
-	for i=1,#r\2 do
-	r[i],r[#r-i+1]=r[#r-i+1],r[i]
+	-- if there is a carry after the 9th digit,
+	-- the result is greater than 999999999
+	if c>0 then
+		return reset_array(9,9)
 	end
+
 	return r
 end
 
 function arr_mult(a,b)
-	local r={} --result array
-	--create enough space for the result
-	for i=1,#a+#b do
-		r[i]=0
-	end
-	--multiply each digit by every digit
-	--starting from the right
-	for i=#a,1,-1 do
-		for j=#b,1,-1 do
-			local p=i+j
-			--add the product to the correct position
-			r[p]+=a[i]*b[j]
+	local r=reset_array(9,0)
+	-- multiply each digit
+	-- work from right to left
+	for i=9,1,-1 do
+		for j=9,1,-1 do
+			-- position of the result digit
+			local k=i+j-9
+			-- only keep products that fit in 9 digits
+			if k>=1 then
+				r[k]+=a[i]*b[j]
+			end
 		end
 	end
-	--handle carries from right to left
-	for i=#r,2,-1 do
-		r[i-1]+=flr(r[i]/10)
-		r[i]%=10
+	-- handle carries from right to left
+	for i=9,2,-1 do
+		local c=flr(r[i]/10)
+		r[i]=r[i]%10
+		r[i-1]+=c
 	end
-	--remove leading zeroes
-	while #r>1 and r[1]==0 do
-		deli(r,1)
+
+	-- if position 1 has more than one digit,
+	-- the result is greater than 999999999
+	if r[1]>=10 then
+		return reset_array(9,9)
 	end
+
 	return r
 end
-function arr_sub(a,b)--subtraction
-	-- result array
-	local r={}
+
+--assumes a>b
+function arr_sub(a,b)
+	local r=reset_array(9,0)
 	local borrow=0
-	local i=#a
-	local j=#b
-	-- subtract digits from right to left
-	while i>0 do
-		local n=a[i]-(j>0 and b[j] or 0)-borrow
-		-- borrow from the next digit if needed
+	-- subtract from right to left
+	for i=9,1,-1 do
+		local n=a[i]-b[i]-borrow
+		-- if the result is negative,
+		-- borrow 1 from the next digit
 		if n<0 then
 			n+=10
 			borrow=1
 		else
 			borrow=0
 		end
-		add(r,n)
-		i-=1
-		j-=1
-	end
-	-- reverse result
-	for i=1,#r\2 do
-		r[i],r[#r-i+1]=r[#r-i+1],r[i]
-	end
-	-- remove leading zeroes
-	while #r>1 and r[1]==0 do
-		deli(r,1)
+		r[i]=n
 	end
 	return r
 end
 
-function arr_greater_equal(a,b)--is a>=b?
-	-- more digits means bigger number
-	if #a>#b then
-		return true
-	elseif #a<#b then
-		return false
-	end
-	-- same number of digits
-	-- compare from left to right
-	for i=1,#a do
+function arr_greater_equal(a,b)
+	-- compare from the most significant digit
+	for i=1,9 do
 		if a[i]>b[i] then
 			return true
 		elseif a[i]<b[i] then
 			return false
 		end
 	end
-	-- numbers are equal
+	-- all digits are equal
 	return true
 end
+
 
 function copy_list(t)
   local out={}
