@@ -1305,6 +1305,8 @@ end
 
 function drw_victory()
 	--display the victory info for the game
+	_txt="end of the season"
+	print(_txt,hcenter(_txt),2,7)
 end
 
 -->8
