@@ -6,7 +6,7 @@ __lua__
 function _init()
 	version,t=0,0
 	debug={"","","",""}
-	 cartdata("club-bets")
+	 cartdata("galaxy_club_bets")
 	category={
 		"movement",
 		"obstacle",
