@@ -224,7 +224,12 @@ function init_betpage()
 	_bet_amt_tmr,bet_off=0,0
 	plyr_menu_sel=1
 	submenu_off,submenu_sel,qm_mode=0,1,1
-	submenu_txts={"quick bet","copy bet amt","confirm bets"}
+	if isdailybet then
+		submenu_txts={"quick bet","confirm bets"}
+	else
+		submenu_txts={"quick bet","copy bet amt","confirm bets"}
+	end
+	men_options=#submenu_txts
 	bet_mode=1--main,plyr sel,amt sel
 	i_amt=6
 	_upd=upd_betpage
@@ -383,10 +388,6 @@ end
 
 function submenu_mode()
 	submenu_off=min(submenu_off+10,50)
-	men_options=3
-	if qm_mode==2 then
-		men_options=5
-	end
 	if btnp(⬆️) then
 		sfx(0)
 		submenu_sel=(submenu_sel-2)%men_options+1
@@ -397,37 +398,29 @@ function submenu_mode()
 		sfx(3)
 		bet_mode=1
 	elseif btnp(🅾️) then
-		if qm_mode==1 then--on regular bet page
-			if submenu_sel==1 then
-				sfx(9)
-				trn_state(init_quickbetpage)
-			elseif submenu_sel==3 then
-				sfx(4)
-				trn_state(init_confirm)
+		if submenu_txts[submenu_sel]=="quick bet" then
+			sfx(9)
+			trn_state(init_quickbetpage)
+		elseif submenu_txts[submenu_sel]=="normal bet" then
+			sfx(9)
+			trn_state(init_betpage)
+		elseif submenu_txts[submenu_sel]=="select row" then
+			select_player_row()
+			sfx(3)
+			bet_mode=1
+		elseif submenu_txts[submenu_sel]=="clear arena" then
+			for ibet=1,10 do
+				clear_arena_bet(ibet,arena_sel)
 			end
-		else--qm_mode==2--on quick bet page
-			if submenu_sel==1 then
-				sfx(9)
-				trn_state(init_betpage)
-			elseif submenu_sel==3 then--duplicate player
-				select_player_row()
-				sfx(3)
-				bet_mode=1
-			elseif submenu_sel==4 then--duplicate player
-				for ibet=1,10 do
-					clear_arena_bet(ibet,arena_sel)
-				end
-				sfx(3)
-				bet_mode=1
-			elseif submenu_sel==5 then--confirm page
-				sfx(4)
-				trn_state(init_confirm)
-			end
-		end
-		if submenu_sel==2 then--copy bets
+			sfx(3)
+			bet_mode=1
+		elseif submenu_txts[submenu_sel]=="copy bet amt" then--copy bets
 			sfx(2)
 			copy_bets()
 			bet_mode=1
+		elseif submenu_txts[submenu_sel]=="confirm bets" then
+			sfx(4)
+			trn_state(init_confirm)
 		end
 	end
 end
@@ -442,10 +435,12 @@ function draw_submenu()
 		rrect(3,_y+(submenu_sel-1)*9+2,60,9,1,9)
 	end
 	line(64,_y,64,_y+128,1)
-	_txt="round:\f9#"..cur_round
-	print(_txt,95-#_txt*2,_y+4,7)
-	_money="cash:\f9"..arr_to_str(money)
-	print(_money,95-#_money*2,_y+14,7)
+	if not isdailybet then
+		_txt="round:\f9#"..cur_round
+		print(_txt,95-#_txt*2,_y+4,7)
+		_money="cash:\f9"..arr_to_str(money)
+		print(_money,95-#_money*2,_y+14,7)
+	end
 end
 
 
@@ -721,7 +716,12 @@ function init_quickbetpage()
 	plyr_menu_sel,arena_sel=1,1--select player for each arena 1-16
 	bet_mode=1
 	submenu_off,submenu_sel,qm_mode=0,1,2
-	submenu_txts={"normal bet","copy bet amt","select row","clear arena","confirm bets"}
+	if isdailybet then
+		submenu_txts={"normal bet","select row","clear arena","confirm bets"}
+	else
+		submenu_txts={"normal bet","copy bet amt","select row","clear arena","confirm bets"}
+	end
+	men_options=#submenu_txts
 	total_odds=0
 	total_pay=0
 	_upd=upd_quickbetpage
