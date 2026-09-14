@@ -108,7 +108,6 @@ function _init()
 	_upd=blank
 	_drw=blank
 	--init_season()
-	init_daily_bet()
 	--dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
@@ -116,7 +115,7 @@ function _init()
 	--calculate_winners()
 	--init_confirm()
 	--init_watch_race()
-	--init_menu()
+	init_menu()
 	--init_victory()
 end
 
@@ -163,7 +162,7 @@ function init_menu()
 	--music(13)
 	sn=0
 	mm_sel=1
-	menu_items={"season mode", "bet of the day", "previous results"}
+	menu_items={"season mode", "daily bet", "season records"}
 	_upd=upd_menu
 	_drw=drw_menu
 end
@@ -178,11 +177,13 @@ function upd_menu()
 		sfx(0)
 		mm_sel=(mm_sel%3)+1
 	elseif btnp(🅾️) then
+		sfx(14)
+		music(-1)
 		if mm_sel==1 then
-			sfx(14)
-			music(-1)
 			reset_season()
 			trn_state(init_betpage)
+		elseif mm_sel==2 then
+			init_daily_bet()
 		end
 	end
 end
@@ -203,18 +204,16 @@ function drw_menu()
 end
 
 function init_daily_bet()
-	--month/day/year
+	srand(year * 10000 + month * 100 + day)
 	if dget(11)==month and dget(12)==day and dget(13)==year then
 		--bet placed for the day already
 		--show results
-
 	else--go to daily bet
 		date=month.."/"..day.."/"..year
 		--year month day
-		srand(year * 10000 + month * 100 + day)
 		reset_season()
 		isdailybet=true
-		init_betpage()
+		trn_state(init_betpage)
 	end
 	
 end
@@ -238,9 +237,15 @@ function upd_betpage()
 		if btnp(⬆️) then
 			sfx(0)
 			arena_sel=(arena_sel-2)%6+1
+			if isdailybet and arena_sel==5 then
+				arena_sel=4
+			end
 		elseif btnp(⬇️) then
 			sfx(0)
 			arena_sel=(arena_sel%6)+1
+			if isdailybet and arena_sel==5 then
+				arena_sel=6
+			end
 		elseif btnp(➡️) then
 			sfx(1)
 			_bet_amt_tmr=10
@@ -316,10 +321,16 @@ function upd_betpage()
 end
 
 function drw_betpage()
-	print("round:#"..cur_round,4,3+bet_off,6)	
+	if isdailybet then
+		print("daily bet",4,3+bet_off,6)
+		print(date,85,3+bet_off,5)
+	else
+		print("round:#"..cur_round,4,3+bet_off,6)	
+		spr(37,85,1+bet_off)--coin
+		print(arr_to_str(money),94,3+bet_off,9)
+	end
+	
 	print("bet:#"..bet_sel,52,3+bet_off,6+3*bet_off)	
-	spr(37,85,1+bet_off)--coin
-	print(arr_to_str(money),94,3+bet_off,9)
 	brdr_rect(3,9+bet_off,122,75,0,7,1)
 	rrectfill(4,10+bet_off,120,9,0,2)--red area
 	print("place a bet",42,12+bet_off,7)
@@ -447,15 +458,19 @@ function draw_winning_calc()
 	line(3,94,124,94,1)--hline1
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
-	for i=6,9 do
-		--digit selection colors
-		i_clr=0
-		if i==i_amt and bet_mode==3 then
-			i_clr=9
+	if isdailybet then
+		print(1,20,105,0)
+	else
+		for i=6,9 do
+			--digit selection colors
+			i_clr=0
+			if i==i_amt and bet_mode==3 then
+				i_clr=9
+			end
+			print(bets[bet_sel][1][i],i*4-6,105,i_clr)
 		end
-		print(bets[bet_sel][1][i],i*4-6,105,i_clr)
 	end
-
+	
 	if arena_sel==5 then
 		rrect(4,103,36,10,0,9)
 	end
@@ -465,7 +480,11 @@ function draw_winning_calc()
 	total_odds=print_bet_odds(bets_odds[bet_sel],true)
 	print(total_odds,57-#total_odds*2,105,0)--center odds
 	print("payout",83,96,0)
-	_winnings=arr_to_str(bets_winnings[bet_sel])
+	if isdailybet then
+		_winnings=tostr(bets_odds[bet_sel]).." points"
+	else
+		_winnings=arr_to_str(bets_winnings[bet_sel])
+	end
 	print(_winnings,94-#_winnings*2,105,0)
 	--button
 	rrectfill(34,116,59,9,1,1)
@@ -780,13 +799,22 @@ function drw_quickbetpage()
 	rrectfill(1,120,126,7,0,5)
 	print("bet \f9#"..bet_sel,2,121,7)
 	line(31,120,31,126,8)
-	print(bets_odds[bet_sel]..":1",34,121,7)
+	_ot=bets_odds[bet_sel]..":1"
+	print(_ot,44-#_ot*2,121,7)
 	line(55,120,55,126,8)
-	spr(37,57,119)--coin
-	print(arr_to_str(bets[bet_sel][1]),64,121,9)
-	line(81,120,81,126,8)
-	spr(37,83,119)--coin
-	print(arr_to_str(bets_winnings[bet_sel]),90,121,9)
+	
+	if isdailybet then
+		--print(1,64,121,7)
+		bet_str=tostr(bets_odds[bet_sel]).." points"
+		print(bet_str,90-#bet_str*2,121,7)
+	else
+		spr(37,57,119)--coin
+		print(arr_to_str(bets[bet_sel][1]),64,121,7)
+		line(81,120,81,126,8)
+		spr(37,83,119)--coin
+		print(arr_to_str(bets_winnings[bet_sel]),90,121,7)
+	end
+	
 	draw_submenu()
 end
 -->8
