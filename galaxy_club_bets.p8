@@ -146,20 +146,21 @@ function save_daily_bet()
 	dset(13,year)
 end
 
-function load_daily_bet()
+function check_daily_placed()
 	month,day,year=stat(91),stat(92),stat(90)
 	date=month.."/"..day.."/"..year
+	dailybetplaced=dget(11)==month and dget(12)==day and dget(13)==year
+end
+
+function load_daily_bet()
 	isdailybet=true
 	srand(year * 10000 + month * 100 + day)
 	reset_bets()
 	reset_season()
-	dailybetplaced=dget(11)==month and dget(12)==day and dget(13)==year
 	if dailybetplaced then
-		
 		--load bet info
 		for i_bet=1,10 do
 			_sbet=tostr(dget(i_bet))
-			debug[i_bet]=_sbet
 			if tonum(_sbet)>0 then
 				for i_arena=1,4 do
 					--bets are saved in form 1xxxx 
@@ -168,7 +169,6 @@ function load_daily_bet()
 					pnum=tonum(plyr)
 					if pnum>0 then
 						bets[i_bet][2][i_arena][pnum]=true
-						debug[11]="plyr_bet: "..i_arena.." "..pnum
 					end
 				end
 			end
@@ -206,6 +206,7 @@ end
 
 function init_menu()
 	--music(13)
+	check_daily_placed()
 	sn=0
 	mm_sel=1
 	menu_items={"season mode", "daily bet", "season records"}
@@ -245,7 +246,10 @@ function drw_menu()
 		_clr=(i==mm_sel) and 4 or 0
 		print(menu_items[i],hcenter(menu_items[i]),60+i*10,_clr)
 	end
+	
 	rrect(30,58+mm_sel*10,67,9,1,9)
+	_dail_bet_spr=(dailybetplaced) and 39 or 38
+	spr(_dail_bet_spr,83,78)
 end
 
 function init_daily_bet()
