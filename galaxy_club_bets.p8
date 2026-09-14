@@ -579,9 +579,14 @@ function prep_draw_bet_summary()
 end
 
 function draw_bet_summary()
-	print("round:#"..cur_round,4,3-scroller,6)	
-	spr(37,83,1-scroller)--coin
-	print(arr_to_str(money),92,3-scroller,9)--my money
+	if isdailybet then
+		print("daily bet",4,3+bet_off,6)
+		print(date,85,3+bet_off,5)
+	else
+		print("round:#"..cur_round,4,3-scroller,6)	
+		spr(37,83,1-scroller)--coin
+		print(arr_to_str(money),92,3-scroller,9)--my money
+	end		
 	brdr_rect(3,9-scroller,122,max_scroll+97,0,7,1)--ticket area
 	rrectfill(4,10-scroller,120,9,0,2)--red area
 	print(bet_title,hcenter(bet_title),12-scroller,7)
