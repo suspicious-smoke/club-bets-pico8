@@ -206,6 +206,7 @@ end
 
 function init_menu()
 	--music(13)
+	isdailybet=false
 	check_daily_placed()
 	sn=0
 	mm_sel=1
@@ -246,8 +247,8 @@ function drw_menu()
 		_clr=(i==mm_sel) and 4 or 0
 		print(menu_items[i],hcenter(menu_items[i]),60+i*10,_clr)
 	end
-	
 	rrect(30,58+mm_sel*10,67,9,1,9)
+	--daily bet checkmark
 	_dail_bet_spr=(dailybetplaced) and 39 or 38
 	spr(_dail_bet_spr,83,78)
 end
@@ -722,6 +723,9 @@ function init_winning_bets()
 	o_pcount=0
 	sfx(14)
 	bet_title="collect winnings"
+	if isdailybet then
+		bet_title="daily winnings"
+	end
 	get_bet_summary()	
 	get_winning_cash()
 	show_winners=true
