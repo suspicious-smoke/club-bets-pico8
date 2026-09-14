@@ -447,7 +447,6 @@ end
 function draw_winning_calc()
 	--winning calculator
 	brdr_rect(3,86,122,28,0,7,1)--ticket area
-
 	rrectfill(4,87,120,8,0,5)--grey title
 	print("winnings calculator",26,88,0)
 	line(3,94,124,94,1)--hline1
@@ -522,7 +521,7 @@ function upd_confirm()
 			init_quickbetpage()
 		end
 	elseif btnp(🅾️) then
-		if has_money and made_bets then
+		if (has_money or isdailybet) and made_bets then
 			sfx(5)
 			trn_state(init_watch_race)
 		else
@@ -531,34 +530,19 @@ function upd_confirm()
 	end
 end
 
-function get_bet_costs()
-	total_bet=reset_array(9,0)
-	for i_bet=1,10 do
-		has_bet=false
-		for i_arena=1,4 do
-			for i_plyr=1,4 do
-				if bets[i_bet][2][i_arena][i_plyr] then
-					has_bet=true
-				end
-			end
-		end
-		if has_bet then
-			total_bet=arr_add(total_bet,bets[i_bet][1])
-		end
-	end
-	return total_bet
-end
-
 --confirm bet page
 function drw_confirm()
 	draw_bet_summary()
 	--total winnings box
 	print("possible winnings",10,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	tw_str=arr_to_str(total_winnings)
-	spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
+	tw_str=get_all_odds().." points"
+	if not isdailybet then
+		tw_str=arr_to_str(total_winnings)
+		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
+	end
 	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
-	if not has_money then
+	if not has_money and not isdailybet then
 		print("not enough cash. press ❎",16,50+o_pcount-scroller,8)
 	elseif not made_bets then
 		print("no bets placed. press ❎",18,50+o_pcount-scroller,8)
@@ -634,8 +618,13 @@ function draw_bet_summary()
 				rrect(3,19+_offy+8,122,p_count*pc_mult,0,1)
 				_p_odds=print_bet_odds(bets_odds[i_bet])
 				print(_p_odds,98-#_p_odds*2,30+_offy,0)
-				winnings_str=arr_to_str(bets_winnings[i_bet])
-				spr(37,90-#winnings_str*2,36+_offy)--coin
+				
+				winnings_str=tostr(bets_odds[i_bet]).." points"
+				if not isdailybet then
+					spr(37,90-#winnings_str*2,36+_offy)--coin
+					winnings_str=arr_to_str(bets_winnings[i_bet])
+				end
+				
 				print(winnings_str,98-#winnings_str*2,38+_offy,0)
 			end
 		end
@@ -1198,6 +1187,33 @@ function select_player_row()
 		clear_arena_bet(b,arena_sel)
 		bets[b][2][arena_sel][plyr_menu_sel]=true
 	end
+end
+
+function get_bet_costs()
+	total_bet=reset_array(9,0)
+	for i_bet=1,10 do
+		has_bet=false
+		for i_arena=1,4 do
+			for i_plyr=1,4 do
+				if bets[i_bet][2][i_arena][i_plyr] then
+					has_bet=true
+				end
+			end
+		end
+		if has_bet then
+			total_bet=arr_add(total_bet,bets[i_bet][1])
+		end
+	end
+	return total_bet
+end
+
+--returns all the odds for each bet added up
+function get_all_odds()
+	_t_odds=reset_array(9,0)
+	for i_bet=1,10 do
+		_t_odds=arr_add(int_to_arr(bets_odds[i_bet]),_t_odds)
+	end
+	return arr_to_str(_t_odds)
 end
 
 --turns percentage into number x used in x:1 format.
