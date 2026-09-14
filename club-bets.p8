@@ -103,18 +103,20 @@ function _init()
 	f1c={8,9,10,5}--red effect
 	f2c={7,6,6,5}--white to grey
 	f3c={7,12,12,1}--blue flame
-
+	isdailybet=false
 	_upd=blank
 	_drw=blank
-	reset_season()
+	--init_season()
+	init_daily_bet()
 	--dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
-	--init_betpage()
+	--init_season()--sets season and sets up bet page
 	--calculate_winners()
 	--init_confirm()
 	--init_watch_race()
-	init_menu()
+	--init_menu()
+	--init_victory()
 end
 
 function dummy_bets()
@@ -129,14 +131,19 @@ function dummy_bets()
 	get_bet_summary()
 end
 
+function init_season()
+	srand()
+	isdailybet=false
+	reset_season()
+	init_betpage()
+end
+
 function blank() end
 
 function _update()
 	t+=1
 	_upd()
 end
-
-
 
 function _draw()
 	cls()
@@ -193,16 +200,14 @@ function drw_menu()
 	rrect(30,58+mm_sel*10,67,9,1,9)
 end
 
-function reset_season()
-	arenas={}
-	odds={}
-	bet_odds={}
-	money=reset_array(9,0)
-	money[7]=1
-	round_features={{},{},{},{}}--ids of arena features for current round
-	round_winners={}
-	cur_round=1
-	fill_arenas()
+function init_daily_bet()
+	--month/day/year
+	date=stat(91).."/"..stat(92).."/"..stat(90)
+	--year month day
+	srand(stat(90) * 10000 + stat(91) * 100 + stat(92))
+	reset_season()
+	isdailybet=true
+	init_betpage()
 end
 
 -->8
@@ -1089,6 +1094,18 @@ function fill_arenas()
 	get_bet_summary()	
 end
 
+function reset_season()
+	arenas={}
+	odds={}
+	bet_odds={}
+	money=reset_array(9,0)
+	money[6]=1
+	round_features={{},{},{},{}}--ids of arena features for current round
+	round_winners={}
+	cur_round=1
+	fill_arenas()
+end
+
 function get_player_mods()
 	--get player base
 	for i_arena=1,4 do
@@ -1305,8 +1322,11 @@ end
 
 function drw_victory()
 	--display the victory info for the game
-	_txt="end of the season"
-	print(_txt,hcenter(_txt),2,7)
+	_txt={"end of the season","final winnings",arr_to_str(money)}
+	_clr={9,7,7}
+	for i=1,#_txt do
+		print(_txt[i],hcenter(_txt[i]),2+i*10,_clr[i])
+	end
 end
 
 -->8
