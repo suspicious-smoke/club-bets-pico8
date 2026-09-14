@@ -107,11 +107,9 @@ function _init()
 	isdailybet=false
 	_upd=blank
 	_drw=blank
-	--init_season()
 	--dummy_bets()
 	--init_quickbetpage()
 	--init_gameover()
-	--init_season()--sets season and sets up bet page
 	--calculate_winners()
 	--init_confirm()
 	--init_watch_race()
@@ -129,6 +127,54 @@ function dummy_bets()
 		end
 	end
 	get_bet_summary()
+end
+
+function save_daily_bet()
+	for i_bet=1,10 do
+		_cbet={1,0,0,0,0}
+		for i_arena=1,4 do
+			for i_plyr=1,4 do
+				if bets[i_bet][2][i_arena][i_plyr] then
+					_cbet[i_arena+1]=i_plyr
+				end
+			end
+		end
+		dset(i_bet,tonum(arr_to_str(_cbet)))--save bet in form 1xxxx where each x is an arena w/ player 0-4
+	end
+	dset(11,month) 
+	dset(12,day)
+	dset(13,year)
+end
+
+function load_daily_bet()
+	month,day,year=stat(91),stat(92),stat(90)
+	date=month.."/"..day.."/"..year
+	isdailybet=true
+	srand(year * 10000 + month * 100 + day)
+	reset_bets()
+	reset_season()
+	dailybetplaced=dget(11)==month and dget(12)==day and dget(13)==year
+	if dailybetplaced then
+		
+		--load bet info
+		for i_bet=1,10 do
+			_sbet=tostr(dget(i_bet))
+			debug[i_bet]=_sbet
+			if tonum(_sbet)>0 then
+				for i_arena=1,4 do
+					--bets are saved in form 1xxxx 
+					--where each x is a player in an arena 0-4
+					plyr=_sbet[i_arena+1]--skip leading 1
+					pnum=tonum(plyr)
+					if pnum>0 then
+						bets[i_bet][2][i_arena][pnum]=true
+						debug[11]="plyr_bet: "..i_arena.." "..pnum
+					end
+				end
+			end
+		end
+	end
+	
 end
 
 function init_season()
@@ -189,7 +235,6 @@ function upd_menu()
 end
 
 function drw_menu()
-	month,day,year=stat(91),stat(92),stat(90)
 	draw_starfield()
 	brdr_rect(21,7,85,97,2,1,5)--big border
 	brdr_rect(21,7,85,11,2,2,5)--red area	
@@ -204,15 +249,11 @@ function drw_menu()
 end
 
 function init_daily_bet()
-	srand(year * 10000 + month * 100 + day)
-	if dget(11)==month and dget(12)==day and dget(13)==year then
-		--bet placed for the day already
-		--show results
+	load_daily_bet()
+	if dailybetplaced then
+		--only show results for bets already placed
+		trn_state(init_confirm)
 	else--go to daily bet
-		date=month.."/"..day.."/"..year
-		--year month day
-		reset_season()
-		isdailybet=true
 		trn_state(init_betpage)
 	end
 	
@@ -327,7 +368,7 @@ end
 
 function drw_betpage()
 	if isdailybet then
-		print("daily bet",4,3+bet_off,6)
+		print("daily bet",4,3+bet_off,9)
 		print(date,85,3+bet_off,5)
 	else
 		print("round:#"..cur_round,4,3+bet_off,6)	
@@ -453,7 +494,7 @@ function draw_winning_calc()
 	line(3,102,124,102,1)--hline2
 	print("bet amt",8,96,0)
 	if isdailybet then
-		print(1,20,105,0)
+		print("n/a",16,105,0)
 	else
 		for i=6,9 do
 			--digit selection colors
@@ -492,6 +533,7 @@ end
 function init_confirm()
 	scroller=0
 	max_scroll=0
+	bet_off=0
 	o_pcount=0
 	bet_title="current bets"
 	get_bet_summary()
@@ -515,13 +557,22 @@ function upd_confirm()
 	end
 	if btnp(❎) then
 		sfx(3)
-		if qm_mode==1 then
-			init_betpage()
+		if dailybetplaced then
+			--back returns to menu on daily bet
+			trn_state(init_menu)
 		else
-			init_quickbetpage()
+			if qm_mode==1 then
+				init_betpage()
+			else
+				init_quickbetpage()
+			end
 		end
 	elseif btnp(🅾️) then
 		if (has_money or isdailybet) and made_bets then
+			if not dailybetplaced then
+				save_daily_bet()
+				dailybetplaced=true
+			end
 			sfx(5)
 			trn_state(init_watch_race)
 		else
@@ -536,7 +587,7 @@ function drw_confirm()
 	--total winnings box
 	print("possible winnings",10,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	tw_str=get_all_odds().." points"
+	tw_str=get_all_odds().." points "
 	if not isdailybet then
 		tw_str=arr_to_str(total_winnings)
 		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
@@ -581,7 +632,7 @@ end
 function draw_bet_summary()
 	if isdailybet then
 		print("daily bet",4,3+bet_off,6)
-		print(date,85,3+bet_off,5)
+		print(date,85,3+bet_off,6)
 	else
 		print("round:#"..cur_round,4,3-scroller,6)	
 		spr(37,83,1-scroller)--coin
@@ -684,7 +735,12 @@ function upd_winning_bets()
 		end
 	end
 	if btnp(🅾️) then
-		trn_state(finish_round)
+		if isdailybet then
+			trn_state(init_menu)
+		else
+			trn_state(finish_round)	
+		end
+		
 	end
 end
 
@@ -693,11 +749,14 @@ function drw_winning_bets()
 	--total winnings box
 	print("winnings",45,34+o_pcount-scroller,0)
 	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	tw_str=arr_to_str(winning_cash)
-	if #tw_str==0 then
-		tw_str="0"
+	tw_str=get_winning_odds().." points "
+	if not isdailybet then
+		tw_str=arr_to_str(winning_cash)
+		if #tw_str==0 then
+			tw_str="0"
+		end
+		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
 	end
-	spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
 	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
 	print("press 🅾️ to continue",25,50+o_pcount-scroller,7)
 end
@@ -1217,6 +1276,17 @@ function get_all_odds()
 	_t_odds=reset_array(9,0)
 	for i_bet=1,10 do
 		_t_odds=arr_add(int_to_arr(bets_odds[i_bet]),_t_odds)
+	end
+	return arr_to_str(_t_odds)
+end
+
+function get_winning_odds()
+	_t_odds=reset_array(9,0)
+	for i_bet=1,10 do
+		if is_winning_bet(bets[i_bet]) then
+			_t_odds=arr_add(int_to_arr(bets_odds[i_bet]),_t_odds)
+		end
+		
 	end
 	return arr_to_str(_t_odds)
 end
