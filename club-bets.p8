@@ -6,6 +6,7 @@ __lua__
 function _init()
 	version,t=0,0
 	debug={"","","",""}
+	 cartdata("club-bets")
 	category={
 		"movement",
 		"obstacle",
@@ -132,7 +133,7 @@ function dummy_bets()
 end
 
 function init_season()
-	srand()
+	srand()--reset the random number generator
 	isdailybet=false
 	reset_season()
 	init_betpage()
@@ -187,6 +188,7 @@ function upd_menu()
 end
 
 function drw_menu()
+	month,day,year=stat(91),stat(92),stat(90)
 	draw_starfield()
 	brdr_rect(21,7,85,97,2,1,5)--big border
 	brdr_rect(21,7,85,11,2,2,5)--red area	
@@ -202,12 +204,19 @@ end
 
 function init_daily_bet()
 	--month/day/year
-	date=stat(91).."/"..stat(92).."/"..stat(90)
-	--year month day
-	srand(stat(90) * 10000 + stat(91) * 100 + stat(92))
-	reset_season()
-	isdailybet=true
-	init_betpage()
+	if dget(11)==month and dget(12)==day and dget(13)==year then
+		--bet placed for the day already
+		--show results
+
+	else--go to daily bet
+		date=month.."/"..day.."/"..year
+		--year month day
+		srand(year * 10000 + month * 100 + day)
+		reset_season()
+		isdailybet=true
+		init_betpage()
+	end
+	
 end
 
 -->8
