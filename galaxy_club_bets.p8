@@ -610,14 +610,14 @@ function upd_confirm()
 	end
 	if btnp(❎) then
 		sfx(3)
-		if dailybetplaced then
+		if isdailybet then
 			--back returns to menu on daily bet
 			trn_state(init_menu)
 		else
 			if qm_mode==1 then
-				init_betpage()
+				trn_state(init_betpage)
 			else
-				init_quickbetpage()
+				trn_state(init_quickbetpage)
 			end
 		end
 	elseif btnp(🅾️) then
@@ -638,21 +638,21 @@ end
 function drw_confirm()
 	draw_bet_summary()
 	--total winnings box
-	print("possible winnings",10,34+o_pcount-scroller,0)
-	line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
-	tw_str=get_all_odds().." points "
-	if not isdailybet then
-		tw_str=arr_to_str(total_winnings)
-		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
-	end
-	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
-	if not has_money and not isdailybet then
-		print("not enough cash. press ❎",16,50+o_pcount-scroller,8)
-	elseif not made_bets then
-		print("no bets placed. press ❎",18,50+o_pcount-scroller,8)
-	else
-		print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
-	end
+	-- print("possible winnings",10,34+o_pcount-scroller,0)
+	-- line(79,27+o_pcount-scroller,79,46+o_pcount-scroller,1)
+	-- tw_str=get_all_odds().." points "
+	-- if not isdailybet then
+	-- 	tw_str=arr_to_str(total_winnings)
+	-- 	spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
+	-- end
+	-- print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+	-- if not has_money and not isdailybet then
+	-- 	print("not enough cash. press ❎",16,50+o_pcount-scroller,8)
+	-- elseif not made_bets then
+	-- 	print("no bets placed. press ❎",18,50+o_pcount-scroller,8)
+	-- else
+	-- 	print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+	-- end
 end
 
 function prep_draw_bet_summary()
@@ -671,8 +671,8 @@ function prep_draw_bet_summary()
 			end
 			if p_count>1 then
 				pc_mult=8
-				if p_count==2 then
-					pc_mult=9
+				if p_count==2 or p_count==3 then
+					pc_mult=14
 				end
 				bet_offsets[i_bet]=o_pcount
 				o_pcount+=p_count*pc_mult-1--next bets bet_offset
@@ -722,7 +722,9 @@ function draw_bet_summary()
 				print(i_bet,6,21+_offy+8,0)
 				pc_mult=8
 				if p_count==2 then
-					pc_mult=9
+					pc_mult=14
+				elseif p_count==3 then
+					pc_mult=11
 				end
 				rrect(3,19+_offy+8,122,p_count*pc_mult,0,1)
 				_p_odds=print_bet_odds(bets_odds[i_bet])
@@ -730,15 +732,17 @@ function draw_bet_summary()
 				
 				winnings_str=tostr(bets_odds[i_bet]).." points"
 				if not isdailybet then
-					spr(37,90-#winnings_str*2,36+_offy)--coin
 					winnings_str=arr_to_str(bets_winnings[i_bet])
+					spr(37,90-#winnings_str*2,44+_offy)--coin
+					amt=arr_to_str(bets[i_bet][1])
+					spr(37,90-#amt*2,36+_offy)--coin
+					print(amt,98-#amt*2,38+_offy,0)
 				end
-				
-				print(winnings_str,98-#winnings_str*2,38+_offy,0)
+				print(winnings_str,98-#winnings_str*2,46+_offy,0)
 			end
 		end
 	end
-	brdr_rect(3,27+o_pcount-scroller,122,20,0,7,1)--ticket area
+	--brdr_rect(3,27+o_pcount-scroller,122,20,0,7,1)--ticket area
 end
 
 function init_race_results()
