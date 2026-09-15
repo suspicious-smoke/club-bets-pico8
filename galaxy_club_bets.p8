@@ -114,6 +114,9 @@ function _init()
 	--init_confirm()
 	--init_watch_race()
 	init_menu()
+	filename="galaxy_bets "..day.."_"..month.."_"..year
+	printh("----------------\ngalaxy club bets ",filename,true,true)
+	printh("----------------\ndaily bets "..date,filename,false,true)
 	--init_victory()
 end
 
@@ -210,7 +213,7 @@ function init_menu()
 	check_daily_placed()
 	sn=0
 	mm_sel=1
-	menu_items={"season mode", "daily bet", "season records"}
+	menu_items={"season mode", "daily bet", "print daily bet"}
 	_upd=upd_menu
 	_drw=drw_menu
 end
