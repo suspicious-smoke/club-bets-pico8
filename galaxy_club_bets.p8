@@ -114,9 +114,7 @@ function _init()
 	--init_confirm()
 	--init_watch_race()
 	init_menu()
-	filename="galaxy_bets "..day.."_"..month.."_"..year
-	printh("----------------\ngalaxy club bets ",filename,true,true)
-	printh("----------------\ndaily bets "..date,filename,false,true)
+	
 	--init_victory()
 end
 
@@ -235,6 +233,8 @@ function upd_menu()
 			trn_state(init_betpage)
 		elseif mm_sel==2 then
 			init_daily_bet()
+		elseif mm_sel==3 then
+			print_ticket()
 		end
 	end
 end
@@ -264,7 +264,49 @@ function init_daily_bet()
 	else--go to daily bet
 		trn_state(init_betpage)
 	end
-	
+end
+
+function print_ticket()
+	load_daily_bet()
+	--recommended font: consolas 11pt, two column. remove spacing before/after paragraph
+	filename="galaxy club daily bets "..day.."."..month.."."..year
+	header="*********************\ngalaxy club daily bet\n*********************\n   date: "..date
+	a_txt=""
+	for i_arena=1,4 do
+		a_txt=a_txt.."\narena "..i_arena
+		for i_aplyr=1,4 do
+			a_txt=a_txt.."\n  "..get_player_string(i_arena,i_aplyr)
+		end
+
+	end
+	printh(header..a_txt,filename,true,true)
+	calculate_winners()
+	get_bet_summary()
+	if dailybetplaced then
+		w_txt=""
+		for i_arena=1,4 do
+			w_txt=w_txt.."\narena "..i_arena..": "..get_player_string(i_arena,round_winners[i_arena])
+		end
+		
+		printh("---------------------\n       winners"..w_txt.."\n---------------------\n\n",filename,false,true)
+		--print tickets
+		t_txt=""
+		for i_bet=1,10 do
+			p_txt=""
+			for i_arena=1,4 do
+				for i_aplyr=1,4 do
+					local a_plyr=arenas[i_arena][i_aplyr]
+					if bets[i_bet][2][i_arena][i_aplyr] then
+						p_txt=p_txt.."\narena "..i_arena..": "..get_player_string(i_arena,i_aplyr)
+					end
+				end
+			end
+			if p_txt!="" then
+				t_txt=t_txt.."\n\n"..header.."\n       bet: #"..i_bet.."\n          -"..p_txt.."\n\namount: "..arr_to_str(bets[i_bet][1]).."\ntotal odds: "..tostr(bets_odds[i_bet])..":1\nwinnings: "..arr_to_str(bets_winnings[i_bet]).."\n---------------------\n"
+			end
+		end
+		printh(t_txt,filename,false,true)
+	end
 end
 
 -->8
