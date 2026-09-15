@@ -211,7 +211,10 @@ function init_menu()
 	check_daily_placed()
 	sn=0
 	mm_sel=1
-	menu_items={"season mode", "daily bet", "print daily bet"}
+	menu_items={"season mode", "daily bet"}
+	if dailybetplaced then
+		menu_items={"season mode", "daily bet", "print daily bet"}
+	end
 	_upd=upd_menu
 	_drw=drw_menu
 end
@@ -221,10 +224,10 @@ function upd_menu()
 	sn=1.5*sin(time()*0.5)
 	if btnp(⬆️) then
 		sfx(0)
-		mm_sel=(mm_sel-2)%3+1
+		mm_sel=(mm_sel-2)%#menu_items+1
 	elseif btnp(⬇️) then
 		sfx(0)
-		mm_sel=(mm_sel%3)+1
+		mm_sel=(mm_sel%#menu_items)+1
 	elseif btnp(🅾️) then
 		sfx(14)
 		music(-1)
