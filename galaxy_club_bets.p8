@@ -320,10 +320,10 @@ end
 function print_ticket()
 	load_daily_bet()
 	print_bet=1
-	--recommended font: consolas 11pt, two column. remove spacing before/after paragraph
 	filename="galaxy club daily bets "..day.."."..month.."."..year
+	instructions="print instructions:\nconsolas 11pt, 3 column layout.\nremove spacing before/after paragraph.\n\n"
 	header="*********************\ngalaxy club daily bet\n*********************\n   date: "..date
-	a_txt=""
+	a_txt="\n  arena information\n"
 	for i_arena=1,4 do
 		a_txt=a_txt.."\narena "..i_arena
 		for i_aplyr=1,4 do
@@ -331,7 +331,7 @@ function print_ticket()
 		end
 
 	end
-	printh(header..a_txt,filename,true,true)
+	printh(instructions..header..a_txt,filename,true,true)
 	calculate_winners()
 	get_bet_summary()
 	if dailybetplaced then
@@ -341,7 +341,21 @@ function print_ticket()
 		end
 		
 		printh("\n---------------------\n       winners"..w_txt.."\n---------------------\n\n",filename,false,true)
-		--print tickets
+		
+		--print arena info
+		-- f_txt="\n"
+		-- for f_i=1,#features do
+		-- 	local _feat=features[f_i]
+		-- 	f_txt=f_txt.._feat[1].."\n  "
+		-- 	for i=1,#_feat[2] do
+		-- 		f_txt=f_txt..category[_feat[2][i]]..", "
+		-- 	end
+		-- 	f_txt=sub(f_txt, 1, -3).."\n"--remove last two characters
+		-- end
+
+		-- printh("\n---------------------\n    track features"..f_txt.."\n---------------------\n\n",filename,false,true)
+
+		--print individual bets
 		t_txt=""
 		for i_bet=1,10 do
 			p_txt=""
