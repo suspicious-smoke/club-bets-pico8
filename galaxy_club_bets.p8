@@ -271,11 +271,9 @@ function drw_menu()
 	_dail_bet_spr=(dailybetplaced) and 39 or 38
 	spr(_dail_bet_spr,83,78)
 	if is_printing then
-		
 		draw_ticket(print_bet,20,140+tick_y)
 		rrectfill(24,110,80,9,1,1)
 		print("printing to desktop",26,112,9)
-		
 	end
 end
 
