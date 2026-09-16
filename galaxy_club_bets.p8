@@ -4,7 +4,7 @@ __lua__
 --galaxy club bets
 --by olivander65
 function _init()
-	version,t=0,0
+	version,t=1,0
 	debug={"","","",""}
 	 cartdata("galaxy_club_bets")
 	category={
@@ -276,6 +276,7 @@ function drw_menu()
 		rrectfill(24,118,80,9,1,1)
 		print("printing to desktop",26,120,9)
 	end
+	print("ver"..version,110,120,1)
 end
 
 function init_daily_bet()
