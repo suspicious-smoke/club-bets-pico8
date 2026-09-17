@@ -21,41 +21,42 @@ function _init()
 		condition,
 		hazard]])
 		
-	
-	features={
-		{"hairpin",{1,2}},
-		{"u-turn",{1,2}},
-		{"straight",{1}},
-		{"ramp",{1,9}},
-		{"lavapit",{2,12}},
-		{"spiketrap",{2,12}},
-		{"rocks",{2,7}},
-		{"boostpad",{3,1}},
-		{"oil slick",{3,11}},
-		{"cannon",{3,12}},
-		{"rain",{4,11}},
-		{"highwind",{4,9}},
-		{"heat",{4,12}},
-		{"off-road",{5,11}},
-		{"ice",{5,11}},
-		{"glass",{5,11}},
-		{"energy",{6,1}},
-		{"glider",{6,9}},
-		{"meteors",{7,12}},
-		{"kaiju",{7,12}},
-		{"wormhole",{7,9}},
-		{"castle",{8,5}},
-		{"caves",{8,10}},
-		{"volcano",{8,4}},
-		{"zero-g",{9,1}},
-		{"rev-grav",{9,1}},
-		{"darkness",{10}},
-		{"fog",{10,4}},
-		{"narrow",{11,1}},
-		{"crumbling",{11,2}},
-		{"lightning",{12,9}},
-		{"fire",{12,4}}
-	}
+	feature_names=split("hairpin,u-turn,straight,ramp,lavapit,spiketrap,rocks,boostpad,oil,slick,cannon,rain,highwind,heat,off-road,ice,glass,energy,glider,meteors,kaiju,wormhole,castle,caves,volcano,zero-g,rev-grav,darkness,fog,narrow,crumbling,lightning,fire")
+	feature_categories={{1,2},{1,2},{1},{1,9},{2,12},{2,12},{2,7},{3,1},{3,11},{3,12},{4,11},{4,9},{4,12},{5,11},{5,11},{5,11},{6,1},{6,9},{7,12},{7,12},{7,9},{8,5},{8,10},{8,4},{9,1},{9,1},{10},{10,4},{11,1},{11,2},{12,9},{12,4}}
+	-- features={
+	-- 	{"hairpin",{1,2}},
+	-- 	{"u-turn",{1,2}},
+	-- 	{"straight",{1}},
+	-- 	{"ramp",{1,9}},
+	-- 	{"lavapit",{2,12}},
+	-- 	{"spiketrap",{2,12}},
+	-- 	{"rocks",{2,7}},
+	-- 	{"boostpad",{3,1}},
+	-- 	{"oil slick",{3,11}},
+	-- 	{"cannon",{3,12}},
+	-- 	{"rain",{4,11}},
+	-- 	{"highwind",{4,9}},
+	-- 	{"heat",{4,12}},
+	-- 	{"off-road",{5,11}},
+	-- 	{"ice",{5,11}},
+	-- 	{"glass",{5,11}},
+	-- 	{"energy",{6,1}},
+	-- 	{"glider",{6,9}},
+	-- 	{"meteors",{7,12}},
+	-- 	{"kaiju",{7,12}},
+	-- 	{"wormhole",{7,9}},
+	-- 	{"castle",{8,5}},
+	-- 	{"caves",{8,10}},
+	-- 	{"volcano",{8,4}},
+	-- 	{"zero-g",{9,1}},
+	-- 	{"rev-grav",{9,1}},
+	-- 	{"darkness",{10}},
+	-- 	{"fog",{10,4}},
+	-- 	{"narrow",{11,1}},
+	-- 	{"crumbling",{11,2}},
+	-- 	{"lightning",{12,9}},
+	-- 	{"fire",{12,4}}
+	-- }
 
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
@@ -461,7 +462,7 @@ function drw_arena_info()
 		f_id=round_features[arena_sel][feat]
 		rrectfill(11+fx_off,72+(feat%4)*11,10,9,1,0)
 		spr(159+f_id,12+fx_off,72+(feat%4)*11)--track feature
-		print(features[f_id][1],23+fx_off,74+(feat%4)*11,0)
+		print(feature_names[f_id],23+fx_off,74+(feat%4)*11,0)
 		if feat==4 then
 			fx_off=54
 		end
@@ -1429,7 +1430,7 @@ function get_player_mods()
 			local p_mod=0
 			for feature_index=1,8 do
 				--get categories for feature
-				categories=features[round_features[i_arena][feature_index]][2]
+				categories=feature_categories[round_features[i_arena][feature_index]]
 				for c=1,#categories do
 					--for each category, see if the player has them as a strength/weakness
 					if players[_plyr_id][5]==categories[c] then--weakness check
