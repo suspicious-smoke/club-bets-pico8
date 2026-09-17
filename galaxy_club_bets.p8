@@ -87,8 +87,7 @@ function _init()
 			.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046
 	}
 	--prob of 3d6 from 3-18
-	bet_sel=1--the currently selected bet (betpage/quickbetpage)
-	arena_sel=1
+	bet_sel,arena_sel=1,1--the currently selected bet (betpage/quickbetpage)
 	fade_tmr,fade_state,fade_r=0,0,0
 
 	--starfield
@@ -108,10 +107,10 @@ function _init()
 	isdailybet=false
 	
 	is_printing,print_bet,t_sep=false,1,0
-
+	cur_round=1
+	money=reset_array(9,0)
 	_upd=blank
 	_drw=blank
-	--fill_arenas()
 	
 	--init_season()--quick bets
 	--dummy_bets()
@@ -162,9 +161,9 @@ end
 
 function load_daily_bet()
 	isdailybet=true
-	srand(year * 10000 + month * 100 + day)
+	srand(year * 10000 + month * 100 + day)--seed rng
 	reset_bets()
-	reset_season()
+	reset_round()
 	if dailybetplaced then
 		--load bet info
 		for i_bet=1,10 do
@@ -184,31 +183,38 @@ function load_daily_bet()
 	end
 end
 
-function save_season()
+function save_season(_round)
 	--save money
 	for i=1,9 do
 		dset(i+13,money[i])
 	end
 	--save round
-	dset(24,cur_round)
+	dset(24,_round)
 end
 
 function load_season()
-	local _season_round=dget(24)
-	if dget(24)>0 then
-		for i=1,9 do
-			money[i]=dget(i+13)
-		end
-		cur_round=_season_round
-	else
-
+	money=reset_array(9,0)
+	for i=1,9 do
+		money[i]=dget(i+13)
 	end
+	cur_round=dget(24)
 end
 
 function init_season()
 	srand()--reset the random number generator
 	isdailybet=false
-	reset_season()
+	cur_round=1
+	money=reset_array(9,0)
+	money[6]=1
+	reset_round()
+	init_betpage()
+end
+
+function continue_season()
+	srand()--reset the random number generator
+	isdailybet=false
+	load_season()
+	reset_round()
 	init_betpage()
 end
 
@@ -237,9 +243,14 @@ function init_menu()
 	check_daily_placed()
 	sn=0
 	mm_sel=1
-	menu_items={"season mode", "daily bet"}
+	menu_items={"new season"}
+	_saved_season=dget(24)
+	if _saved_season>1 then
+		add(menu_items,"continue season ".._saved_season.."/20")
+	end
+	add(menu_items, "daily bet")
 	if dailybetplaced then
-		menu_items={"season mode", "daily bet", "print daily bet"}
+		add(menu_items, "print daily bet")
 	end
 	t_upd=blank--ticket update
 	_upd=upd_menu
@@ -262,37 +273,40 @@ function upd_menu()
 		mm_sel=(mm_sel%#menu_items)+1
 	elseif btnp(🅾️) then
 		music(-1)
-		if _m_item=="season mode" then
+		if _m_item=="new season" then
 			sfx(14)
-			reset_season()
-			trn_state(init_betpage)
+			trn_state(init_season)
 		elseif _m_item=="daily bet" then
-			
 			sfx(14)
 			init_daily_bet()
 		elseif _m_item=="print daily bet" then
 			init_print_ticket()
+		elseif mm_sel==2 and _saved_season>1 then--continue season
+			trn_state(continue_season)
 		end
 	end
 end
 
 function drw_menu()
 	draw_starfield()
-	brdr_rect(21,33,85,80,2,1,5)--big border
+	brdr_rect(20,33,87,80,2,1,5)--big border
 	--print("★galaxy club bets★",24,10,7)
 	_logo_x=8
 	spr(69,_logo_x,7,10,3)--galaxy club
 	spr(123,_logo_x+82,0,4,3)--bets
 	spr(64,48,34+sn,5,5)--floating ticket
-	brdr_rect(28,75,71,36,2,7,5)--menu area
+	brdr_rect(20,75,87,45,2,7,5)--menu area
+	rrect(22,68+mm_sel*10,83,9,1,9)--selector
 	for i=1,#menu_items do
 		_clr=(i==mm_sel) and 4 or 0
 		print(menu_items[i],hcenter(menu_items[i]),70+i*10,_clr)
+		--daily bet checkmark
+		if menu_items[i]=="daily bet" then
+			_dail_bet_spr=(dailybetplaced) and 39 or 38
+			spr(_dail_bet_spr,83,68+i*10)
+		end
 	end
-	rrect(30,68+mm_sel*10,67,9,1,9)
-	--daily bet checkmark
-	_dail_bet_spr=(dailybetplaced) and 39 or 38
-	spr(_dail_bet_spr,83,88)
+
 	if is_printing then
 		draw_ticket(print_bet,20,140+tick_y)
 		rrectfill(24,118,80,9,1,1)
@@ -1211,7 +1225,7 @@ function init_watch_race()
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	
-	save_season()--save bet stuff
+	save_season(cur_round+1)--save bet stuff
 	race_px=reset_num_array(4,4,0)
 	race_over=reset_array(4,false)
 	for i_arena=1,4 do
@@ -1397,15 +1411,12 @@ function fill_arenas()
 	get_bet_summary()	
 end
 
-function reset_season()
+function reset_round()
 	arenas={}
 	odds={}
 	bet_odds={}
-	money=reset_array(9,0)
-	money[6]=1
 	round_features={{},{},{},{}}--ids of arena features for current round
 	round_winners={}
-	cur_round=1
 	fill_arenas()
 end
 
