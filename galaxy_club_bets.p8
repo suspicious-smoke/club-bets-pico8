@@ -120,7 +120,7 @@ function _init()
 	--init_confirm()
 	--init_watch_race()
 	init_menu()
-	sfx(30)
+	music(40)
 	--init_victory()
 end
 
@@ -181,7 +181,27 @@ function load_daily_bet()
 			end
 		end
 	end
-	
+end
+
+function save_season()
+	--save money
+	for i=1,9 do
+		dset(i+13,money[i])
+	end
+	--save round
+	dset(24,cur_round)
+end
+
+function load_season()
+	local _season_round=dget(24)
+	if dget(24)>0 then
+		for i=1,9 do
+			money[i]=dget(i+13)
+		end
+		cur_round=_season_round
+	else
+
+	end
 end
 
 function init_season()
@@ -232,6 +252,7 @@ function upd_menu()
 	if is_printing then
 		return
 	end
+	local _m_item=menu_items[mm_sel]
 	if btnp(⬆️) then
 		sfx(0)
 		mm_sel=(mm_sel-2)%#menu_items+1
@@ -239,16 +260,16 @@ function upd_menu()
 		sfx(0)
 		mm_sel=(mm_sel%#menu_items)+1
 	elseif btnp(🅾️) then
-		if mm_sel==1 then
+		music(-1)
+		if _m_item=="season mode" then
 			sfx(14)
-			music(-1)
 			reset_season()
 			trn_state(init_betpage)
-		elseif mm_sel==2 then
-			music(-1)
+		elseif _m_item=="daily bet" then
+			
 			sfx(14)
 			init_daily_bet()
-		elseif mm_sel==3 then
+		elseif _m_item=="print daily bet" then
 			init_print_ticket()
 		end
 	end
@@ -905,8 +926,6 @@ function init_winning_bets()
 	if isdailybet then
 		bet_title="daily winnings"
 	end
-	get_bet_summary()	
-	get_winning_cash()
 	show_winners=true
 	prep_draw_bet_summary()
 	_upd=upd_winning_bets
@@ -1184,8 +1203,14 @@ end
 
 function init_watch_race()
 	calculate_winners()
-		--pay for bets
+	--pay for bets
 	money=arr_sub(money,total_bet)
+	get_bet_summary()	
+	get_winning_cash()
+	--give player winnings
+	money=arr_add(winning_cash,money)
+	
+	save_season()--save bet stuff
 	race_px=reset_num_array(4,4,0)
 	race_over=reset_array(4,false)
 	for i_arena=1,4 do
@@ -1610,8 +1635,6 @@ function get_winning_cash()
 end
 
 function finish_round()
-	--give player winnings
-	money=arr_add(winning_cash,money)
 	winning_cash={}
 	if arr_to_str(money)=="0" then
 		init_gameover()
@@ -2364,7 +2387,7 @@ __music__
 00 414a4944
 00 414a4944
 00 414a4944
-00 414a4944
+00 1e4a4944
 00 414a4944
 00 414a4944
 00 414a4944
