@@ -102,7 +102,7 @@ function _init()
 	
 	is_printing,print_bet,t_sep=false,1,0
 	cur_round=1
-	money=reset_array(9,0)
+	money=split("0,0,0,0,0,0,0,0,0")
 	_upd,_drw=blank,blank
 	
 	--init_season()--quick bets
@@ -186,7 +186,7 @@ function save_season(_round)
 end
 
 function load_season()
-	money=reset_array(9,0)
+	money=split("0,0,0,0,0,0,0,0,0")
 	for i=1,9 do
 		money[i]=dget(i+13)
 	end
@@ -197,8 +197,7 @@ function init_season()
 	srand(time())--reset the random number generator
 	isdailybet=false
 	cur_round=1
-	money=reset_array(9,0)
-	money[6]=1
+	money=split("0,0,0,0,0,1,0,0,0")
 	reset_round()
 	init_betpage()
 end
@@ -820,7 +819,7 @@ function drw_confirm()
 end
 
 function prep_draw_bet_summary()
-	bet_offsets=reset_array(10,0)
+	bet_offsets=split("0,0,0,0,0,0,0,0,0,0")--10
 	o_pcount=0--old_player_count
 	for i_bet=1,10 do
 		p_count=1
@@ -1240,7 +1239,7 @@ function init_watch_race()
 	r_tmr=0
 	state_tmr=0
 	sn=1.5*sin(time())
-	f_line_x=reset_array(4,0)
+	f_line_x=split("0,0,0,0")
 	music(0)
 	_upd=upd_watch_race
 	_drw=drw_watch_race
@@ -1454,8 +1453,7 @@ end
 function reset_bets()
 	bets={}
 	for i=1,10 do
-		local amt=reset_array(9,0)
-		amt[7]=1--100 to start with
+		local amt=div_money()
 		local _bet={amt,{}}
 		for j=1,4 do
 			local _selected_player=reset_array(4,false)
@@ -1480,7 +1478,7 @@ function select_player_row()
 end
 
 function get_bet_costs()
-	total_bet=reset_array(9,0)
+	total_bet=split("0,0,0,0,0,0,0,0,0")
 	for i_bet=1,10 do
 		has_bet=false
 		for i_arena=1,4 do
@@ -1499,7 +1497,7 @@ end
 
 --returns all the odds for each bet added up
 function get_all_odds()
-	_t_odds=reset_array(9,0)
+	_t_odds=split("0,0,0,0,0,0,0,0,0")
 	for i_bet=1,10 do
 		_t_odds=arr_add(int_to_arr(bets_odds[i_bet]),_t_odds)
 	end
@@ -1507,7 +1505,7 @@ function get_all_odds()
 end
 
 function get_winning_odds()
-	_t_odds=reset_array(9,0)
+	_t_odds=split("0,0,0,0,0,0,0,0,0")
 	for i_bet=1,10 do
 		if is_winning_bet(bets[i_bet]) then
 			_t_odds=arr_add(int_to_arr(bets_odds[i_bet]),_t_odds)
@@ -1531,9 +1529,9 @@ end
 --gets odds and winnings for each bet and total payout
 function get_bet_summary()
 	--global summary arrays to use elsewhere
-	bets_odds=reset_array(10,1)--array follows the bet_id
+	bets_odds=split("1,1,1,1,1,1,1,1,1,1")--array follows the bet_id
 	bets_winnings=reset_num_array(10,9,0)
-	total_winnings=reset_array(9,0)
+	total_winnings=split("0,0,0,0,0,0,0,0,0")
 	--get bets and odds
 	for i_bet=1,10 do
 		_bet_arena=bets[i_bet][2]
@@ -1639,7 +1637,7 @@ function is_winning_bet(_bet)
 end
 
 function get_winning_cash()
-	winning_cash=reset_array(9,0)
+	winning_cash=split("0,0,0,0,0,0,0,0,0")
 	for i_bet=1,10 do
 		_cbet=bets[i_bet]
 		if is_winning_bet(_cbet) then
@@ -1781,7 +1779,7 @@ end
 
 --only works for numbers<32767
 function int_to_arr(n)
- local r=reset_array(9,0)
+ local r=split("0,0,0,0,0,0,0,0,0")
  local i=9--start at the rightmost position
  while n>0 do--extract digits from right to left
   r[i]=n%10--get the last digit n and store it at i
@@ -1816,7 +1814,7 @@ end
 
 --array math
 function arr_add(a,b)
-	local r=reset_array(9,0)
+	local r=split("0,0,0,0,0,0,0,0,0")
 	local c=0
 	-- add from right to left
 	for i=9,1,-1 do
@@ -1829,14 +1827,14 @@ function arr_add(a,b)
 	-- if there is a carry after the 9th digit,
 	-- the result is greater than 999999999
 	if c>0 then
-		return reset_array(9,9)
+		return split("9,9,9,9,9,9,9,9,9")
 	end
 
 	return r
 end
 
 function arr_mult(a,b)
-	local r=reset_array(9,0)
+	local r=split("0,0,0,0,0,0,0,0,0")
 	-- multiply each digit
 	-- work from right to left
 	for i=9,1,-1 do
@@ -1859,7 +1857,7 @@ function arr_mult(a,b)
 	-- if position 1 has more than one digit,
 	-- the result is greater than 999999999
 	if r[1]>=10 then
-		return reset_array(9,9)
+		return split("9,9,9,9,9,9,9,9,9")
 	end
 
 	return r
@@ -1867,7 +1865,7 @@ end
 
 --assumes a>b
 function arr_sub(a,b)
-	local r=reset_array(9,0)
+	local r=split("0,0,0,0,0,0,0,0,0")
 	local borrow=0
 	-- subtract from right to left
 	for i=9,1,-1 do
@@ -1898,6 +1896,18 @@ function arr_greater_equal(a,b)
 	return true
 end
 
+--divides money by 10 for reset_bet
+function div_money()
+	local max=split('0,0,0,0,0,0,0,0,0')
+	for i=1,8 do
+		if money[i]>0 and i<5 then
+			return split('0,0,0,0,0,9,9,9,9')
+		else
+			max[i+1]=money[i]
+		end
+	end
+	return max
+end
 
 function copy_list(t)
   local out={}
