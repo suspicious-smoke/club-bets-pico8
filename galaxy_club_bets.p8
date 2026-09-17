@@ -7,20 +7,21 @@ function _init()
 	version,t=1,0
 	debug={"","","",""}
 	 cartdata("galaxy_club_bets")
-	category={
-		"movement",
-		"obstacle",
-		"powerup",
-		"weather",
-		"terrain",
-		"ship-mod",
-		"event",
-		"section",
-		"physics",
-		"visibility",
-		"condition",
-		"hazard"
-	}
+	category=split([[
+		movement,
+		obstacle,
+		powerup,
+		weather,
+		terrain,
+		ship-mod,
+		event,
+		section,
+		physics,
+		visibility,
+		condition,
+		hazard]])
+		
+	
 	features={
 		{"hairpin",{1,2}},
 		{"u-turn",{1,2}},
