@@ -102,8 +102,6 @@ function _init()
 	effects={}
 	--two flame effects
 	f1c={8,9,10,5}--red effect
-	f2c={7,6,6,5}--white to grey
-	f3c={7,12,12,1}--blue flame
 	isdailybet=false
 	
 	is_printing,print_bet,t_sep=false,1,0
@@ -161,7 +159,7 @@ end
 
 function load_daily_bet()
 	isdailybet=true
-	srand(year * 10000 + month * 100 + day)--seed rng
+	srand(year*10000+month*100+day)--seed rng
 	reset_bets()
 	reset_round()
 	if dailybetplaced then
@@ -306,7 +304,10 @@ function drw_menu()
 			spr(_dail_bet_spr,83,68+i*10)
 		end
 	end
-
+	-- spr(120,24,50,3,3)--star
+	-- print("\^o5401 mil",23,49,7)
+	-- spr(120,85,50,3,3)--star
+	-- print("\^o540100k",87,49,7)
 	if is_printing then
 		draw_ticket(print_bet,20,140+tick_y)
 		rrectfill(24,118,80,9,1,1)
@@ -550,12 +551,13 @@ function upd_betpage()
 			bet_mode=1
 		end
 	elseif bet_mode==3 then--amount select
+		local _sel_amt=bets[bet_sel][1][i_amt]
 		if btnp(⬆️) then
 			sfx(0)
-			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]+1)%10			
+			bets[bet_sel][1][i_amt]=(_sel_amt+1)%10			
 		elseif btnp(⬇️) then
 			sfx(0)
-			bets[bet_sel][1][i_amt]=(bets[bet_sel][1][i_amt]-1)%10
+			bets[bet_sel][1][i_amt]=(_sel_amt-1)%10
 		elseif btnp(➡️) then
 			sfx(0)
 			i_amt=(i_amt-5)%4+6
@@ -600,26 +602,27 @@ function drw_betpage()
 	print("player",72,21+bet_off,0)
 	--arenas
 	for i_arena=1,4 do
-		line(3,13+i_arena*14+bet_off,124,13+i_arena*14+bet_off,1)
-		rrectfill(42,16+i_arena*14+bet_off,80,9,1,6)
+		local x_arval=i_arena*14+bet_off
+		line(3,13+x_arval,124,13+x_arval,1)
+		rrectfill(42,16+x_arval,80,9,1,6)
 		if arena_sel==i_arena and bet_mode==1 then
-			rrect(42,16+i_arena*14+bet_off,80,9,1,9)
+			rrect(42,16+x_arval,80,9,1,9)
 		end
-		print(i_arena,18,18+i_arena*14+bet_off,0)
-		spr(32+i_arena,27,16+i_arena*14+bet_off)--planet
+		print(i_arena,18,18+x_arval,0)
+		spr(32+i_arena,27,16+x_arval)--planet
 		--get player
 		chk_spr=38
 		local plyr_str="who to bet on?"
 		for i_aplyr=1,4 do 
 			if bets[bet_sel][2][i_arena][i_aplyr] then
 				plyr_str="  "..get_player_string(i_arena,i_aplyr)
-				spr(47+arenas[i_arena][i_aplyr][1],48,16+i_arena*14+bet_off)--ship spr
+				spr(47+arenas[i_arena][i_aplyr][1],48,16+x_arval)--ship spr
 				chk_spr=39
 			end
 		end
-		spr(chk_spr,8,16+i_arena*14+bet_off)--check mark
-		print(plyr_str,52,18+i_arena*14+bet_off,0)
-		spr(32,115,19+i_arena*14+bet_off)
+		spr(chk_spr,8,16+x_arval)--check mark
+		print(plyr_str,52,18+x_arval,0)
+		spr(32,115,19+x_arval)
 	end
 	draw_winning_calc()
 	draw_submenu()
