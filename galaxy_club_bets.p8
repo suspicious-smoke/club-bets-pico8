@@ -248,7 +248,7 @@ function init_menu()
 	end
 	add(menu_items, "daily bet")
 	if dailybetplaced then
-		add(menu_items, "print daily bet")
+		add(menu_items, "print daily bet (pc)")
 	end
 	t_upd=blank--ticket update
 	_upd=upd_menu
@@ -277,7 +277,7 @@ function upd_menu()
 		elseif _m_item=="daily bet" then
 			sfx(14)
 			init_daily_bet()
-		elseif _m_item=="print daily bet" then
+		elseif _m_item=="print daily bet (pc)" then
 			init_print_ticket()
 		elseif mm_sel==2 and _saved_season>1 then--continue season
 			trn_state(continue_season)
