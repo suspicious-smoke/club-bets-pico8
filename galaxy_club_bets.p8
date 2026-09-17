@@ -776,7 +776,7 @@ function upd_confirm()
 	end
 	if btnp(❎) then
 		sfx(3)
-		if isdailybet then
+		if dailybetplaced then
 			--back returns to menu on daily bet
 			trn_state(init_menu)
 		else
