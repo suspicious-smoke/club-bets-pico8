@@ -63,16 +63,16 @@ function _init()
 
 	--{name,abreiv,base,{strengths category},weakness category}
 	players={
-		{"bosco","bos",10,{1,3},8},
+		{"bosco","bos",12,{9},3},
 		{"admiral","adm",11,{1,4},10},
 		{"dexter","dxt",12,{2,7,12},5},
 		{"pontoon","ptn",14,{4,8},2},
 		{"sailor","slr",15,{5},7},
 		{"bucket","bkt",16,{6},11},
-		{"pod eng","pod",17,{1,6,9},10},
+		{"pod eng","pod",10,{1,3},8},
 		{"merchant","mer",10,{2,3},8},
 		{"scuttle","sct",11,{4,9},6},
-		{"beluga","blg",12,{9},3},
+		{"beluga","blg",17,{1,6,9},10},
 		{"ant","ant",13,{10},5},
 		{"turtle","trt",14,{2,11},4},
 		{"beholder","bhd",15,{9},1},
@@ -238,9 +238,10 @@ function init_menu()
 	sn=0
 	mm_sel=1
 	menu_items={"new season"}
-	_saved_season=dget(24)
-	if _saved_season>1 then
-		add(menu_items,"continue season ".._saved_season.."/20")
+	saved_season=dget(24)
+	saved_tier=dget(25)--load achivement tier
+	if saved_season>1 then
+		add(menu_items,"continue season "..saved_season.."/20")
 	end
 	add(menu_items, "daily bet")
 	if dailybetplaced then
@@ -274,7 +275,7 @@ function upd_menu()
 			init_daily_bet()
 		elseif _m_item=="print daily bet (pc)" then
 			init_print_ticket()
-		elseif mm_sel==2 and _saved_season>1 then--continue season
+		elseif mm_sel==2 and saved_season>1 then--continue season
 			trn_state(continue_season)
 		end
 	end
@@ -284,10 +285,14 @@ function drw_menu()
 	draw_starfield()
 	brdr_rect(20,33,87,80,2,1,5)--big border
 	--print("★galaxy club bets★",24,10,7)
-	_logo_x=8
-	spr(69,_logo_x,7,10,3)--galaxy club
-	spr(123,_logo_x+82,0,4,3)--bets
-	spr(64,48,34+sn,5,5)--floating ticket
+	spr(69,8,7,10,3)--galaxy club
+	spr(123,90,0,4,3)--bets
+	if saved_tier>0 then
+		draw_achievement(40,saved_tier)
+	else
+		
+		spr(64,48,34+sn,5,5)--floating ticket
+	end
 	brdr_rect(20,75,87,45,2,7,5)--menu area
 	rrect(22,68+mm_sel*10,83,9,1,9)--selector
 	for i=1,#menu_items do
@@ -585,8 +590,7 @@ function drw_betpage()
 	brdr_rect(3,9+bet_off,122,75,0,7,1)
 	rrectfill(4,10+bet_off,120,9,0,2)--red area
 	print("place a bet",42,12+bet_off,7)
-	rrectfill(4,20+bet_off,120,8,0,5)--grey area
-	line(3,19+bet_off,124,19+bet_off,1)--hline
+	brdr_rect(3,19+bet_off,122,9,0,5,1)--grey area
 	line(39,19+bet_off,39,83+bet_off,1)--vline
 	print("arena",12,21+bet_off,0)
 	print("player",72,21+bet_off,0)
@@ -594,7 +598,7 @@ function drw_betpage()
 	for i_arena=1,4 do
 		local x_arval=i_arena*14+bet_off
 		line(3,13+x_arval,124,13+x_arval,1)
-		rrectfill(42,16+x_arval,80,9,1,6)
+		rrectfill(42,16+x_arval,80,9,1,6)--dropdown area
 		if arena_sel==i_arena and bet_mode==1 then
 			rrect(42,16+x_arval,80,9,1,9)--selector
 		end
@@ -891,7 +895,6 @@ function draw_bet_summary()
 				end
 			end
 			if p_count>1 then--atleast one player
-				
 				print(i_bet,6,21+_offy+8,0)
 				betsum_off=bet_summary_offset(p_count)
 				rrect(3,27+_offy,122,betsum_off,0,1)
@@ -930,7 +933,7 @@ function drw_race_results()
 	for i_arena=1,4 do
 		local w_pid=arenas[i_arena][round_winners[i_arena]][1]
 		spr(32+i_arena,30,16+i_arena*12)--planet
-		spr(47+w_pid,41,15+i_arena*12)
+		spr(47+w_pid,41,15+i_arena*12)--ship
 		print(get_player_string(i_arena,round_winners[i_arena]),52,17+i_arena*12,7)
 	end
 	print("press 🅾️ to continue",25,120,7)
@@ -1520,8 +1523,8 @@ end
 
 --turns percentage into number x used in x:1 format.
 function bet_colon_format(_bet_perc)
-	local _percs={40,30,25,20,15,10,7, 5, 3, 4, 0}
-	local _podds={2, 3, 4, 5, 6, 7, 8,10,11,12,13}
+	local _percs=split("40,30,25,20,15,10,7, 5, 3, 4, 0")
+	local _podds=split("2, 3, 4, 5, 6, 7, 8,10,11,12,13")
 	for i=1,#_percs do
 		if _bet_perc>=_percs[i] then
 			return add(bet_odds,_podds[i])
@@ -1673,12 +1676,16 @@ function init_victory()
 	music(13,1000)
 	v_tmr=0
 	dset(24,0)--delete save season
+	c_tier=0
 	if arr_greater_equal(money,split('0,0,1,0,0,0,0,0,0')) then
 		c_tier=3
 	elseif arr_greater_equal(money,split('0,0,0,1,0,0,0,0,0')) then
 		c_tier=2
 	elseif arr_greater_equal(money,split('0,0,0,0,1,0,0,0,0')) then
 		c_tier=1
+	end
+	if dget(25)<c_tier then
+		dset(25,c_tier)--save tier
 	end
 	_upd=upd_victory
 	_drw=drw_victory
@@ -1698,27 +1705,30 @@ function drw_victory()
 		print("press ❎ to exit",hcenter("press ❎ to exit"),120,7)
 	end
 	--display the victory info for the game
-	c_txt=split('\f4\^o140big spenders club,\f6\^o540high rollers club,\fa\^o940millionares club')
 	local _m=arr_to_str(money)
 	_txt={"end of the season","final winnings",_m}
-	_next_tier=split('next tier at 10k,next tier at 100k,next tier at 1 million,')
 	_clr={9,7,7}
 	for i=1,#_txt do
 		print("\^o540".._txt[i],hcenter(_txt[i]),2+i*10,_clr[i])
 	end
 	spr(37,56-#_m*2,30)--coin
-	c_tier=0
-	if c_tier>0 then
-		print(c_txt[c_tier],hcenter(c_txt[c_tier])+14,50)
+	draw_achievement(50,c_tier)
+end
+
+function draw_achievement(_y,_tier)
+	c_txt=split('\f4\^o240big spenders club,\f6\^o540high rollers club,\fa\^o940millionares club')
+	_next_tier=split('next tier at 10k,next tier at 100k,next tier at 1 mil,')
+	if _tier>0 then
+		print(c_txt[_tier],hcenter(c_txt[_tier])+14,_y)
 	end
 	for i=1,3 do
 		_ispr=14
-		if c_tier>=i then
+		if _tier>=i then
 			_ispr=6+i*2
 		end
-		spr(_ispr,15+i*20,54,2,3)
+		spr(_ispr,15+i*20,_y+2,2,3)
 	end
-	print(_next_tier[c_tier+1],hcenter(_next_tier[c_tier+1]),82,1)
+	print(_next_tier[_tier+1],hcenter(_next_tier[_tier+1]),_y+30,1)
 end
 
 -->8
@@ -2138,8 +2148,8 @@ __gfx__
 00000000222b0000000000000444440040f40f000ddddd0000000000d000000000000000cc0000000000000c8d330000282828000000999a0000aa0000ccc000
 1cccdd008222222d1dddcc00844411404f040f00ddddd1d0000008df0dddddd0840000000c1cccf00cc00cc00bdbb0300288800009ac9000089999a00ddddd00
 8cc77cd0223232008ddd77c0049944144004f0008dccd1d0490cccdd0dd22dcd044494c000c11ccfcccccce033939323028cc000899dc99a9999cc9adf882fd0
-1c7ccccc8222222d1d77ddd084449440841914408d66d1d044c0000008dddddc0494444400cccfccccdccdc0bbbbbbbb028880009aa9d000089999a00ddddd00
-000000000000000000dddd000444440049449400ddddd1d0000cccdf0d1ddd1d8400d0000cc0f0008dd8dd0003003000282828000000999a0000aa0000000000
+1c7c5ccc8222222d1d77ddd084449440841914408d66d1d044c0000008dddddc0494444400cccfccccdccdc0bbbbbbbb028880009aa9d000089999a00ddddd00
+005500000000000000dddd000444440049449400ddddd1d0000cccdf0d1ddd1d8400d0000cc0f0008dd8dd0003003000282828000000999a0000aa0000000000
 00000000000000000000000000000000000000000ddddd00000008dd0000000000000dd0cc000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000aa00000000000aa00000000000000000000000000000000aaa00000aa0000000000000000000000
