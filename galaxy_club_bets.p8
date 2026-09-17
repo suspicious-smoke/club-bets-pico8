@@ -349,7 +349,7 @@ function print_ticket()
 	load_daily_bet()
 	print_bet=1
 	filename="galaxy club daily bets "..day.."."..month.."."..year
-	instructions="print instructions:\nconsolas 11pt, 3 column layout.\nremove spacing before/after paragraph.\n\n"
+	instructions="print instructions:\nconsolas 11pt, 3 column layout.\nremove spacing before/after paragraph.\nadd/remove empty lines as needed to fit :)\n\n"
 	header="*********************\ngalaxy club daily bet\n*********************\n   date: "..date
 	a_txt="\n  arena information\n"
 	for i_arena=1,4 do
