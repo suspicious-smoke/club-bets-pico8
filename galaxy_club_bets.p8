@@ -803,22 +803,23 @@ end
 --confirm bet page
 function drw_confirm()
 	draw_bet_summary()
+	local _oscroll=o_pcount-scroller
 	--total winnings box
-	print("possible winnings",10,34+o_pcount-scroller,0)
-	line(79,27+o_pcount-scroller,79,45+o_pcount-scroller,1)
+	print("possible winnings",10,34+_oscroll,0)
+	line(79,27+_oscroll,79,45+_oscroll,1)
 	tw_str=get_all_odds().." points "
 	if not isdailybet then
 		tw_str=arr_to_str(total_winnings)
-		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
+		spr(37,96-#tw_str*2,32+_oscroll)--coin
 	end
-	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+	print(tw_str,104-#tw_str*2,34+_oscroll,0)
+	local _clr,_inf_txt=7,"press 🅾️ to confirm"
 	if not has_money and not isdailybet then
-		print("not enough cash. press ❎",16,50+o_pcount-scroller,8)
+		_clr,_inf_txt=8,"not enough cash. press ❎"
 	elseif not made_bets then
-		print("no bets placed. press ❎",18,50+o_pcount-scroller,8)
-	else
-		print("press 🅾️ to confirm",28,50+o_pcount-scroller,7)
+		_clr,_inf_txt=8,"no bets placed. press ❎"
 	end
+	print(_inf_txt,hcenter(_inf_txt),50+_oscroll,_clr)
 end
 
 function prep_draw_bet_summary()
@@ -1655,6 +1656,7 @@ function finish_round()
 		init_gameover()
 	elseif cur_round>=20 then
 		--victory screen
+		trn_state(init_victory)
 	else
 		--refill arena
 		fill_arenas()
@@ -1669,15 +1671,22 @@ function finish_round()
 end
 
 function init_victory()
+	v_tmr=0
 	_upd=upd_victory
 	_drw=drw_victory
 end
 
 function upd_victory()
-
+	v_tmr+=1
+	if btnp(❎) and v_tmr>60 then
+		trn_state(init_menu)
+	end
 end
 
 function drw_victory()
+	if v_tmr>60 then
+		print("press ❎ to exit",hcenter("press ❎ to exit"),120)
+	end
 	--display the victory info for the game
 	_txt={"end of the season","final winnings",arr_to_str(money)}
 	_clr={9,7,7}
