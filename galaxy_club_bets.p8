@@ -86,6 +86,7 @@ function _init()
 	--prob of 3d6 from 3-18
 	bet_sel,arena_sel=1,1--the currently selected bet (betpage/quickbetpage)
 	fade_tmr,fade_state,fade_r=0,0,0
+	bet_mode=1--main,plyr sel,amt sel
 
 	--starfield
 	starx,stary,starspd={},{},{}
@@ -223,11 +224,11 @@ function _draw()
 	_drw()
 	drw_and_upd_fade()
 	--debug
-	offst=0
-	for txt in all(debug) do
-		print(txt,10,offst,8)
-		offst+=8
-	end
+	-- offst=0
+	-- for txt in all(debug) do
+	-- 	print(txt,10,offst,8)
+	-- 	offst+=8
+	-- end
 end
 
 function init_menu()
@@ -475,7 +476,6 @@ function init_betpage()
 		submenu_txts=split("quick bet,copy bet amt,arenas info,confirm bets")
 	end
 	men_options=#submenu_txts
-	bet_mode=1--main,plyr sel,amt sel
 	i_amt=6
 	_upd=upd_betpage
 	_drw=drw_betpage
@@ -596,7 +596,7 @@ function drw_betpage()
 		line(3,13+x_arval,124,13+x_arval,1)
 		rrectfill(42,16+x_arval,80,9,1,6)
 		if arena_sel==i_arena and bet_mode==1 then
-			rrect(42,16+x_arval,80,9,1,9)
+			rrect(42,16+x_arval,80,9,1,9)--selector
 		end
 		print(i_arena,18,18+x_arval,0)
 		spr(32+i_arena,27,16+x_arval)--planet
@@ -648,9 +648,11 @@ function submenu_mode()
 	 local _smt=submenu_txts[submenu_sel]
 		if _smt=="quick bet" then
 			sfx(9)
+			bet_mode=1
 			trn_state(init_quickbetpage)
 		elseif _smt=="normal bet" then
 			sfx(9)
+			bet_mode=1
 			trn_state(init_betpage)
 		elseif _smt=="select row" then
 			select_player_row()
@@ -672,6 +674,10 @@ function submenu_mode()
 		elseif _smt=="arenas info" then
 			sfx(2)
 			trn_state(init_arena_info)
+		elseif _smt=="change amt" then
+			sfx(2)
+			bet_mode,arena_sel=3,5
+			trn_state(init_betpage)
 		end
 	end
 end
@@ -717,7 +723,7 @@ function draw_winning_calc()
 	end
 	
 	if arena_sel==5 then
-		rrect(4,103,36,10,0,9)
+		rrect(4,103,36,10,0,9)--selector
 	end
 	line(40,94,40,112,1)--vline1
 	print("odds",45,96,0)
@@ -984,14 +990,14 @@ end
 -->8
 --quick bet/submenu pages
 function init_quickbetpage()
-	bet_sel=1--1-10
+	--bet_sel=1--1-10
 	plyr_menu_sel,arena_sel=1,1--select player for each arena 1-16
 	bet_mode=1
 	submenu_off,submenu_sel,qm_mode=0,1,2
 	if isdailybet then
 		submenu_txts=split("normal bet,select row,clear arena,confirm bets")
 	else
-		submenu_txts=split("normal bet,select row,clear arena,confirm bets")
+		submenu_txts=split("normal bet,select row,clear arena,change amt,confirm bets")
 	end
 	men_options=#submenu_txts
 	total_odds=0
@@ -1667,8 +1673,6 @@ function init_victory()
 	music(13,1000)
 	v_tmr=0
 	dset(24,0)--delete save season
-	c_tier=0
-	money=split('0,0,0,0,0,0,0,0,0')
 	if arr_greater_equal(money,split('0,0,1,0,0,0,0,0,0')) then
 		c_tier=3
 	elseif arr_greater_equal(money,split('0,0,0,1,0,0,0,0,0')) then
@@ -1684,7 +1688,7 @@ function upd_victory()
 	v_tmr+=1
 	if btnp(❎) and v_tmr>60 then
 		trn_state(init_menu)
-		music(-1,1000)
+		music(40,1000)
 	end
 end
 
