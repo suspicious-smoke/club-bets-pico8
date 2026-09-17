@@ -199,7 +199,7 @@ function load_season()
 end
 
 function init_season()
-	srand()--reset the random number generator
+	srand(time())--reset the random number generator
 	isdailybet=false
 	cur_round=1
 	money=reset_array(9,0)
@@ -209,7 +209,7 @@ function init_season()
 end
 
 function continue_season()
-	srand()--reset the random number generator
+	srand(time())--reset the random number generator
 	isdailybet=false
 	load_season()
 	reset_round()
