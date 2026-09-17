@@ -5,7 +5,7 @@ __lua__
 --by olivander65
 function _init()
 	version,t=1,0
-	debug={"","","",""}
+	debug=split(",,,,,")
 	 cartdata("galaxy_club_bets")
 	category=split([[
 		movement,
@@ -989,9 +989,9 @@ function init_quickbetpage()
 	bet_mode=1
 	submenu_off,submenu_sel,qm_mode=0,1,2
 	if isdailybet then
-		submenu_txts={"normal bet","select row","clear arena","confirm bets"}
+		submenu_txts=split("normal bet,select row,clear arena,confirm bets")
 	else
-		submenu_txts={"normal bet","copy bet amt","select row","clear arena","confirm bets"}
+		submenu_txts=split("normal bet,select row,clear arena,confirm bets")
 	end
 	men_options=#submenu_txts
 	total_odds=0
