@@ -650,28 +650,24 @@ function submenu_mode()
 		bet_mode=1
 	elseif btnp(🅾️) then
 	 local _smt=submenu_txts[submenu_sel]
+	 	bet_mode=1
 		if _smt=="quick bet" then
 			sfx(9)
-			bet_mode=1
 			trn_state(init_quickbetpage)
 		elseif _smt=="normal bet" then
 			sfx(9)
-			bet_mode=1
 			trn_state(init_betpage)
 		elseif _smt=="select row" then
 			select_player_row()
 			sfx(3)
-			bet_mode=1
 		elseif _smt=="clear arena" then
 			for ibet=1,10 do
 				clear_arena_bet(ibet,arena_sel)
 			end
 			sfx(3)
-			bet_mode=1
 		elseif _smt=="copy bet amt" then--copy bets
 			sfx(2)
 			copy_bets()
-			bet_mode=1
 		elseif _smt=="confirm bets" then
 			sfx(4)
 			trn_state(init_confirm)
