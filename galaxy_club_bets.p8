@@ -224,11 +224,11 @@ function _draw()
 	_drw()
 	drw_and_upd_fade()
 	--debug
-	-- offst=0
-	-- for txt in all(debug) do
-	-- 	print(txt,10,offst,8)
-	-- 	offst+=8
-	-- end
+	offst=0
+	for txt in all(debug) do
+		print(txt,10,offst,8)
+		offst+=8
+	end
 end
 
 function init_menu()
