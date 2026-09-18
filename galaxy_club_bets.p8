@@ -859,9 +859,11 @@ function draw_bet_summary()
 		print("daily bet",4,3+bet_off,6)
 		print(date,85,3+bet_off,6)
 	else
-		print("round:#"..cur_round,4,3-scroller,6)	
-		spr(37,83,1-scroller)--coin
-		print(arr_to_str(money),92,3-scroller,9)--my money
+		print("round:#"..cur_round,4,3-scroller,6)
+		if bet_title!="collect winnings" then	
+			spr(37,83,1-scroller)--coin
+			print(arr_to_str(money),92,3-scroller,9)--my money
+		end
 	end		
 	brdr_rect(3,9-scroller,122,max_scroll+97,0,7,1)--ticket area
 	rrectfill(4,10-scroller,120,9,0,2)--red area
@@ -1653,6 +1655,7 @@ function finish_round()
 		init_gameover()
 	elseif cur_round>=20 then
 		--victory screen
+		sfx(13)
 		trn_state(init_victory)
 	else
 		--refill arena
