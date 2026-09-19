@@ -290,7 +290,7 @@ end
 
 function drw_menu()
 	draw_starfield()
-	brdr_rect(20,33,87,80,2,1,5)--big border
+	brdr_rect(20,33,87,80,2,1,13)--big border
 	--print("★galaxy club bets★",24,10,7)
 	spr(69,8,7,10,3)--galaxy club
 	spr(123,90,0,4,3)--bets
@@ -300,7 +300,7 @@ function drw_menu()
 		
 		spr(64,48,34+sn,5,5)--floating ticket
 	end
-	brdr_rect(20,75,87,45,2,7,5)--menu area
+	brdr_rect(20,75,87,45,2,7,13)--menu area
 	rrect(22,68+mm_sel*10,83,9,1,9)--selector
 	for i=1,#menu_items do
 		_clr=(i==mm_sel) and 4 or 0
@@ -523,18 +523,15 @@ function upd_betpage()
 			elseif arena_sel==5 then
 				--change money
 				sfx(2)
-				i_amt=6
-				bet_mode=3
+				bet_mode,i_amt=3,6
 			else
 				sfx(2)
-				bet_mode=2--player sel
-				plyr_menu_sel=1
+				bet_mode,plyr_menu_sel=2,1--player sel
 			end
 		elseif btnp(❎) then
 			--submenu
 			sfx(3)
-			submenu_sel=1
-			bet_mode=4
+			submenu_sel,bet_mode=1,4
 		end
 	elseif bet_mode==2 then--player select
 		if btnp(⬆️) then
@@ -754,19 +751,14 @@ end
 
 --confirm bet page
 function init_confirm()
-	scroller=0
-	max_scroll=0
-	bet_off=0
-	o_pcount=0
-	bet_title="current bets"
+	o_pcount,bet_off,scroller,max_scroll=0,0,0,0
+	bet_title,show_winners="current bets",false
 	get_bet_summary()
-	show_winners=false
 	get_bet_costs()
 	prep_draw_bet_summary()
 	has_money=arr_greater_equal(money,total_bet)
 	made_bets=arr_to_str(total_winnings)!="0"
-	_upd=upd_confirm
-	_drw=drw_confirm
+	_upd,_drw=upd_confirm,drw_confirm
 end
 
 --confirm bet page
@@ -792,7 +784,7 @@ function upd_confirm()
 		end
 	elseif btnp(🅾️) then
 		if (has_money or isdailybet) and made_bets then
-			if not dailybetplaced then
+			if not dailybetplaced and isdailybet then
 				save_daily_bet()
 				dailybetplaced=true
 			end
@@ -922,8 +914,7 @@ end
 
 function init_race_results()
 	sfx(13)
-	_upd=upd_race_results
-	_drw=drw_race_results
+	_upd,_drw=upd_race_results,drw_race_results
 end
 
 function upd_race_results()
@@ -955,8 +946,7 @@ function init_winning_bets()
 	end
 	show_winners=true
 	prep_draw_bet_summary()
-	_upd=upd_winning_bets
-	_drw=drw_winning_bets
+	_upd,_drw=upd_winning_bets,drw_winning_bets
 end
 
 function upd_winning_bets()
@@ -1007,11 +997,8 @@ function init_quickbetpage()
 	else
 		submenu_txts=split("normal bet,select row,clear arena,change amt,confirm bets")
 	end
-	men_options=#submenu_txts
-	total_odds=0
-	total_pay=0
-	_upd=upd_quickbetpage
-	_drw=drw_quickbetpage
+	men_options,total_odds,total_pay=#submenu_txts,0,0
+	_upd,_drw=upd_quickbetpage,drw_quickbetpage
 end
 
 function upd_quickbetpage()
@@ -1104,9 +1091,8 @@ end
 -->8
 --ticket
 function init_gameover()
-	gameover_mode=1
 	sfx(15)
-	ty_off,t_tmr,t_sep=0,0,0
+	gameover_mode,ty_off,t_tmr,t_sep=1,0,0,0
 	get_bet_summary()
 	get_bet_costs()
 	prep_draw_bet_summary()
@@ -1179,9 +1165,10 @@ function draw_ticket(i_bet,_tx,_ty)
 	palt()
 	spr(208,_tx,_sy_d+42,11,1)--bottom tear
 	--lower ticket
-	rrectfill(_tx,_sy_d+50,88,31,0,7)--ticket2
+	
 	line(_tx-1,_sy_d+44,_tx-1,_sy_d+80,5)--shadow2
-	rrectfill(_tx+6,_sy_d+81,82,24,0,7)--lwr ticket
+	brdr_rect(_tx+5,_sy_d+80,83,25,0,7,5)--lwr ticket
+	rrectfill(_tx,_sy_d+50,88,31,0,7)--ticket2 area
 	spr(203,_tx-2,_sy_d+81,1,3)--left leaf
 	spr(204,_tx+87,_sy_d+81,1,3)--right leaf
 	--ticket text
@@ -1469,6 +1456,9 @@ function reset_bets()
 	bets={}
 	for i=1,10 do
 		local amt=div_money()
+		if isdailybet then
+			amt=split('0,0,0,0,0,0,0,0,1')
+		end
 		local _bet={amt,{}}
 		for j=1,4 do
 			local _selected_player=reset_array(4,false)
@@ -2262,7 +2252,7 @@ __gfx__
 00055555566600055555006666655555555666600555555666666005555000066666600000000000000000000000057777777000000000000000000000000000
 00055555666660555555506666655555555666605555555566666655555500666666660000000000000000000000057777777700000000000000000000000000
 00066556666666555555506666655555555655605555555566556555555550666666660000000000000000000000005777777700000000000000000000000000
-00066556666666555555506666655555555655605555555566556555555550666666660000000000000000000000005777777770000000000000000000000000
+00066556666666555555506666655555555655605555555566556555555550666666660000000000000000000000000555555500000000000000000000000000
 00006556666666555555500666665555556665505555555566566555555550666666660600000000000000000000000000000000000000000000000000000000
 00056655666660655555000666665555566660500555555665566555555550066666600600000000000000000000000000000000000000000000000000000000
 00555656666606555550006666655555556666500555550055660055555560006666006600000000000000000000000000000000000000000000000000000000
