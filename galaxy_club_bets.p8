@@ -1222,10 +1222,11 @@ function init_watch_race()
 	get_winning_cash()
 	--give player winnings
 	money=arr_add(winning_cash,money)
-	
-	save_season(cur_round+1)--save bet stuff
-	if arr_to_str(money)=="0" then
-		dset(24,0)--delete save season
+	if not isdailybet then
+		save_season(cur_round+1)--save bet stuff
+		if arr_to_str(money)=="0" then
+			dset(24,0)--delete save season
+		end
 	end
 	race_px=reset_num_array(4,4,0)
 	race_over=reset_array(4,false)
@@ -1234,8 +1235,7 @@ function init_watch_race()
 			race_px[i_arena][i_plyr]=rnd_rng(1,20)
 		end
 	end
-	r_tmr=0
-	state_tmr=0
+	state_tmr,r_tmr=0,0
 	sn=1.5*sin(time())
 	f_line_x=split("0,0,0,0")
 	music(0)
@@ -1415,11 +1415,8 @@ function fill_arenas()
 end
 
 function reset_round()
-	arenas={}
-	odds={}
-	bet_odds={}
+	arenas,odds,bet_odds,round_winners={},{},{},{}
 	round_features={{},{},{},{}}--ids of arena features for current round
-	round_winners={}
 	fill_arenas()
 end
 
