@@ -83,11 +83,12 @@ function _init()
 	}
 	
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
-	d6x3=split('0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046')
 	--prob of 3d6 from 3-18
-	bet_sel,arena_sel=1,1--the currently selected bet (betpage/quickbetpage)
+	d6x3=split('0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046')
+	
+	--bet_mode: 1main 2plyr_sel 3amt_sel
+	bet_sel,arena_sel,bet_mode=1,1,1--the currently selected bet (betpage/quickbetpage)
 	fade_tmr,fade_state,fade_r=0,0,0
-	bet_mode=1--main,plyr sel,amt sel
 
 	--starfield
 	starx,stary,starspd={},{},{}
@@ -98,10 +99,8 @@ function _init()
 	end
 	effects={}
 	--two flame effects
-	f1c=split('8,9,10,5')--red effect
-	isdailybet=false
-	
-	is_printing,print_bet,t_sep=false,1,0
+	f1c=split('8,9,10,5')--red effect	
+	is_printing,print_bet,t_sep,isdailybet=false,1,0,false
 	cur_round=1
 	money=split("0,0,0,0,0,0,0,0,0")
 	_upd,_drw=blank,blank
@@ -1286,7 +1285,7 @@ function upd_watch_race()
 		end
 	else
 		sn=1.5*sin(time())--crowd sin wave
-	end
+	end 
 end
 
 function change_ship_pos()
@@ -1333,8 +1332,11 @@ function drw_watch_race()
 			fire(20+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly+5,-1,0,1,6,f1c)
 			p_spr=47+arenas[i_arena][i_plyr][1]
 			spr(p_spr,18+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly)
+			if arena_favorites[i_arena][i_plyr]>=4 then
+				spr(7,18+race_px[i_arena][i_plyr]+_lx,i_plyr*10+_ly-8)--favorite logo
+			end
 		end
-
+		
 		if race_over[i_arena] then
 			win_spr=47+arenas[i_arena][round_winners[i_arena]][1]
 			rrectfill(15+_lx,3+_ly,46,46,0,1)
@@ -1547,12 +1549,14 @@ function get_bet_summary()
 	bets_odds=split("1,1,1,1,1,1,1,1,1,1")--array follows the bet_id
 	bets_winnings=reset_num_array(10,9,0)
 	total_winnings=split("0,0,0,0,0,0,0,0,0")
+	arena_favorites={split('0,0,0,0'),split('0,0,0,0'),split('0,0,0,0'),split('0,0,0,0')}
 	--get bets and odds
 	for i_bet=1,10 do
 		_bet_arena=bets[i_bet][2]
 		for i_arena=1,4 do
 			for i_aplyr=1,4 do
 				if _bet_arena[i_arena][i_aplyr] then
+					arena_favorites[i_arena][i_aplyr]+=1
 					bets_odds[i_bet]*=arenas[i_arena][i_aplyr][4]
 				end
 			end
