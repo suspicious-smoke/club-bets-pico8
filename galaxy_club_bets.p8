@@ -195,8 +195,7 @@ end
 
 function init_season()
 	srand(time())--reset the random number generator
-	isdailybet=false
-	cur_round=1
+	isdailybet,cur_round=false,1
 	money=split("0,0,0,0,0,1,0,0,0")
 	reset_round()
 	init_betpage()
@@ -234,11 +233,9 @@ function init_menu()
 	--music(13,1000)
 	isdailybet=false
 	check_daily_placed()
-	sn=0
-	mm_sel=1
+	mm_sel,sn=1,0
 	menu_items={"new season"}
-	saved_season=dget(24)
-	saved_tier=dget(25)--load achivement tier
+	saved_season,saved_tier=dget(24),dget(25)--load achivement tier
 	if saved_season>1 then
 		add(menu_items,"continue season "..saved_season.."/20")
 	end
@@ -1144,6 +1141,7 @@ function upd_gameover()
 		end
 	end
 	if btnp(🅾️) then
+		t_sep=0
 		trn_state(init_menu)
 	end
 end
