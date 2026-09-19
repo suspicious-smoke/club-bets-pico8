@@ -267,11 +267,10 @@ function upd_menu()
 		mm_sel=(mm_sel%#menu_items)+1
 	elseif btnp(🅾️) then
 		music(-1)
+		sfx(14)
 		if _m_item=="new season" then
-			sfx(14)
 			trn_state(init_season)
 		elseif _m_item=="daily bet" then
-			sfx(14)
 			init_daily_bet()
 		elseif _m_item=="print daily bet (pc)" then
 			init_print_ticket()
@@ -1269,7 +1268,7 @@ function upd_watch_race()
 		change_ship_pos()
 	end
 	for i_arena=1,4 do
-		if race_px[i_arena][round_winners[i_arena]]==34 and race_over[i_arena]==false then
+		if race_px[i_arena][round_winners[i_arena]]==36 and race_over[i_arena]==false then
 			race_over[i_arena]=true
 			sfx(11)
 		end
@@ -1295,7 +1294,7 @@ function change_ship_pos()
 		for i_plyr=1,4 do
 			if state_tmr>60 and round_winners[i_arena]==i_plyr then
 				--move winner to finish line
-				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,34)
+				race_px[i_arena][i_plyr]=min(race_px[i_arena][i_plyr]+1,36)
 				if race_px[i_arena][i_plyr]>30 then
 					f_line_x[i_arena]=min(f_line_x[i_arena]+1,4)
 				end
@@ -1324,7 +1323,7 @@ function drw_watch_race()
 	for i_arena=1,4 do 
 		_lx=(i_arena+1)%2*50
 		_ly=flr((i_arena-1)/2)*50
-		rrect(14+_lx,2+_ly,48,48,0,7)
+		
 		--finish line
 		if f_line_x[i_arena]>0 then
 			line(_lx+61-f_line_x[i_arena],_ly+3,_lx+61-f_line_x[i_arena],_ly+48,8)
@@ -1345,6 +1344,7 @@ function drw_watch_race()
 
 			spr(win_spr,_lx+34,_ly+31)
 		end
+		rrect(14+_lx,2+_ly,48,48,0,7)--silver cover
 		rrectfill(15+_lx,3+_ly,10,10,1,1)--planet bg
 		spr(32+i_arena,16+_lx,4+_ly)--planet
 	end
