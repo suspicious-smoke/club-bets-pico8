@@ -1222,7 +1222,7 @@ function init_watch_race()
 	money=arr_sub(money,total_bet)
 	get_bet_summary()	
 	get_winning_cash()
-	dset(26,get_winning_odds())
+	
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	if not isdailybet then
@@ -1230,6 +1230,8 @@ function init_watch_race()
 		if arr_to_str(money)=="0" then
 			dset(24,0)--delete save season
 		end
+	else
+		dset(26,get_winning_odds())
 	end
 	race_px=reset_num_array(4,4,0)
 	race_over=reset_array(4,false)
