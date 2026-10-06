@@ -1610,7 +1610,7 @@ function calculate_winners()
 		scores={}
 		for i_a_player=1,4 do
 			local _arena_plyr=arenas[i_arena][i_a_player]
-			local p_score=_arena_plyr[2]+_arena_plyr[3]+explode_d6()+explode_d6()+explode_d6()
+			local p_score=_arena_plyr[2]+_arena_plyr[3]+d6()+d6()+explode_d6()
 			add(scores,p_score)
 		end
 		_rwinner=1
