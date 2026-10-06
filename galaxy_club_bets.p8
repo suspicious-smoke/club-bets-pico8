@@ -4,7 +4,7 @@ __lua__
 --galaxy club bets
 --by olivander65
 function _init()
-	version,t=2,0
+	version,t=3,0
 	debug=split(",,,,,")
 	 cartdata("galaxy_club_bets")
 	category=split([[
@@ -97,9 +97,8 @@ function _init()
 		add(stary,flr(rnd(128)))
 		add(starspd,rnd(2)+0.5)		
 	end
-	effects={}
-	--two flame effects
-	f1c=split('8,9,10,5')--red effect	
+	effects,f1c={},split('8,9,10,5')--red effect	
+
 	is_printing,print_bet,t_sep,isdailybet=false,1,0,false
 	cur_round=1
 	money=split("0,0,0,0,0,0,0,0,0")
@@ -240,7 +239,9 @@ function init_menu()
 		add(menu_items,"continue season "..saved_season.."/20")
 	end
 	add(menu_items, "daily bet")
+	daily_points=""
 	if dailybetplaced then
+		daily_points=tostr(dget(26))
 		add(menu_items, "print daily bet (pc)")
 	end
 	t_upd=blank--ticket update
@@ -307,6 +308,7 @@ function drw_menu()
 		print(menu_items[i],hcenter(menu_items[i]),70+i*10,_clr)
 		--daily bet checkmark
 		if menu_items[i]=="daily bet" then
+			print(daily_points,ccenter(38,daily_points),70+i*10,4)
 			_dail_bet_spr=(dailybetplaced) and 39 or 38
 			spr(_dail_bet_spr,83,68+i*10)
 		end
@@ -698,9 +700,9 @@ function draw_submenu()
 	line(64,_y,64,_y+128,1)
 	if not isdailybet then
 		_txt="round:\f9#"..cur_round
-		print(_txt,95-#_txt*2,_y+4,7)
+		print(_txt,ccenter(95,_txt),_y+4,7)
 		_money="cash:\f9"..arr_to_str(money)
-		print(_money,95-#_money*2,_y+14,7)
+		print(_money,ccenter(95,_money),_y+14,7)
 	end
 end
 
@@ -733,14 +735,14 @@ function draw_winning_calc()
 	print("odds",45,96,0)
 	line(64,94,64,112,1)--vline2
 	total_odds=print_bet_odds(bets_odds[bet_sel],true)
-	print(total_odds,57-#total_odds*2,105,0)--center odds
+	print(total_odds,ccenter(57,total_odds),105,0)--center odds
 	print("payout",83,96,0)
 	if isdailybet then
 		_winnings=tostr(bets_odds[bet_sel]).." points"
 	else
 		_winnings=arr_to_str(bets_winnings[bet_sel])
 	end
-	print(_winnings,94-#_winnings*2,105,0)
+	print(_winnings,ccenter(94,_winnings),105,0)
 	--button
 	rrectfill(34,116,59,9,1,1)
 	print("place all bets",36,118,7)
@@ -806,9 +808,9 @@ function drw_confirm()
 	tw_str=get_all_odds().." points "
 	if not isdailybet then
 		tw_str=arr_to_str(total_winnings)
-		spr(37,96-#tw_str*2,32+_oscroll)--coin
+		spr(37,ccenter(96,tw_str),32+_oscroll)--coin
 	end
-	print(tw_str,104-#tw_str*2,34+_oscroll,0)
+	print(tw_str,ccenter(104,tw_str),34+_oscroll,0)
 	local _clr,_inf_txt=7,"press 🅾️ to confirm"
 	if not has_money and not isdailybet then
 		_clr,_inf_txt=8,"not enough cash. press ❎"
@@ -896,17 +898,17 @@ function draw_bet_summary()
 				betsum_off=bet_summary_offset(p_count)
 				rrect(3,27+_offy,122,betsum_off,0,1)
 				_p_odds="odds "..print_bet_odds(bets_odds[i_bet])
-				print(_p_odds,98-#_p_odds*2,30+_offy,0)
+				print(_p_odds,ccenter(98,_p_odds),30+_offy,0)
 				
 				winnings_str=tostr(bets_odds[i_bet]).." points"
 				if not isdailybet then
 					amt="amount  "..arr_to_str(bets[i_bet][1])
-					spr(37,122-#amt*2,36+_offy)--coin
-					print(amt,98-#amt*2,38+_offy,0)
+					spr(37,ccenter(122,amt),36+_offy)--coin
+					print(amt,ccenter(98,amt),38+_offy,0)
 					winnings_str=arr_to_str(bets_winnings[i_bet])
-					spr(37,90-#winnings_str*2,18+_offy+betsum_off)--win coin
+					spr(37,ccenter(90,winnings_str),18+_offy+betsum_off)--win coin
 				end
-				print(winnings_str,98-#winnings_str*2,20+_offy+betsum_off,0)
+				print(winnings_str,ccenter(98,winnings_str),20+_offy+betsum_off,0)
 			end
 		end
 	end
@@ -978,9 +980,9 @@ function drw_winning_bets()
 		if #tw_str==0 then
 			tw_str="0"
 		end
-		spr(37,96-#tw_str*2,32+o_pcount-scroller)--coin
+		spr(37,ccenter(96,tw_str),32+o_pcount-scroller)--coin
 	end
-	print(tw_str,104-#tw_str*2,34+o_pcount-scroller,0)
+	print(tw_str,ccenter(104,tw_str),34+o_pcount-scroller,0)
 	print("press 🅾️ to continue",25,50+o_pcount-scroller,7)
 end
 
@@ -1071,13 +1073,13 @@ function drw_quickbetpage()
 	print("bet \f9#"..bet_sel,2,121,7)
 	line(31,120,31,126,8)
 	_ot=bets_odds[bet_sel]..":1"
-	print(_ot,44-#_ot*2,121,7)
+	print(_ot,ccenter(44,_ot),121,7)
 	line(55,120,55,126,8)
 	
 	if isdailybet then
 		--print(1,64,121,7)
 		bet_str=tostr(bets_odds[bet_sel]).." points"
-		print(bet_str,90-#bet_str*2,121,7)
+		print(bet_str,ccenter(90,bet_str),121,7)
 	else
 		spr(37,57,119)--coin
 		print(arr_to_str(bets[bet_sel][1]),64,121,7)
@@ -1220,6 +1222,7 @@ function init_watch_race()
 	money=arr_sub(money,total_bet)
 	get_bet_summary()	
 	get_winning_cash()
+	dset(26,get_winning_odds())
 	--give player winnings
 	money=arr_add(winning_cash,money)
 	if not isdailybet then
@@ -1327,7 +1330,7 @@ function drw_watch_race()
 			rrectfill(15+_lx,3+_ly,46,46,0,1)
 			print("winner!",_lx+24,_ly+14,9)
 			local winner=players[arenas[i_arena][round_winners[i_arena]][1]][1]
-			print(winner,_lx+38-#winner*2,_ly+24,9)
+			print(winner,ccenter(_lx+38,winner),_ly+24,9)
 
 			spr(win_spr,_lx+34,_ly+31)
 		end
@@ -1564,11 +1567,6 @@ function get_bet_summary()
 end
 
 function toggle_bet()
-	--toggle bet if already selected
-	if bets[bet_sel][2][arena_sel][plyr_menu_sel] then
-		bets[bet_sel][2][arena_sel][plyr_menu_sel]=false
-		return
-	end
 	--turn off other bets
 	clear_arena_bet(bet_sel,arena_sel)
 	--select bet
@@ -1656,7 +1654,6 @@ function finish_round()
 		init_gameover()
 	elseif cur_round>=20 then
 		--victory screen
-		sfx(13)
 		trn_state(init_victory)
 	else
 		--refill arena
@@ -1710,7 +1707,7 @@ function drw_victory()
 	for i=1,#_txt do
 		print("\^o540".._txt[i],hcenter(_txt[i]),2+i*10,_clr[i])
 	end
-	spr(37,56-#_m*2,30)--coin
+	spr(37,ccenter(56,_m),30)--coin
 	draw_achievement(50,c_tier)
 end
 
@@ -1745,8 +1742,12 @@ function explode_d6()
 	return total
 end
 
-function hcenter(s)
-	return 64-#s*2
+function hcenter(_s)
+	return ccenter(64,_s)
+end
+
+function ccenter(_off,_s)
+	return _off-#_s*2
 end
 
 --i=2 gives num between 0,1
