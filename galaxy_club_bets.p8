@@ -4,7 +4,7 @@ __lua__
 --galaxy club bets
 --by olivander65
 function _init()
-	version,t=1,0
+	version,t=2,0
 	debug=split(",,,,,")
 	 cartdata("galaxy_club_bets")
 	category=split([[
