@@ -4,7 +4,7 @@ __lua__
 --galaxy club bets
 --by olivander65
 function _init()
-	version,t=3,0
+	version,t=2,0
 	debug=split(",,,,,")
 	 cartdata("galaxy_club_bets")
 	category=split([[
@@ -1567,6 +1567,11 @@ function get_bet_summary()
 end
 
 function toggle_bet()
+	--toggle bet if already selected
+	if bets[bet_sel][2][arena_sel][plyr_menu_sel] then
+		bets[bet_sel][2][arena_sel][plyr_menu_sel]=false
+		return
+	end
 	--turn off other bets
 	clear_arena_bet(bet_sel,arena_sel)
 	--select bet
