@@ -63,25 +63,29 @@ function _init()
 	-- where { {t,f,f,f},... } is the arenas and selected players
 
 	--{name,abreiv,base,{strengths category},weakness category}
-	players={
-		{"bosco","bos",12,{9},3},
-		{"admiral","adm",11,{1,4},10},
-		{"dexter","dxt",12,{2,7,12},5},
-		{"pontoon","ptn",14,{4,8},2},
-		{"sailor","slr",15,{5},7},
-		{"bucket","bkt",16,{6},11},
-		{"pod eng","pod",10,{1,3},8},
-		{"merchant","mer",10,{2,3},8},
-		{"scuttle","sct",11,{4,9},6},
-		{"beluga","blg",17,{1,6,9},10},
-		{"ant","ant",13,{10},5},
-		{"turtle","trt",14,{2,11},4},
-		{"beholder","bhd",15,{9},1},
-		{"trident","trd",16,{12},6},
-		{"kingshot","kng",17,{8},5},
-		{"ufo","ufo",13,{1},4},
-	}
-	
+	-- players={
+	-- 	{"bosco","bos",12,{9},3},
+	-- 	{"admiral","adm",11,{1,4},10},
+	-- 	{"dexter","dxt",12,{2,7,12},5},
+	-- 	{"pontoon","ptn",14,{4,8},2},
+	-- 	{"sailor","slr",15,{5},7},
+	-- 	{"bucket","bkt",16,{6},11},
+	-- 	{"pod eng","pod",10,{1,3},8},
+	-- 	{"merchant","mer",10,{2,3},8},
+	-- 	{"scuttle","sct",11,{4,9},6},
+	-- 	{"beluga","blg",17,{1,6,9},10},
+	-- 	{"ant","ant",13,{10},5},
+	-- 	{"turtle","trt",14,{2,11},4},
+	-- 	{"beholder","bhd",15,{9},1},
+	-- 	{"trident","trd",16,{12},6},
+	-- 	{"kingshot","kng",17,{8},5},
+	-- 	{"ufo","ufo",13,{1},4},
+	-- }
+	r_names=split("bosco, admiral, dexter, pontoon, sailor, bucket, pod eng, merchant, scuttle, beluga, ant, turtle, beholder, trident, kingshot, ufo")
+	r_abriev=split("bos, adm, dxt, ptn, slr, bkt, pod, mer, sct, blg, ant, trt, bhd, trd, kng, ufo")
+	r_base=split(" 12, 11, 12, 14, 15, 16, 10, 10, 11, 17, 13, 14, 15, 16, 17, 13")
+	r_weaknesses=split("3,10,5,2,7,11,8,8,6,10,5,4,1,6,5,4")
+	r_strengths={{9},{1,4},{2,7,12},{4,8},{5},{6},{1,3},{2,3},{4,9},{1,6,9},{10},{2,11},{9},{12},{8},{1} }
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
 	--prob of 3d6 from 3-18
 	d6x3=split('0,0,.0046,.0139,.0278,.0463,.0694,.0972,.1157,.1250,.1250,.1157,.0972,.0694,.0463,.0278,.0139,.0046')
@@ -888,7 +892,7 @@ function draw_bet_summary()
 						local p_off=p_count*9+_offy
 						spr(32+i_arena,19,20+p_off)--planet
 						spr(47+_pid,28,20+p_off)--ship spr
-						print(players[_pid][1],37,22+p_off,0)--player name
+						print(r_names[_pid],37,22+p_off,0)--racer name
 						p_count+=1		
 					end
 				end
@@ -1049,7 +1053,7 @@ function drw_quickbetpage()
 			_py=((i_arena-1)*4+i_aplyr)*7+g_off
 			rrectfill(1,_py-6,126,7,0,6+i_aplyr%2)--row background
 			local a_plyr=arenas[i_arena][i_aplyr]
-			print(players[a_plyr[1]][2].." "..a_plyr[4]..":1",3,_py-5,arena_clr[i_arena])
+			print(r_abriev[a_plyr[1]].." "..a_plyr[4]..":1",3,_py-5,arena_clr[i_arena])
 			--bet buttons
 			for k=1,10 do
 				bet_clr=5
@@ -1199,7 +1203,7 @@ function draw_ticket(i_bet,_tx,_ty)
 				end
 				print(i_arena,_tx+10,t_off+33+8*p_count,0)
 				local arena_player=arenas[i_arena][i_aplyr]
-				local _p_name=players[arena_player[1]][1]
+				local _p_name=r_names[arena_player[1]]
 				print(_p_name,_tx-#_p_name*4+56,t_off+33+8*p_count,0)
 				local _odds=arena_player[4]..":1"
 				print(_odds,_tx+82-#_odds*4,t_off+33+8*p_count,0)
@@ -1331,7 +1335,7 @@ function drw_watch_race()
 			win_spr=47+arenas[i_arena][round_winners[i_arena]][1]
 			rrectfill(15+_lx,3+_ly,46,46,0,1)
 			print("winner!",_lx+24,_ly+14,9)
-			local winner=players[arenas[i_arena][round_winners[i_arena]][1]][1]
+			local winner=r_names[arenas[i_arena][round_winners[i_arena]][1]]
 			print(winner,ccenter(_lx+38,winner),_ly+24,9)
 
 			spr(win_spr,_lx+34,_ly+31)
@@ -1436,10 +1440,10 @@ function get_player_mods()
 				categories=feature_categories[round_features[i_arena][feature_index]]
 				for c=1,#categories do
 					--for each category, see if the player has them as a strength/weakness
-					if players[_plyr_id][5]==categories[c] then--weakness check
+					if r_weaknesses[_plyr_id]==categories[c] then--weakness check
 						p_mod-=1
 					end
-					local strengths=players[_plyr_id][4]--strengths
+					local strengths=r_strengths[_plyr_id]--strengths
 					for s_i=1,#strengths do
 						if strengths[s_i]==categories[c] then
 							p_mod+=1
@@ -1448,7 +1452,7 @@ function get_player_mods()
 				end
 			end
 			--add to arena info
-			arenas[i_arena][i_a_player][2]=players[_plyr_id][3]--base
+			arenas[i_arena][i_a_player][2]=r_base[_plyr_id]--base
 			arenas[i_arena][i_a_player][3]=p_mod
 		end
 	end
@@ -1603,10 +1607,11 @@ end
 function get_player_string(i_arena,i_aplyr,no_odds)
 	
 	local arena_player=arenas[i_arena][i_aplyr]
+	local r_str=r_names[arena_player[1]]
 	if no_odds then
-		return players[arena_player[1]][1]
+		return r_str
 	end
-	return players[arena_player[1]][1].." "..arena_player[4]..":1"
+	return r_str.." "..arena_player[4]..":1"
 end
 
 function calculate_winners()
