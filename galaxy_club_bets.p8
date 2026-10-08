@@ -7,20 +7,7 @@ function _init()
 	version,t=2,0
 	debug=split(",,,,,")
 	 cartdata("galaxy_club_bets")
-	category=split([[
-		movement,
-		obstacle,
-		powerup,
-		weather,
-		terrain,
-		ship-mod,
-		event,
-		section,
-		physics,
-		visibility,
-		condition,
-		hazard]])
-		
+	category=split([[movement, obstacle, powerup, weather, terrain, ship-mod, event, section, physics, visibility, condition, hazard]])
 	feature_names=split("hairpin,u-turn,straight,ramp,lavapit,spiketrap,rocks,boostpad,oil,slick,cannon,rain,highwind,heat,off-road,ice,glass,energy,glider,meteors,kaiju,wormhole,castle,caves,volcano,zero-g,rev-grav,darkness,fog,narrow,crumbling,lightning,fire")
 	feature_categories={{1,2},{1,2},{1},{1,9},{2,12},{2,12},{2,7},{3,1},{3,11},{3,12},{4,11},{4,9},{4,12},{5,11},{5,11},{5,11},{6,1},{6,9},{7,12},{7,12},{7,9},{8,5},{8,10},{8,4},{9,1},{9,1},{10},{10,4},{11,1},{11,2},{12,9},{12,4}}
 	-- features={
@@ -81,9 +68,9 @@ function _init()
 	-- 	{"kingshot","kng",17,{8},5},
 	-- 	{"ufo","ufo",13,{1},4},
 	-- }
-	r_names=split("bosco, admiral, dexter, pontoon, sailor, bucket, pod eng, merchant, scuttle, beluga, ant, turtle, beholder, trident, kingshot, ufo")
-	r_abriev=split("bos, adm, dxt, ptn, slr, bkt, pod, mer, sct, blg, ant, trt, bhd, trd, kng, ufo")
-	r_base=split(" 12, 11, 12, 14, 15, 16, 10, 10, 11, 17, 13, 14, 15, 16, 17, 13")
+	r_names=split("bosco,admiral,dexter,pontoon,sailor,bucket,pod-eng,merchant,scuttle,beluga,ant,turtle,beholder,trident,kingshot,ufo")
+	r_abriev=split("bos,adm,dxt,ptn,slr,bkt,pod,mer,sct,blg,ant,trt,bhd,trd,kng,ufo")
+	r_base=split("12,11,12,14,15,16,10,10,11,17,13,14,15,16,17,13")
 	r_weaknesses=split("3,10,5,2,7,11,8,8,6,10,5,4,1,6,5,4")
 	r_strengths={{9},{1,4},{2,7,12},{4,8},{5},{6},{1,3},{2,3},{4,9},{1,6,9},{10},{2,11},{9},{12},{8},{1} }
 	--used the helpful table from https://gurpsland.no-ip.org/articles/d6chance.htm
@@ -969,7 +956,9 @@ function upd_winning_bets()
 		else
 			finish_round()
 		end
-		
+	elseif btnp(❎) then
+		--go back
+		trn_state(init_race_results)
 	end
 end
 
