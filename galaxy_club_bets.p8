@@ -10,64 +10,12 @@ function _init()
 	category=split([[movement, obstacle, powerup, weather, terrain, ship-mod, event, section, physics, visibility, condition, hazard]])
 	feature_names=split("hairpin,u-turn,straight,ramp,lavapit,spiketrap,rocks,boostpad,oil,slick,cannon,rain,highwind,heat,off-road,ice,glass,energy,glider,meteors,kaiju,wormhole,castle,caves,volcano,zero-g,rev-grav,darkness,fog,narrow,crumbling,lightning,fire")
 	feature_categories={{1,2},{1,2},{1},{1,9},{2,12},{2,12},{2,7},{3,1},{3,11},{3,12},{4,11},{4,9},{4,12},{5,11},{5,11},{5,11},{6,1},{6,9},{7,12},{7,12},{7,9},{8,5},{8,10},{8,4},{9,1},{9,1},{10},{10,4},{11,1},{11,2},{12,9},{12,4}}
-	-- features={
-	-- 	{"hairpin",{1,2}},
-	-- 	{"u-turn",{1,2}},
-	-- 	{"straight",{1}},
-	-- 	{"ramp",{1,9}},
-	-- 	{"lavapit",{2,12}},
-	-- 	{"spiketrap",{2,12}},
-	-- 	{"rocks",{2,7}},
-	-- 	{"boostpad",{3,1}},
-	-- 	{"oil slick",{3,11}},
-	-- 	{"cannon",{3,12}},
-	-- 	{"rain",{4,11}},
-	-- 	{"highwind",{4,9}},
-	-- 	{"heat",{4,12}},
-	-- 	{"off-road",{5,11}},
-	-- 	{"ice",{5,11}},
-	-- 	{"glass",{5,11}},
-	-- 	{"energy",{6,1}},
-	-- 	{"glider",{6,9}},
-	-- 	{"meteors",{7,12}},
-	-- 	{"kaiju",{7,12}},
-	-- 	{"wormhole",{7,9}},
-	-- 	{"castle",{8,5}},
-	-- 	{"caves",{8,10}},
-	-- 	{"volcano",{8,4}},
-	-- 	{"zero-g",{9,1}},
-	-- 	{"rev-grav",{9,1}},
-	-- 	{"darkness",{10}},
-	-- 	{"fog",{10,4}},
-	-- 	{"narrow",{11,1}},
-	-- 	{"crumbling",{11,2}},
-	-- 	{"lightning",{12,9}},
-	-- 	{"fire",{12,4}}
-	-- }
 
 	--build initial bets
 	--a single bet for example is bet={amount(4char array), { {t,f,f,f},... }} 
 	-- where { {t,f,f,f},... } is the arenas and selected players
 
-	--{name,abreiv,base,{strengths category},weakness category}
-	-- players={
-	-- 	{"bosco","bos",12,{9},3},
-	-- 	{"admiral","adm",11,{1,4},10},
-	-- 	{"dexter","dxt",12,{2,7,12},5},
-	-- 	{"pontoon","ptn",14,{4,8},2},
-	-- 	{"sailor","slr",15,{5},7},
-	-- 	{"bucket","bkt",16,{6},11},
-	-- 	{"pod eng","pod",10,{1,3},8},
-	-- 	{"merchant","mer",10,{2,3},8},
-	-- 	{"scuttle","sct",11,{4,9},6},
-	-- 	{"beluga","blg",17,{1,6,9},10},
-	-- 	{"ant","ant",13,{10},5},
-	-- 	{"turtle","trt",14,{2,11},4},
-	-- 	{"beholder","bhd",15,{9},1},
-	-- 	{"trident","trd",16,{12},6},
-	-- 	{"kingshot","kng",17,{8},5},
-	-- 	{"ufo","ufo",13,{1},4},
-	-- }
+	--racer stats
 	r_names=split("bosco,admiral,dexter,pontoon,sailor,bucket,pod-eng,merchant,scuttle,beluga,ant,turtle,beholder,trident,kingshot,ufo")
 	r_abriev=split("bos,adm,dxt,ptn,slr,bkt,pod,mer,sct,blg,ant,trt,bhd,trd,kng,ufo")
 	r_base=split("12,11,12,14,15,16,10,10,11,17,13,14,15,16,17,13")
